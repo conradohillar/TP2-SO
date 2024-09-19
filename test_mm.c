@@ -1,4 +1,5 @@
 #include "test_util.h"
+#include "memoryManager.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,4 +59,12 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
       if (mm_rqs[i].address)
         free(mm_rqs[i].address);
   }
+}
+
+int main(int argc, char* argv[]) {
+    uint8_t array[BLOCK_SIZE * TOTAL_BLOCKS];
+    MemoryManagerADT my_mm;
+    
+    MemoryManagerADT mem_manager = freeArrayConstructor(&array, my_mm);
+    test_mm(argc, argv);
 }
