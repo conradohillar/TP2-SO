@@ -1,7 +1,7 @@
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
-#include "test_util.h"
+#include "test_mm.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,8 +12,6 @@
 
 typedef struct MemoryManagerCDT * MemoryManagerADT;
 
-MemoryManagerADT freeArrayConstructor(void* memory_start_address, MemoryManagerADT memory_manager_address);
-
 /*
 
 */
@@ -23,12 +21,5 @@ void * mm_malloc(uint64_t size);
 
 */
 void mm_free(void* ptr);
-
-//TEMPORAL
-typedef struct MemoryManagerCDT {
-    void* memory_start;   // Puntero al bloque de memoria inicial
-    int free_array[TOTAL_BLOCKS];  // Array que representa los bloques libres (usamos índices)
-    int free_index;  // Índice del primer bloque libre
-} MemoryManagerCDT;
 
 #endif
