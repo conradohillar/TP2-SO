@@ -1,8 +1,8 @@
 .tgdbinit
 .compile.sh
-# .config
-# .vscode
-# Bootloader/
-# Image/
-# Toolchain/
-# ./compile.sh
+.config
+.vscode
+Bootloader/
+Image/
+Toolchain/
+./compile.sh
