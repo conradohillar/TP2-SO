@@ -8,6 +8,7 @@ typedef int (*EntryPoint)();
 #include <stdint.h>
 #include <lib.h>
 #include <moduleLoader.h>
+#include <../memory/memoryManager.h>
 
 
 

@@ -1,4 +1,5 @@
 #include <kernel.h>
+#include "./include/textMode.h"
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -42,6 +43,30 @@ void * initializeKernelBinary()
 int main()
 {	
 	load_idt();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	// Testeo del Memory Manager
+
+	put_string_nt("Inicializando Memory Manager\n", 0x00FF00, 0x000000);
+    MemoryManagerADT mem_manager = freeArrayConstructor(MEM_START_ADDRESS, MEM_MANAGER_ADDRESS);
+    if (mem_manager == '\0') {
+		put_string_nt("Failed to initialize Memory Manager\n", 0xFF0000, 0x000000);
+        return -1;
+    }
+
+	put_string_nt("Creando variables\n", 0x00FF00, 0x000000);
+
+    uint64_t argc = 2;
+	char *argv[] = {"1000"};
+
+	put_string_nt("Ejecutando test_mm\n", 0x00FF00, 0x000000);
+
+    test_mm(argc - 1, argv);
+
+	put_string_nt("Error de test_mm\n", 0xFF0000, 0x000000);
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	((EntryPoint)sampleCodeModuleAddress)();
 	return 0;
 }
