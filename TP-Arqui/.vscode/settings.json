@@ -1,0 +1,32 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "idtloader.h": "c",
+        "naiveconsole.h": "c",
+        "syscalls.h": "c",
+        "keyboarddriver.h": "c",
+        "syscallsdispatcher.h": "c",
+        "videodriver.h": "c",
+        "textmode.h": "c",
+        "time.h": "c",
+        "shell.h": "c",
+        "libc.h": "c",
+        "registers.h": "c",
+        "moduleloader.h": "c",
+        "interrupts.h": "c",
+        "rtcdriver.h": "c",
+        "lib.h": "c",
+        "string.h": "c",
+        "syscaller.h": "c",
+        "syscall.h": "c",
+        "sounddriver.h": "c",
+        "song_book.h": "c",
+        "notes.h": "c",
+        "irqdispatcher.h": "c",
+        "libasm.h": "c",
+        "mytime.h": "c",
+        "exceptions.h": "c",
+        "kernel.h": "c",
+        "exceptionstester.h": "c"
+    }
+}
