@@ -1,0 +1,12 @@
+.tgdbinit
+<<<<<<< HEAD
+
+.compile.sh
+=======
+.config
+.vscode
+Bootloader/
+Image/
+Toolchain/
+./compile.sh
+>>>>>>> d952386fe453b1cfe5696dfd73952d794ae56f04
