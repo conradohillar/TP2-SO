@@ -1,1 +1,0 @@
-valgrind --leak-check=full --show-reachable=yes --track-origins=yes --show-leak-kinds=all --track-fds=yes ./test_program 1024
