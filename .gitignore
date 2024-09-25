@@ -1,6 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c,assembler,cmake,linux,windows,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,assembler,cmake,linux,windows,macos
-
+backup.c
 ### Assembler ###
 *.exe
 *.o

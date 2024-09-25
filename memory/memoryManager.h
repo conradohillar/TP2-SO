@@ -22,4 +22,6 @@ void * mm_malloc(uint64_t size);
 */
 void mm_free(void* ptr);
 
+void print_memory_state();
+
 #endif
