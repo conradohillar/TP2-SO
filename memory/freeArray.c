@@ -10,7 +10,7 @@
 
 #define MAX_LEVEL 16
 #define MEMORY_SIZE 65536 //
-#define MIN_LEVEL 2
+#define MIN_LEVEL 8
 
 typedef struct Block {
   struct Block *next;
@@ -50,7 +50,7 @@ void mm_init(void *mem_start_address, void *mem_manager_address) {
 
 void *mm_malloc(size_t size) {
   // Validations
-  if (size <= 2 || size > MEMORY_SIZE) {
+  if (size <= 0 || size > MEMORY_SIZE) {
     printf("Invalid size: %lu\n", size);
     return NULL;
   }
@@ -61,6 +61,8 @@ void *mm_malloc(size_t size) {
     level++;
     current_size *= 2;
   }
+
+  level = (MIN_LEVEL > level) ? MIN_LEVEL : level;
   printf("size: %lu, block size: %d, level: %d\n", size, current_size, --level);
 
   if (!memory_manager
@@ -104,10 +106,9 @@ void mm_free(void *ptr) {
   block->is_free = 1;
 
   uint64_t rel = (uint64_t)((void *)block - memory_manager->mem_start);
-
+    printf("%lu\n",(((uint64_t)rel) ^  (2L << block->level)));
   Block *buddy =
-      (Block *)((uint64_t)memory_manager->mem_start + (((uint64_t)rel) ^
-                                                       (2L << block->level)) /* + (uint64_t)(1 << (block->level + 1)) +  + (uint64_t)(1 << (block->level - 1))*/);
+      (Block *)((uint64_t)memory_manager->mem_start + (((uint64_t)rel) ^  (2L << block->level)) /* + (uint64_t)(1 << (block->level + 1)) +  + (uint64_t)(1 << (block->level - 1))*/);
   printf("In free: buddy at: %p, level: %lu, current block level: %ld, buddy "
          "is_free: %d\n",
          buddy, buddy->level, block->level, buddy->is_free);
@@ -116,9 +117,7 @@ void mm_free(void *ptr) {
     block = merge(block, buddy);
     rel = (uint64_t)((void *)block - memory_manager->mem_start);
     buddy = (Block *)((uint64_t)memory_manager->mem_start +
-                      (((uint64_t)rel) ^ (2L << block->level)) +
-                      (uint64_t)(1 << (block->level + 1)) +
-                      +(uint64_t)(1 << (block->level - 1)));
+                      (((uint64_t)rel) ^ (2L << block->level)));
     printf("\nIn while (free): buddy at: %p, level: %lu, current block level: "
            "%ld, buddy is_free: %d\n",
            buddy, buddy->level, block->level, buddy->is_free);
@@ -201,7 +200,7 @@ static Block *create_block(void *block_pointer, uint64_t level) {
   if (block_pointer == NULL) {
     printf("Error trying to create a pointer NULL\n");
   }
-  printf("%ld\n", block_pointer - memory_manager->mem_start);
+//   printf("created block at %p\n", block_pointer - memory_manager->mem_start);
   Block *new_block = (Block *)block_pointer;
   new_block->is_free = 1;
   new_block->level = level;
@@ -236,38 +235,45 @@ int main(int argc, char *argv[]) {
 
   MemoryManagerADT my_mm = malloc(sizeof(MemoryManagerCDT));
   Block *blocks = malloc(MEMORY_SIZE * 2);
-
   mm_init(blocks, my_mm);
-  printf("Created (%p - %p)\n", blocks, blocks + MEMORY_SIZE);
-  print_memory_state();
+//   printf("Created (%p - %p)\n", blocks, blocks + MEMORY_SIZE);
+//   print_memory_state();
 
-  // Prueba de asignación y liberación
-  // void *p1 = mm_malloc(120);
-  // printf("Passed malloc 1 at: %p\n", p1 - sizeof(Block));
-  // print_memory_state();
+//   void *p1 = mm_malloc(1200);
+//   printf("Passed malloc 1 at: %p\n", p1 - sizeof(Block));
+//   print_memory_state();
 
-  void *p2 = mm_malloc(569);
-  printf("Passed malloc 2 at: %p\n", p2 - sizeof(Block));
-  print_memory_state();
+//   void *p2 = mm_malloc(569);
+//   printf("Passed malloc 2 at: %p\n", p2 - sizeof(Block));
+//   print_memory_state();
 
-  // void *p3 = mm_malloc(1010);
-  // printf("Passed malloc 3\n");
-  // print_memory_state();
+//   void *p3 = mm_malloc(1010);
+//   printf("Passed malloc 3\n");
+//   print_memory_state();
 
-  // mm_free(p1);
-  // printf("Passed free 1 at: %p\n", p1 - sizeof(Block));
-  // print_memory_state();
+//   void *p4 = mm_malloc(32);
+//   printf("Passed malloc 4\n");
+//   print_memory_state();
 
-  mm_free(p2);
-  printf("Passed free 2 at: %p\n", p2 - sizeof(Block));
-  print_memory_state();
+//   mm_free(p1);
+//   printf("Passed free 1 at: %p\n", p1 - sizeof(Block));
+//   print_memory_state();
 
-  // mm_free(p3);
+//   mm_free(p2);
+//   printf("Passed free 2 at: %p\n", p2 - sizeof(Block));
+//   print_memory_state();
 
-  printf("Success\n");
-  return 0;
+//   mm_free(p3);
+//     printf("Passed free 3 at %p\n", p3- sizeof(Block));
+//     print_memory_state();
 
-  // mm_init();
+//     mm_free(p4);
+//     printf("Passed free 4 at: %p\n", p4 - sizeof(Block));
+//     print_memory_state();
+
+//   printf("Success\n");
+//   return 0;
+
   printf("Starting test:\n");
   test_mm(argc - 1, &argv[1]);
 
