@@ -1,10 +1,11 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
+// https://pvs-studio.com
 
+#include "test_util.h"
+#include "syscall.h"
 #include <stdint.h>
 #include <stdio.h>
-#include "syscall.h"
-#include "test_util.h"
 
 // Random
 static uint32_t m_z = 362436069;

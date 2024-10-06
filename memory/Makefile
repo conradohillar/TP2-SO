@@ -5,7 +5,7 @@ LDFLAGS =
 
 OBJS = $(SRCS:.c=.o)
 TARGET = test_program
-SRCS = test_mm.c freeArray.c test_util.c syscall.c
+SRCS = $(wildcard *.c)
 
 .PHONY: all clean
 
