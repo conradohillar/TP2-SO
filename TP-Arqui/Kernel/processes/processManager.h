@@ -1,23 +1,30 @@
-#ifndef PROCESS_H
-#define PROCESS_H
+#ifndef PROCESS_MANAGER_H
+#define PROCESS_MANAGER_H
 
 #include <stdint.h>
 
-#define MAX_PROCESS_COUNT 64
+typedef enum { READY, RUNNING, BLOCKED, KILLED } process_status;
+
+typedef uint32_t pid_t;
+
+typedef struct schedulerCDT *schedulerADT;
+
+typedef struct processManagerCDT *processManagerADT;
 
 typedef struct process_control_block {
   void *stack_base_pointer;
   void *stack_pointer;
-  uint64_t pid;
+  pid_t pid;
   uint64_t parent_pid;
-  uint64_t waiting_pid;
 
-  uint8_t name[32];
+  uint8_t *name;
   uint8_t **argv;
+  uint64_t argc;
 
+  uint8_t in_fg;
   uint8_t killable;
   uint8_t priority;
-  uint8_t status;
+  process_status status;
 
 } process_control_block;
 
@@ -43,13 +50,5 @@ typedef struct stack_template {
   uint64_t rsp;
   uint64_t ss;
 } stack_template;
-
-typedef void (*main_function)(int argc, char **argv);
-
-void kill(uint64_t pid);
-void block(uint64_t pid);
-void unblock(uint64_t pid);
-
-void wait();
 
 #endif

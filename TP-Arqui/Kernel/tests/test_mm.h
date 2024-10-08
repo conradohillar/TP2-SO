@@ -1,5 +1,5 @@
+#include "../memory/memoryManager.h"
 #include "test_util.h"
-#include "memoryManager.h"
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <string.h>
