@@ -67,3 +67,10 @@ ls
 exit
 exit
 exit
+cd ~
+ls
+ls -a
+./compile.sh
+gdb
+gdb
+exit

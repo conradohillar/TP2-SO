@@ -63,7 +63,7 @@ void unblock(uint64_t pid);
  * Kills a process.
  * @param pid The PID of the process to kill.
  */
-void kill(uint64_t pid);
+uint8_t kill(processManagerADT pm, uint64_t pid);
 
 /**
  * Waits for all child processes to finish.
