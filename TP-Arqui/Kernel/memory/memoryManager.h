@@ -5,10 +5,6 @@
 
 #define TOTAL_BLOCKS 1000 // Total de bloques de memoria
 #define BLOCK_SIZE 2048   // Tamaño de cada bloque (en bytes)
-#define MEM_START_ADDRESS 0x200000
-#define MEM_MANAGER_ADDRESS                                                    \
-  0x050000 // Dirección de memoria para el Memory Manager (segun Pure64 alli
-           // esta libre)
 
 typedef struct MemoryManagerCDT *MemoryManagerADT;
 

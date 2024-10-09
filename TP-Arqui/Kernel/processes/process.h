@@ -45,30 +45,30 @@ uint64_t getppid();
  * @param pid The PID of the process.
  * @param priority The new priority.
  */
-void setpriority(uint64_t pid, uint8_t priority);
+uint16_t setpriority(processManagerADT pm, uint64_t pid, uint8_t priority);
 
 /**
  * Blocks a process.
  * @param pid The PID of the process to block.
  */
-void block(uint64_t pid);
+uint16_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
 
 /**
  * Unblocks a process.
  * @param pid The PID of the process to unblock.
  */
-void unblock(uint64_t pid);
+uint16_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
 
 /**
  * Kills a process.
  * @param pid The PID of the process to kill.
  */
-void kill(uint64_t pid);
+uint8_t kill(processManagerADT pm, uint64_t pid, schedulerADT scheduler);
 
 /**
  * Waits for all child processes to finish.
  */
-void wait();
+void wait(processManagerADT pm, uint64_t pid, schedulerADT scheduler);
 
 /**
  * Yields the CPU to the next process.

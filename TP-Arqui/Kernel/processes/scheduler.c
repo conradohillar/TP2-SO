@@ -53,3 +53,14 @@ void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb) {
   scheduler->unblocked_processes[scheduler->next_index].tail_index =
       scheduler->unblocked_processes[scheduler->current_index].tail_index;
 }
+
+void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb) {
+  for (int i = 0; i < scheduler->unblocked_process_count; i++) {
+    if (scheduler->unblocked_processes[i].pcb == pcb) {
+      scheduler->next_index = scheduler->current_index;
+      scheduler->current_index = i;
+    }
+  }
+}
+
+uint64_t schedule(uint64_t prev_sp) {}

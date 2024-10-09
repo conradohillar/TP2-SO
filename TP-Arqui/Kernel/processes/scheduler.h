@@ -14,6 +14,6 @@ uint64_t schedule(uint64_t prev_sp);
 
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
-void remove_from_scheduler(uint64_t pid);
+void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
 #endif

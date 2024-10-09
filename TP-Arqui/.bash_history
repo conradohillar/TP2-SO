@@ -67,3 +67,10 @@ ls
 exit
 exit
 exit
+cd root
+pwd
+ls
+exit
+cd root
+ls
+exit

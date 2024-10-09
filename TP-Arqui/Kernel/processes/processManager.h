@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef enum { READY, RUNNING, BLOCKED, KILLED } process_status;
+typedef enum { READY, RUNNING, BLOCKED, KILLED, ZOMBIE } process_status;
 
 typedef uint32_t pid_t;
 
@@ -25,6 +25,9 @@ typedef struct process_control_block {
   uint8_t killable;
   uint8_t priority;
   process_status status;
+
+  uint8_t waited;
+  uint8_t waiting;
 
 } process_control_block;
 
