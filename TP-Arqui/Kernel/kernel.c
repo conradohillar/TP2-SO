@@ -8,6 +8,9 @@ extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
 
+schedulerADT my_scheduler = NULL;
+processManagerADT my_pm = NULL;
+
 static const uint64_t PageSize = 0x1000;
 
 static void *const sampleCodeModuleAddress = (void *)0x400000;
@@ -35,7 +38,7 @@ int main() {
 
   put_string_nt("Inicializando Memory Manager\n", 0x00FF00, 0x000000);
   MemoryManagerADT mem_manager =
-      freeArrayConstructor(MEM_START_ADDRESS, MEM_MANAGER_ADDRESS);
+      create_memory_manager(MEM_START_ADDRESS, MEM_MANAGER_ADDRESS);
   if (mem_manager == '\0') {
     put_string_nt("Failed to initialize Memory Manager\n", 0xFF0000, 0x000000);
     return -1;
@@ -57,21 +60,21 @@ int main() {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // Testeo de los procesos
-  put_string_nt("Creando scheduler\n", 0x00FF00, 0x000000);
-  schedulerADT scheduler = create_scheduler();
-  if (scheduler == NULL) {
-    put_string_nt("Error creando scheduler\n", 0xFF0000, 0x000000);
+  put_string_nt("Creando my_scheduler\n", 0x00FF00, 0x000000);
+  my_scheduler = create_scheduler();
+  if (my_scheduler == NULL) {
+    put_string_nt("Error creando my_scheduler\n", 0xFF0000, 0x000000);
     return -1;
   }
   put_string_nt("Creando process manager\n", 0x00FF00, 0x000000);
-  processManagerADT pm = create_process_manager();
-  if (pm == NULL) {
+  my_pm = create_process_manager();
+  if (my_pm == NULL) {
     put_string_nt("Error creando process manager\n", 0xFF0000, 0x000000);
     return -1;
   }
   put_string_nt("Ejecutando test_processes\n", 0x00FF00, 0x000000);
   char *argv[] = {"64"};
-  test_processes(1, argv, pm, scheduler);
+  test_processes(1, argv, my_pm, my_scheduler);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
 

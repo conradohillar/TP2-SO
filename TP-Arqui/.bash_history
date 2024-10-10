@@ -81,3 +81,6 @@ ls -a
 gdb
 gdb
 exit
+cd root
+ls
+exit

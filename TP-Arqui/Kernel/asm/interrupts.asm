@@ -62,8 +62,9 @@ SECTION .text
 	pushState
 
 	mov rdi, %1 ; pasaje de parametro
+	mov rsi, rsp
 	call irq_dispatcher
-
+	mov rsp, rax
 	; signal pic EOI (End of Interrupt)
 	mov al, 20h
 	out 20h, al

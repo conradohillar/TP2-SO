@@ -54,4 +54,6 @@ typedef struct stack_template {
   uint64_t ss;
 } stack_template;
 
+uint64_t context_switch(schedulerADT scheduler, uint64_t stack_pointer);
+
 #endif

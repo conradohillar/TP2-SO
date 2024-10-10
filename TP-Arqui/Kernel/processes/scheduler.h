@@ -10,7 +10,7 @@
  */
 schedulerADT create_scheduler();
 
-uint64_t schedule(uint64_t prev_sp);
+uint64_t schedule(schedulerADT scheduler, uint64_t prev_sp);
 
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 

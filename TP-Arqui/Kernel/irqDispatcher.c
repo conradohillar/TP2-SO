@@ -1,24 +1,22 @@
 #include <irqDispatcher.h>
 
-void irq_dispatcher(uint64_t irq) {
-	switch (irq) {
-		case 0:
-			int_20();
-			break;
-		case 1:
-			int_21();
-			break;
+extern schedulerADT my_scheduler;
 
-		default:
-			break;
-	}
-	return;
+uint64_t irq_dispatcher(uint64_t irq, uint64_t stack_pointer) {
+  switch (irq) {
+  case 0:
+    return int_20(stack_pointer);
+  case 1:
+    return int_21();
+
+  default:
+    break;
+  }
+  return;
 }
 
-void int_20() {
-	timer_handler();
+uint64_t int_20(uint64_t stack_pointer) {
+  return timer_handler(my_scheduler, stack_pointer);
 }
 
-void int_21() {
-	keyboard_handler();
-}
+uint64_t int_21() { keyboard_handler(); }

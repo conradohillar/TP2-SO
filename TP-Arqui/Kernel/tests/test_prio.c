@@ -1,7 +1,10 @@
+#include "../include/syscalls.h"
+#include "../include/textMode.h"
+#include "../processes/process.h"
+#include "../processes/processManager.h"
+#include "../processes/scheduler.h"
 #include "syscall.h"
 #include "test_util.h"
-#include <stdint.h>
-#include <stdio.h>
 
 #define MINOR_WAIT                                                             \
   1000000 // TODO: Change this value to prevent a process from flooding the
@@ -11,45 +14,53 @@
            // processes beeing run at least twice
 
 #define TOTAL_PROCESSES 3
-#define LOWEST 0  // TODO: Change as required
-#define MEDIUM 1  // TODO: Change as required
-#define HIGHEST 2 // TODO: Change as required
+#define LOWEST 1  // TODO: Change as required
+#define MEDIUM 2  // TODO: Change as required
+#define HIGHEST 3 // TODO: Change as required
 
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
+void holaquetal(uint64_t argc, uint8_t **argv);
 
-void test_prio() {
+void test_prio(uint64_t argc, char *argv[], processManagerADT pm,
+               schedulerADT scheduler) {
   int64_t pids[TOTAL_PROCESSES];
-  char *argv[] = {0};
   uint64_t i;
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    pids[i] = my_create_process("endless_loop_print", 0, argv);
+    pids[i] = create_process(scheduler, pm, &holaquetal, argv, 10,
+                             "endless_loop_print", INIT_PID, LOWEST, 1, 1);
 
   bussy_wait(WAIT);
   // printf("\nCHANGING PRIORITIES...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    my_nice(pids[i], prio[i]);
+    setpriority(pm, pids[i], prio[i]);
 
   bussy_wait(WAIT);
   // printf("\nBLOCKING...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    my_block(pids[i]);
+    block(pm, scheduler, pids[i]);
 
   // printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    my_nice(pids[i], MEDIUM);
+    setpriority(pm, pids[i], MEDIUM);
 
   // printf("UNBLOCKING...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    my_unblock(pids[i]);
+    unblock(pm, scheduler, pids[i]);
 
   bussy_wait(WAIT);
   // printf("\nKILLING...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    my_kill(pids[i]);
+    kill(pm, pids[i], scheduler);
+}
+
+void holaquetal(uint64_t argc, uint8_t **argv) {
+  while (1)
+    put_string_nt("Holaquetal jaja\n", BLUE, BLACK);
+  return 0;
 }

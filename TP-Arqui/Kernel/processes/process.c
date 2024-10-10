@@ -6,6 +6,9 @@
 #include "../memory/memoryManager.h"
 #include "./scheduler.h"
 
+extern schedulerADT my_scheduler;
+extern processManagerADT my_pm;
+
 static void init_pcb(process_control_block *pcb, main_function code,
                      uint64_t pid, uint64_t ppid, char **argv, uint64_t argc,
                      uint8_t *name, uint8_t priority, uint8_t killable,
@@ -42,6 +45,12 @@ processManagerADT create_process_manager() {
   return pm;
 }
 
+void process_wrapper(main_function code, uint64_t argc, uint8_t **argv) {
+  code(argc, argv);
+  kill(my_pm, getpid(), my_scheduler);
+  exit();
+}
+
 uint16_t create_process(schedulerADT scheduler,
                         processManagerADT process_manager, main_function code,
                         char **argv, uint64_t argc, char *name, uint64_t ppid,
@@ -57,8 +66,8 @@ uint16_t create_process(schedulerADT scheduler,
     return -1;
   }
 
-  init_pcb(new_pcb, code, process_manager->next_pid, ppid, argv, argc, name,
-           priority, killable, in_fg);
+  init_pcb(new_pcb, &process_wrapper, process_manager->next_pid, ppid, argv,
+           argc, name, priority, killable, in_fg);
 
   process_manager->process_table[process_manager->next_pid].pcb = new_pcb;
   process_manager->current_pid = process_manager->next_pid;
@@ -169,8 +178,10 @@ void wait(processManagerADT pm, uint64_t pid, schedulerADT scheduler) {
   for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
     if (pm->process_table[i].pcb != NULL &&
         pm->process_table[i].pcb->parent_pid == pid &&
-        pm->process_table[i].pcb->status == ZOMBIE)
+        pm->process_table[i].pcb->status == ZOMBIE) {
+      kill(pm, i, scheduler);
       return;
+    }
   }
   // Si no, lo bloqueo
 
