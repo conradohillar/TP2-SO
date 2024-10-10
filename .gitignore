@@ -149,6 +149,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+.cache 
+.bash_history
 test_mm
 
 # End of https://www.toptal.com/developers/gitignore/api/c,assembler,cmake,linux,windows,macos

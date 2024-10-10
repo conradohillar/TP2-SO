@@ -74,3 +74,10 @@ exit
 cd root
 ls
 exit
+cd ~
+ls
+ls -a
+./compile.sh
+gdb
+gdb
+exit
