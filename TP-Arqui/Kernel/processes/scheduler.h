@@ -5,12 +5,18 @@
 
 #define NULL '\0'
 
+typedef struct scheduler_node {
+  process_control_block *pcb;
+  struct scheduler_node *next;
+  uint64_t remaining_quantum;
+} scheduler_node;
+
 /**
  * Creates a new scheduler.
  */
 schedulerADT create_scheduler();
 
-uint64_t schedule(schedulerADT scheduler, uint64_t prev_sp);
+scheduler_node *schedule(schedulerADT scheduler);
 
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 

@@ -14,11 +14,6 @@ static void init_pcb(process_control_block *pcb, main_function code,
                      uint8_t *name, uint8_t priority, uint8_t killable,
                      uint8_t in_fg);
 
-typedef struct process_node {
-  process_control_block *pcb;
-  uint16_t next_index;
-} process_node;
-
 struct processManagerCDT {
   process_node process_table[MAX_PROCESS_COUNT];
   uint64_t next_pid;
@@ -70,9 +65,8 @@ uint16_t create_process(schedulerADT scheduler,
            argc, name, priority, killable, in_fg);
 
   process_manager->process_table[process_manager->next_pid].pcb = new_pcb;
-  process_manager->current_pid = process_manager->next_pid;
   process_manager->next_pid =
-      process_manager->process_table[process_manager->current_pid].next_index;
+      process_manager->process_table[process_manager->next_pid].next_index;
   process_manager->process_count++;
   add_to_scheduler(scheduler, new_pcb);
 }

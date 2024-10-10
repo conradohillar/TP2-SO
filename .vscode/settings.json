@@ -1,8 +1,9 @@
 {
-    "files.associations": {
-        "memorymanageradt.h": "c",
-        "stdlib.h": "c",
-        "listutils.h": "c",
-        "process.h": "c"
-    }
+  "files.associations": {
+    "memorymanageradt.h": "c",
+    "stdlib.h": "c",
+    "listutils.h": "c",
+    "process.h": "c",
+    "irqdispatcher.h": "c"
+  }
 }

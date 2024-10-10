@@ -7,6 +7,11 @@
 #define STACK_SIZE_BYTES 4096
 #define INIT_PID 0
 
+typedef struct process_node {
+  process_control_block *pcb;
+  uint16_t next_index;
+} process_node;
+
 typedef process_control_block *process_table[MAX_PROCESS_COUNT];
 
 typedef void (*main_function)(int argc, char **argv);

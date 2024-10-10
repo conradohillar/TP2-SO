@@ -39,7 +39,8 @@ create_memory_manager(void *memory_start_address,
 void *mm_malloc(uint64_t size) {
 
   // Verifica que el tamaño sea válido y que haya bloques libres
-  if (size > BLOCK_SIZE || mem_manager->free_index == -1) {
+  if (size > BLOCK_SIZE ||
+      mem_manager->free_array[mem_manager->free_index] == -1) {
     return '\0';
   }
   int block_idx =

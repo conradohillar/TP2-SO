@@ -1,5 +1,5 @@
-#ifndef _IRQDISPATHCER_H
-#define _IRQDISPATHCER_H
+#ifndef _IRQDISPATCHER_H
+#define _IRQDISPATCHER_H
 
 #include <keyboardDriver.h>
 #include <mytime.h>
@@ -7,7 +7,7 @@
 #include <videoDriver.h>
 
 uint64_t int_20(uint64_t stack_pointer);
-uint64_t int_21();
+uint64_t int_21(uint64_t stack_pointer);
 
 uint64_t irq_dispatcher(uint64_t irq, uint64_t stack_pointer);
 
