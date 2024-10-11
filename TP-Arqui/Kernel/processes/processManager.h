@@ -25,8 +25,6 @@ typedef struct process_control_block {
   uint8_t killable;
   uint8_t priority;
   process_status status;
-
-  uint8_t waited;
   uint8_t waiting;
 
 } process_control_block;

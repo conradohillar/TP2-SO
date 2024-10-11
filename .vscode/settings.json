@@ -9,6 +9,6 @@
     "kernel.h": "c",
     "scheduler.h": "c",
     "memorymanager.h": "c",
-    "list.h": "c"
+    "list.h": "c",
   }
 }

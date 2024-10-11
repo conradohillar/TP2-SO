@@ -32,7 +32,6 @@ void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb) {
 
   scheduler_data *new_node = mm_malloc(sizeof(scheduler_data));
   if (new_node == NULL) {
-    put_string_nt("ACA\n", 0xFF0000, 0x000000);
     put_string_nt("Error adding to scheduler\n", 0xFF0000, 0x000000);
     return;
   }
@@ -50,6 +49,7 @@ void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb) {
   remove_from_list(scheduler->list, pcb);
   if (scheduler->running->pcb == pcb) {
     scheduler->running = list_next(scheduler->list);
+    scheduler->running->pcb->status = RUNNING;
   }
 }
 
@@ -60,6 +60,7 @@ scheduler_data *schedule(schedulerADT scheduler) {
 
   if (scheduler->running == NULL) {
     scheduler->running = list_next(scheduler->list);
+    scheduler->running->pcb->status = RUNNING;
     scheduler->running->remaining_quantum--;
     return scheduler->running;
   }
@@ -67,6 +68,7 @@ scheduler_data *schedule(schedulerADT scheduler) {
   if (scheduler->running->remaining_quantum == 0) {
     scheduler->running->remaining_quantum = scheduler->running->pcb->priority;
     scheduler->running = list_next(scheduler->list);
+    scheduler->running->pcb->status = RUNNING;
   }
 
   scheduler->running->remaining_quantum--;
@@ -74,7 +76,7 @@ scheduler_data *schedule(schedulerADT scheduler) {
 }
 
 uint64_t context_switch(schedulerADT scheduler, uint64_t stack_pointer) {
-  if (!is_empty(scheduler->list)) {
+  if (scheduler->running != NULL) {
     scheduler->running->pcb->stack_pointer = (void *)stack_pointer;
   }
 

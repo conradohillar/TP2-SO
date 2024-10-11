@@ -41,7 +41,7 @@ int main() {
   put_string_nt("Inicializando Memory Manager\n", 0x00FF00, 0x000000);
   memoryManagerADT mem_manager =
       create_memory_manager(MEM_START_ADDRESS, MEM_MANAGER_ADDRESS);
-  if (mem_manager == '\0') {
+  if (mem_manager == NULL) {
     put_string_nt("Failed to initialize Memory Manager\n", 0xFF0000, 0x000000);
     return -1;
   }
@@ -68,12 +68,15 @@ int main() {
     put_string_nt("Error creando my_scheduler\n", 0xFF0000, 0x000000);
     return -1;
   }
+
   put_string_nt("Creando process manager\n", 0x00FF00, 0x000000);
-  my_pm = create_process_manager();
+  my_pm = create_process_manager(my_scheduler);
   if (my_pm == NULL) {
     put_string_nt("Error creando process manager\n", 0xFF0000, 0x000000);
     return -1;
   }
+
+  _sti();
 
   // // MI TESTEO DE PROCESOS
   // _cli();
@@ -120,7 +123,7 @@ int main() {
                  3, 1, 1);
 
   put_string_nt("\nScheduling ... \n", 0x00FF00, 0x000000);
-  uint8_t count = 20;
+  uint8_t count = 30;
   scheduler_data *aux = NULL;
   while (count) {
     aux = schedule(my_scheduler);
@@ -130,14 +133,13 @@ int main() {
     count--;
   }
 
-  mm_free(my_pm);
+  destroy_process_table(my_pm);
   put_string_nt("\nLiberando my_pm\n", 0x00FF00, 0x000000);
   destroy_scheduler(my_scheduler);
   put_string_nt("Liberando my_scheduler\n", 0x00FF00, 0x000000);
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   // ((EntryPoint)sampleCodeModuleAddress)();
-  _sti();
 
   return 0;
 }

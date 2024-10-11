@@ -1,6 +1,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+#include "../include/interrupts.h"
 #include "./processManager.h"
 
 #define MAX_PROCESS_COUNT 64
@@ -18,7 +19,7 @@ typedef void (*wrapper_fn)(main_fn code, int argc, char **argv);
 /**
  * Creates a new process table.
  */
-processManagerADT create_process_manager();
+processManagerADT create_process_manager(schedulerADT scheduler);
 
 /**
  * Creates a new process.
@@ -34,6 +35,36 @@ uint64_t create_process(schedulerADT scheduler,
                         uint8_t **argv, uint64_t argc, uint8_t *name,
                         uint64_t ppid, uint8_t priority, uint8_t killable,
                         uint8_t in_fg);
+
+void init_process(int argc, char **argv);
+
+/**
+ * Exits the current process.
+ */
+uint8_t exit(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+
+/**
+ * Kills a process.
+ * @param pid The PID of the process to kill.
+ */
+uint8_t kill(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+
+/**
+ * Waits for all child processes to finish.
+ */
+void wait(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+
+/**
+ * Blocks a process.
+ * @param pid The PID of the process to block.
+ */
+uint8_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+
+/**
+ * Unblocks a process.
+ * @param pid The PID of the process to unblock.
+ */
+uint8_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
 
 /**
  * Returns the PID of the current process.
@@ -53,31 +84,13 @@ uint64_t getppid();
 uint16_t setpriority(processManagerADT pm, uint64_t pid, uint8_t priority);
 
 /**
- * Blocks a process.
- * @param pid The PID of the process to block.
- */
-uint16_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
-
-/**
- * Unblocks a process.
- * @param pid The PID of the process to unblock.
- */
-uint16_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
-
-/**
- * Kills a process.
- * @param pid The PID of the process to kill.
- */
-uint8_t kill(processManagerADT pm, uint64_t pid, schedulerADT scheduler);
-
-/**
- * Waits for all child processes to finish.
- */
-void wait(processManagerADT pm, uint64_t pid, schedulerADT scheduler);
-
-/**
  * Yields the CPU to the next process.
  */
 void yield();
+
+/**
+ * Destroys the process table.
+ */
+void destroy_process_table(processManagerADT pm);
 
 #endif

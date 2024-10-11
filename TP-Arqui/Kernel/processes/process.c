@@ -6,21 +6,25 @@
 #include "../memory/memoryManager.h"
 #include "./scheduler.h"
 
-extern schedulerADT my_scheduler;
-extern processManagerADT my_pm;
-
-static void init_pcb(process_control_block *pcb, wrapper_fn wrapper,
+static void pcb_init(process_control_block *pcb, wrapper_fn wrapper,
                      main_fn code, uint64_t pid, uint64_t ppid, uint8_t **argv,
                      uint64_t argc, uint8_t *name, uint8_t priority,
                      uint8_t killable, uint8_t in_fg);
 
+static void process_wrapper(main_fn code, uint64_t argc, uint8_t **argv,
+                            processManagerADT pm, schedulerADT scheduler);
+
+static uint8_t terminate_process(processManagerADT pm, schedulerADT scheduler,
+                                 uint64_t pid, process_status status);
+
 struct processManagerCDT {
   process_node process_table[MAX_PROCESS_COUNT];
   uint64_t next_pid;
+  uint64_t current_pid;
   uint64_t process_count;
 } processManagerCDT;
 
-processManagerADT create_process_manager() {
+processManagerADT create_process_manager(schedulerADT scheduler) {
 
   processManagerADT pm = mm_malloc(sizeof(processManagerCDT));
   if (pm == NULL) {
@@ -34,15 +38,13 @@ processManagerADT create_process_manager() {
   pm->process_table[MAX_PROCESS_COUNT - 1].next_index = -1;
 
   pm->next_pid = 0;
+  pm->current_pid = -1;
   pm->process_count = 0;
-  return pm;
-}
 
-void process_wrapper(main_fn code, uint64_t argc, uint8_t **argv,
-                     processManagerADT pm, schedulerADT scheduler) {
-  code(argc, argv);
-  exit(pm, scheduler, getpid());
-  // , sacar del scheduler, kill y free
+  // INIT process
+  create_process(scheduler, pm, &init_process, NULL, 0, "init", -1, 1, 0, 0);
+
+  return pm;
 }
 
 uint64_t create_process(schedulerADT scheduler,
@@ -61,12 +63,16 @@ uint64_t create_process(schedulerADT scheduler,
     return -1;
   }
 
-  init_pcb(new_pcb, &process_wrapper, code, process_manager->next_pid, ppid,
+  pcb_init(new_pcb, &process_wrapper, code, process_manager->next_pid, ppid,
            argv, argc, name, priority, killable, in_fg);
 
   process_manager->process_table[process_manager->next_pid].pcb = new_pcb;
+
   process_manager->next_pid =
       process_manager->process_table[process_manager->next_pid].next_index;
+
+  process_manager->current_pid = new_pcb->pid;
+
   process_manager->process_count++;
 
   add_to_scheduler(scheduler, new_pcb);
@@ -74,7 +80,7 @@ uint64_t create_process(schedulerADT scheduler,
   return new_pcb->pid;
 }
 
-static void init_pcb(process_control_block *pcb, wrapper_fn wrapper,
+static void pcb_init(process_control_block *pcb, wrapper_fn wrapper,
                      main_fn code, uint64_t pid, uint64_t ppid, uint8_t **argv,
                      uint64_t argc, uint8_t *name, uint8_t priority,
                      uint8_t killable, uint8_t in_fg) {
@@ -114,49 +120,67 @@ static void init_pcb(process_control_block *pcb, wrapper_fn wrapper,
   pcb->killable = killable;
   pcb->priority = priority;
   pcb->status = READY;
-
-  pcb->waited = 0;
   pcb->waiting = 0;
-
   pcb->in_fg = in_fg;
 }
 
-uint8_t kill(processManagerADT pm, uint64_t pid, schedulerADT scheduler) {
+static void process_wrapper(main_fn code, uint64_t argc, uint8_t **argv,
+                            processManagerADT pm, schedulerADT scheduler) {
+  code(argc, argv);
+  exit(pm, scheduler, getpid(pm));
+}
+
+uint8_t exit(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
+  return terminate_process(pm, scheduler, pid, ZOMBIE);
+}
+
+uint8_t kill(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
+  return terminate_process(pm, scheduler, pid, KILLED);
+}
+
+static uint8_t terminate_process(processManagerADT pm, schedulerADT scheduler,
+                                 uint64_t pid, process_status status) {
   if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
       pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->killable == 0) {
     return -1;
   }
 
-  if (pm->process_table[pid].pcb->status == READY) {
-    remove_from_scheduler(scheduler, pm->process_table[pid].pcb);
-  }
-  pm->process_table[pid].pcb->status = KILLED;
+  if (pm->process_table[pid].pcb->status == KILLED) {
+    return 0;
 
-  for (int i = 0; i < pm->process_count; i++) {
-    if (pm->process_table[i].pcb->parent_pid == pid) {
-      pm->process_table[i].pcb->parent_pid = INIT_PID;
-      // OR KILL
+  } else if (pm->process_table[pid].pcb->status != ZOMBIE) {
+
+    pm->process_table[pid].pcb->status = status;
+
+    // Remove from scheduler
+    if (pm->process_table[pid].pcb->status != BLOCKED) {
+      remove_from_scheduler(scheduler, pm->process_table[pid].pcb);
+    }
+
+    // Make orphan children INIT children
+    for (int i = 0; i < pm->process_count; i++) {
+      if (pm->process_table[i].pcb->parent_pid == pid) {
+        pm->process_table[i].pcb->parent_pid = INIT_PID;
+      }
+    }
+
+    // Check if parent was waiting
+    uint32_t ppid = pm->process_table[pid].pcb->parent_pid;
+    if (pm->process_table[ppid].pcb->waiting) {
+      pm->process_table[ppid].pcb->waiting = 0;
+      pm->process_table[ppid].pcb->status = READY;
+      add_to_scheduler(scheduler, pm->process_table[ppid].pcb);
     }
   }
 
-  uint32_t ppid = pm->process_table[pid].pcb->parent_pid;
-  // tengo que ver si el padre lo estaba esperando
-  if (pm->process_table[ppid].pcb->waiting) {
-    pm->process_table[ppid].pcb->waiting = 0;
-    pm->process_table[ppid].pcb->status =
-        READY; // HAY QUE VER SI ES LO QUE QUIEREN
-    add_to_scheduler(scheduler, pm->process_table[ppid].pcb);
-  }
-
-  // Desalojo de la tabla
-  if (pm->process_table[pid].pcb->waited ||
-      pm->process_table[pid].pcb->parent_pid == INIT_PID) {
+  // If it's INIT's child, remove from process_table and free
+  if (pm->process_table[pid].pcb->parent_pid == INIT_PID) {
     // IMPLEMENTAR UN free_process
     mm_free(pm->process_table[pid].pcb);
     pm->process_table[pid].pcb = NULL;
-    // Chequear por las dudas
-    uint32_t aux_pid = pm->next_pid;
+
+    uint64_t aux_pid = pm->next_pid;
     pm->next_pid = pid;
     pm->process_table[pid].next_index = aux_pid;
   }
@@ -164,32 +188,28 @@ uint8_t kill(processManagerADT pm, uint64_t pid, schedulerADT scheduler) {
   return 0;
 }
 
-// cuando hago wait hago kill y eso lo mata definitivo
-
-void wait(processManagerADT pm, uint64_t pid, schedulerADT scheduler) {
+void wait(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
   if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
       pm->process_table[pid].pcb == NULL) {
     return;
   }
 
-  // Si habia un hijo que habia terminado esperando un wait, entonces sigo
   for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
     if (pm->process_table[i].pcb != NULL &&
         pm->process_table[i].pcb->parent_pid == pid &&
         pm->process_table[i].pcb->status == ZOMBIE) {
-      kill(pm, i, scheduler);
+      unblock(pm, scheduler, pid);
+      kill(pm, scheduler, i);
       return;
     }
   }
-  // Si no, lo bloqueo
 
-  pm->process_table[pid].pcb->status = BLOCKED;
-  pm->process_table[pid].pcb->waiting = 1; // DESPUES HACEMOS ENUM O DEFINE
-  remove_from_scheduler(scheduler, pm->process_table[pid].pcb);
-  return;
+  // In case no children has finished, block parent
+  pm->process_table[pid].pcb->waiting = 1;
+  block(pm, scheduler, pid);
 }
 
-uint16_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
+uint8_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
   if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
       pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->status == BLOCKED ||
@@ -202,11 +222,10 @@ uint16_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
   return 0;
 }
 
-uint16_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
+uint8_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
   if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
       pm->process_table[pid].pcb == NULL ||
-      pm->process_table[pid].pcb->status == READY ||
-      pm->process_table[pid].pcb->status == KILLED) {
+      pm->process_table[pid].pcb->status != BLOCKED) {
     return -1;
   }
 
@@ -215,9 +234,16 @@ uint16_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
   return 0;
 }
 
+uint64_t getpid(processManagerADT pm) { return pm->current_pid; }
+
+uint64_t getppid(processManagerADT pm) {
+  return pm->process_table[pm->current_pid].pcb->parent_pid;
+}
+
 uint16_t setpriority(processManagerADT pm, uint64_t pid, uint8_t priority) {
   if (pid < 0 || pid >= MAX_PROCESS_COUNT ||
-      pm->process_table[pid].pcb == NULL) {
+      pm->process_table[pid].pcb == NULL ||
+      pm->process_table[pid].pcb->status == KILLED) {
     return -1;
   }
 
@@ -225,30 +251,19 @@ uint16_t setpriority(processManagerADT pm, uint64_t pid, uint8_t priority) {
   return 0;
 }
 
-uint64_t getpid() { return my_pm->process_table[my_pm->next_pid].pcb->pid; }
-
-uint64_t getppid() {
-  return my_pm->process_table[my_pm->next_pid].pcb->parent_pid;
-}
-
-void exit(processManagerADT pm, schedulerADT scheduler, uint64_t pid) {
-  pm->process_table[pid].pcb->status = ZOMBIE;
-  uint64_t ppid = pm->process_table[pid].pcb->parent_pid;
-  if (pm->process_table[ppid].pcb->waiting) {
-    pm->process_table[ppid].pcb->waiting = 0;
-    pm->process_table[ppid].pcb->status = READY;
-    add_to_scheduler(scheduler, pm->process_table[ppid].pcb);
-  }
-
+void destroy_process_table(processManagerADT pm) {
   for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-    if (pm->process_table[i].pcb != NULL &&
-        pm->process_table[i].pcb->parent_pid == pid) {
-      pm->process_table[i].pcb->parent_pid = INIT_PID;
+    if (pm->process_table[i].pcb != NULL) {
+      mm_free(pm->process_table[i].pcb);
     }
   }
+  mm_free(pm);
+}
 
-  remove_from_scheduler(scheduler, pm->process_table[pid].pcb);
-  kill(pm, pid, scheduler); // HAY QUE HACER ESTE KILL?
+void init_process(int argc, char **argv) {
+  while (1) {
+    _hlt();
+  }
 }
 
 process_control_block *getPCB(processManagerADT pm, uint64_t pid) {
