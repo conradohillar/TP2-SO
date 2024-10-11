@@ -39,6 +39,7 @@ void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb) {
 
   if (scheduler->size == 0) {
     scheduler->first = new_node;
+    scheduler->running = new_node;
   } else {
     scheduler->last->next = new_node;
   }
@@ -66,6 +67,7 @@ void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb) {
           scheduler->last = prev;
         }
       }
+      mm_free(current);
       scheduler->size--;
       if (scheduler->size == 0) {
         scheduler->first = NULL;
@@ -82,10 +84,6 @@ void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb) {
 scheduler_node *schedule(schedulerADT scheduler) {
   if (scheduler->size == 0) {
     return NULL;
-  }
-
-  if (scheduler->size == 1) {
-    scheduler->running = scheduler->first;
   }
 
   if (scheduler->running->remaining_quantum == 0) {
@@ -126,4 +124,17 @@ void print_scheduler(schedulerADT scheduler) {
     prev = current;
     current = prev->next;
   }
+}
+
+void print_schedule_info(scheduler_node *node) {
+  put_string_nt((uint8_t *)"Process ", ORANGE, 0x000000);
+  uint8_t num[20] = {0};
+  itoa(node->pcb->pid, num);
+  put_string_nt((uint8_t *)num, ORANGE, 0x000000);
+  put_string_nt((uint8_t *)": ", ORANGE, 0x000000);
+  put_string_nt(node->pcb->name, ORANGE, 0x000000);
+  put_string_nt(" -> ", ORANGE, 0x000000);
+  itoa(node->remaining_quantum, num);
+  put_string_nt((uint8_t *)num, ORANGE, 0x000000);
+  put_string_nt((uint8_t *)" quantum remaining\n", ORANGE, 0x000000);
 }

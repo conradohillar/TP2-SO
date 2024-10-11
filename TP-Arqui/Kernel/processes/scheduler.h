@@ -24,4 +24,6 @@ void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
 void print_scheduler(schedulerADT scheduler);
 
+void print_schedule_info(scheduler_node *node);
+
 #endif

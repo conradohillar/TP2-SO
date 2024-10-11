@@ -36,6 +36,8 @@ void *initializeKernelBinary() {
 int main() {
   load_idt();
 
+  _cli();
+
   put_string_nt("Inicializando Memory Manager\n", 0x00FF00, 0x000000);
   MemoryManagerADT mem_manager =
       create_memory_manager(MEM_START_ADDRESS, MEM_MANAGER_ADDRESS);
@@ -83,29 +85,40 @@ int main() {
                  "test_processes2", 0, 1, 1, 1);
 
   process_control_block *pcb = getPCB(my_pm, 1);
-  if (pcb == NULL) {
-    put_string_nt("Error obteniendo pcb\n", 0xFF0000, 0x000000);
-    return -1;
-  }
-  if (pcb->status != READY) {
-    put_string_nt("Error en el estado del pcb\n", 0xFF0000, 0x000000);
-    return -1;
-  }
 
   print_scheduler(my_scheduler);
 
-  put_string_nt("Removing ...\n", 0x00FF00, 0x000000);
+  put_string_nt("\nRemoving ...\n", 0x00FF00, 0x000000);
 
   remove_from_scheduler(my_scheduler, pcb);
 
   print_scheduler(my_scheduler);
 
+  put_string_nt("\nAdding ...\n", 0x00FF00, 0x000000);
+  create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0,
+                 "test_processes3", 0, 3, 1, 1);
+
+  print_scheduler(my_scheduler);
+
+  put_string_nt("\Scheduling ...\n", 0x00FF00, 0x000000);
+
+  uint8_t count = 100;
+  scheduler_node *aux = NULL;
+  while (count) {
+    aux = schedule(my_scheduler);
+    print_schedule_info(aux);
+    count--;
+  }
+
   mm_free(my_pm);
-  put_string_nt("Liberando my_pm\n", 0x00FF00, 0x000000);
+  put_string_nt("\nLiberando my_pm\n", 0x00FF00, 0x000000);
   mm_free(my_scheduler);
   put_string_nt("Liberando my_scheduler\n", 0x00FF00, 0x000000);
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   // ((EntryPoint)sampleCodeModuleAddress)();
+
+  _sti();
+
   return 0;
 }
