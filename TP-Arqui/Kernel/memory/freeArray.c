@@ -4,24 +4,24 @@
 
 #include "memoryManager.h"
 
-typedef struct MemoryManagerCDT {
+typedef struct memoryManagerCDT {
   void *memory_start;           // Puntero al bloque de memoria inicial
   int free_array[TOTAL_BLOCKS]; // Array que representa los bloques libres
                                 // (usamos índices)
   int free_index;               // Índice del primer bloque libre
-} MemoryManagerCDT;
+} memoryManagerCDT;
 
-MemoryManagerADT mem_manager;
+memoryManagerADT mem_manager;
 
-MemoryManagerADT
+memoryManagerADT
 create_memory_manager(void *memory_start_address,
-                      MemoryManagerADT memory_manager_address) {
+                      memoryManagerADT memory_manager_address) {
 
   if (memory_manager_address == NULL) {
     return NULL;
   }
 
-  mem_manager = (MemoryManagerADT)memory_manager_address;
+  mem_manager = (memoryManagerADT)memory_manager_address;
   mem_manager->memory_start =
       memory_start_address; // Apuntamos a la memoria contigua
 

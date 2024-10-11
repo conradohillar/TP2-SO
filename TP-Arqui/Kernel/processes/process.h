@@ -12,9 +12,8 @@ typedef struct process_node {
   uint16_t next_index;
 } process_node;
 
-typedef process_control_block *process_table[MAX_PROCESS_COUNT];
-
-typedef void (*main_function)(int argc, char **argv);
+typedef void (*main_fn)(int argc, char **argv);
+typedef void (*wrapper_fn)(main_fn code, int argc, char **argv);
 
 /**
  * Creates a new process table.
@@ -31,7 +30,7 @@ processManagerADT create_process_manager();
  *@param unkillable If the process is unkillable.
  */
 uint64_t create_process(schedulerADT scheduler,
-                        processManagerADT process_manager, main_function code,
+                        processManagerADT process_manager, main_fn code,
                         uint8_t **argv, uint64_t argc, uint8_t *name,
                         uint64_t ppid, uint8_t priority, uint8_t killable,
                         uint8_t in_fg);

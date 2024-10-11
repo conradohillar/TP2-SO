@@ -1,29 +1,27 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#include "./list.h"
 #include "./processManager.h"
 
 #define NULL ((void *)0)
 
-typedef struct scheduler_node {
+typedef struct scheduler_data {
   process_control_block *pcb;
-  struct scheduler_node *next;
   uint64_t remaining_quantum;
-} scheduler_node;
+} scheduler_data;
 
 /**
  * Creates a new scheduler.
  */
 schedulerADT create_scheduler();
 
-scheduler_node *schedule(schedulerADT scheduler);
+scheduler_data *schedule(schedulerADT scheduler);
 
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
 void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
-void print_scheduler(schedulerADT scheduler);
-
-void print_schedule_info(scheduler_node *node);
+void destroy_scheduler(schedulerADT scheduler);
 
 #endif

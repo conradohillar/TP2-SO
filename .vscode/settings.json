@@ -8,6 +8,7 @@
     "processmanager.h": "c",
     "kernel.h": "c",
     "scheduler.h": "c",
-    "memorymanager.h": "c"
+    "memorymanager.h": "c",
+    "list.h": "c"
   }
 }
