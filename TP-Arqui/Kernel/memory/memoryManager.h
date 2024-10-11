@@ -3,6 +3,8 @@
 
 #include "../tests/test_mm.h"
 
+#define NULL ((void *)0)
+
 #define TOTAL_BLOCKS 1000
 #define BLOCK_SIZE 2048
 

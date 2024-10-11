@@ -3,7 +3,7 @@
 
 #include "./processManager.h"
 
-#define NULL '\0'
+#define NULL ((void *)0)
 
 typedef struct scheduler_node {
   process_control_block *pcb;
@@ -21,5 +21,7 @@ scheduler_node *schedule(schedulerADT scheduler);
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
 void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb);
+
+void print_scheduler(schedulerADT scheduler);
 
 #endif

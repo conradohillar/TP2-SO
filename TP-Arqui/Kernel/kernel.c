@@ -72,10 +72,38 @@ int main() {
     put_string_nt("Error creando process manager\n", 0xFF0000, 0x000000);
     return -1;
   }
-  put_string_nt("Ejecutando test_processes\n", 0x00FF00, 0x000000);
-  char *argv[] = {"64"};
-  test_processes(1, argv, my_pm, my_scheduler);
+  // put_string_nt("Ejecutando test_processes\n", 0x00FF00, 0x000000);
+  // char *argv[] = {"64"};
+  // test_processes(1, argv, my_pm, my_scheduler);
 
+  create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0,
+                 "test_processes1", 0, 1, 1, 1);
+
+  create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0,
+                 "test_processes2", 0, 1, 1, 1);
+
+  process_control_block *pcb = getPCB(my_pm, 1);
+  if (pcb == NULL) {
+    put_string_nt("Error obteniendo pcb\n", 0xFF0000, 0x000000);
+    return -1;
+  }
+  if (pcb->status != READY) {
+    put_string_nt("Error en el estado del pcb\n", 0xFF0000, 0x000000);
+    return -1;
+  }
+
+  print_scheduler(my_scheduler);
+
+  put_string_nt("Removing ...\n", 0x00FF00, 0x000000);
+
+  remove_from_scheduler(my_scheduler, pcb);
+
+  print_scheduler(my_scheduler);
+
+  mm_free(my_pm);
+  put_string_nt("Liberando my_pm\n", 0x00FF00, 0x000000);
+  mm_free(my_scheduler);
+  put_string_nt("Liberando my_scheduler\n", 0x00FF00, 0x000000);
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
   // ((EntryPoint)sampleCodeModuleAddress)();

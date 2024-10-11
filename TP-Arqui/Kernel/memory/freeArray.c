@@ -17,8 +17,8 @@ MemoryManagerADT
 create_memory_manager(void *memory_start_address,
                       MemoryManagerADT memory_manager_address) {
 
-  if (memory_manager_address == '\0') {
-    return 0;
+  if (memory_manager_address == NULL) {
+    return NULL;
   }
 
   mem_manager = (MemoryManagerADT)memory_manager_address;
@@ -41,7 +41,7 @@ void *mm_malloc(uint64_t size) {
   // Verifica que el tamaño sea válido y que haya bloques libres
   if (size > BLOCK_SIZE ||
       mem_manager->free_array[mem_manager->free_index] == -1) {
-    return '\0';
+    return NULL;
   }
   int block_idx =
       mem_manager->free_index; // Toma el índice del primer bloque libre

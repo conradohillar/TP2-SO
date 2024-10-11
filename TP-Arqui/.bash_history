@@ -84,3 +84,7 @@ exit
 cd root
 ls
 exit
+cd ~
+ls
+./run.sh
+exit

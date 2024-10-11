@@ -4,6 +4,10 @@
     "stdlib.h": "c",
     "listutils.h": "c",
     "process.h": "c",
-    "irqdispatcher.h": "c"
+    "irqdispatcher.h": "c",
+    "processmanager.h": "c",
+    "kernel.h": "c",
+    "scheduler.h": "c",
+    "memorymanager.h": "c"
   }
 }

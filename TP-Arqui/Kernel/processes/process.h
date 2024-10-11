@@ -30,10 +30,11 @@ processManagerADT create_process_manager();
  * @param priority The priority of the process.
  *@param unkillable If the process is unkillable.
  */
-uint16_t create_process(schedulerADT scheduler,
+uint64_t create_process(schedulerADT scheduler,
                         processManagerADT process_manager, main_function code,
-                        char **argv, uint64_t argc, char *name, uint64_t ppid,
-                        uint8_t priority, uint8_t killable, uint8_t in_fg);
+                        uint8_t **argv, uint64_t argc, uint8_t *name,
+                        uint64_t ppid, uint8_t priority, uint8_t killable,
+                        uint8_t in_fg);
 
 /**
  * Returns the PID of the current process.

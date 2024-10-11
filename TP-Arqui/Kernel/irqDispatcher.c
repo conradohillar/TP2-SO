@@ -12,7 +12,7 @@ uint64_t irq_dispatcher(uint64_t irq, uint64_t stack_pointer) {
   default:
     break;
   }
-  return;
+  return stack_pointer;
 }
 
 uint64_t int_20(uint64_t stack_pointer) {
