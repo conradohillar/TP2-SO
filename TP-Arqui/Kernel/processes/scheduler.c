@@ -81,11 +81,6 @@ uint64_t context_switch(schedulerADT scheduler, uint64_t stack_pointer) {
   }
 
   scheduler_data *next_process = schedule(scheduler);
-  if (next_process == NULL) {
-    return stack_pointer;
-  }
-
-  scheduler->running = next_process;
 
   return (uint64_t)next_process->pcb->stack_pointer;
 }

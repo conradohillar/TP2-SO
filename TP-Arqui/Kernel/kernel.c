@@ -38,7 +38,6 @@ int main() {
 
   load_idt();
 
-  put_string_nt("Inicializando Memory Manager\n", 0x00FF00, 0x000000);
   memoryManagerADT mem_manager =
       create_memory_manager(MEM_START_ADDRESS, MEM_MANAGER_ADDRESS);
   if (mem_manager == NULL) {
@@ -62,14 +61,12 @@ int main() {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // Testeo de los procesos
-  put_string_nt("Creando my_scheduler\n", 0x00FF00, 0x000000);
   my_scheduler = create_scheduler();
   if (my_scheduler == NULL) {
     put_string_nt("Error creando my_scheduler\n", 0xFF0000, 0x000000);
     return -1;
   }
 
-  put_string_nt("Creando process manager\n", 0x00FF00, 0x000000);
   my_pm = create_process_manager(my_scheduler);
   if (my_pm == NULL) {
     put_string_nt("Error creando process manager\n", 0xFF0000, 0x000000);
@@ -77,69 +74,38 @@ int main() {
   }
 
   _sti();
-
-  // // MI TESTEO DE PROCESOS
-  // _cli();
-  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0,
-  //                "test_processes1", 0, 1, 1, 1);
-
-  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0,
-  //                "test_processes2", 0, 1, 1, 1);
-
-  // process_control_block *pcb = getPCB(my_pm, 1);
-
-  // print_scheduler(my_scheduler);
-
-  // put_string_nt("\nRemoving ...\n", 0x00FF00, 0x000000);
-
-  // remove_from_scheduler(my_scheduler, pcb);
-
-  // print_scheduler(my_scheduler);
-
-  // put_string_nt("\nAdding ...\n", 0x00FF00, 0x000000);
-  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0,
-  //                "test_processes3", 0, 3, 1, 1);
-
-  // print_scheduler(my_scheduler);
-
-  // put_string_nt("\Scheduling ...\n", 0x00FF00, 0x000000);
-
-  // uint8_t count = 20;
-  // scheduler_data *aux = NULL;
-  // while (count) {
-  //   aux = schedule(my_scheduler);
-  //   print_schedule_info(aux);
-  //   count--;
-  // }
+  while (1) {
+    _hlt();
+  }
 
   // // TESTS DE LA CÁTEDRA
   // put_string_nt("Ejecutando test_processes\n", 0x00FF00, 0x000000);
   // char *argv[] = {"64"};
   // test_processes(1, argv, my_pm, my_scheduler);
 
-  create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0, "1", 0,
-                 1, 1, 1);
-  create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0, "3", 0,
-                 3, 1, 1);
+  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0, "1",
+  // 0,
+  //                1, 1, 1);
+  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0, "3",
+  // 0,
+  //                3, 1, 1);
 
-  put_string_nt("\nScheduling ... \n", 0x00FF00, 0x000000);
-  uint8_t count = 30;
-  scheduler_data *aux = NULL;
-  while (count) {
-    aux = schedule(my_scheduler);
-    put_string_nt("  ", ORANGE, 0x000000);
-    put_string_nt(aux->pcb->name, ORANGE, 0x000000);
-    put_string_nt("\n", ORANGE, 0x000000);
-    count--;
-  }
+  // put_string_nt("\nScheduling ... \n", 0x00FF00, 0x000000);
+  // uint8_t count = 30;
+  // scheduler_data *aux = NULL;
+  // while (count) {
+  //   aux = schedule(my_scheduler);
+  //   put_string_nt("  ", ORANGE, 0x000000);
+  //   put_string_nt(aux->pcb->name, ORANGE, 0x000000);
+  //   put_string_nt("\n", ORANGE, 0x000000);
+  //   count--;
+  // }
 
   destroy_process_table(my_pm);
   put_string_nt("\nLiberando my_pm\n", 0x00FF00, 0x000000);
   destroy_scheduler(my_scheduler);
   put_string_nt("Liberando my_scheduler\n", 0x00FF00, 0x000000);
   /////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // ((EntryPoint)sampleCodeModuleAddress)();
 
   return 0;
 }

@@ -4,6 +4,7 @@
 #include "../include/interrupts.h"
 #include "./processManager.h"
 
+#define USERLAND_ADDRESS 0x400000
 #define MAX_PROCESS_COUNT 64
 #define STACK_SIZE_BYTES 4096
 #define INIT_PID 0
@@ -13,8 +14,8 @@ typedef struct process_node {
   uint16_t next_index;
 } process_node;
 
-typedef void (*main_fn)(int argc, char **argv);
-typedef void (*wrapper_fn)(main_fn code, int argc, char **argv);
+typedef void (*main_fn)(uint64_t argc, uint8_t **argv);
+typedef void (*wrapper_fn)(main_fn code, uint64_t argc, uint8_t **argv);
 
 /**
  * Creates a new process table.
@@ -23,12 +24,17 @@ processManagerADT create_process_manager(schedulerADT scheduler);
 
 /**
  * Creates a new process.
- * @param code The function to execute.
- * @param args The arguments to pass to the function.
+ * @param scheduler The scheduler.
+ * @param process_manager The process manager.
+ * @param code The code to execute.
+ * @param argv The arguments.
  * @param argc The number of arguments.
  * @param name The name of the process.
+ * @param ppid The PID of the parent process.
  * @param priority The priority of the process.
- *@param unkillable If the process is unkillable.
+ * @param killable Whether the process is killable.
+ * @param in_fg Whether the process is in the foreground.
+ * @return The PID of the new process. -1 if the process could not be created.
  */
 uint64_t create_process(schedulerADT scheduler,
                         processManagerADT process_manager, main_fn code,

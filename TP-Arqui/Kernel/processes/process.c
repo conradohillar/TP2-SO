@@ -6,12 +6,13 @@
 #include "../memory/memoryManager.h"
 #include "./scheduler.h"
 
-static void pcb_init(process_control_block *pcb, wrapper_fn wrapper,
+static void pcb_init(processManagerADT pm, schedulerADT scheduler,
+                     process_control_block *pcb, wrapper_fn wrapper,
                      main_fn code, uint64_t pid, uint64_t ppid, uint8_t **argv,
                      uint64_t argc, uint8_t *name, uint8_t priority,
                      uint8_t killable, uint8_t in_fg);
 
-static void process_wrapper(main_fn code, uint64_t argc, uint8_t **argv,
+static void process_wrapper(uint64_t code, uint64_t argc, uint8_t **argv,
                             processManagerADT pm, schedulerADT scheduler);
 
 static uint8_t terminate_process(processManagerADT pm, schedulerADT scheduler,
@@ -41,8 +42,12 @@ processManagerADT create_process_manager(schedulerADT scheduler) {
   pm->current_pid = -1;
   pm->process_count = 0;
 
-  // INIT process
-  create_process(scheduler, pm, &init_process, NULL, 0, "init", -1, 1, 0, 0);
+  // INIT process (unkillable)
+  create_process(scheduler, pm, init_process, NULL, 0, "init", -1, 1, 0, 0);
+
+  // SHELL
+  create_process(scheduler, pm, (void *)USERLAND_ADDRESS, NULL, 0, "shell", 0,
+                 5, 1, 1);
 
   return pm;
 }
@@ -63,8 +68,9 @@ uint64_t create_process(schedulerADT scheduler,
     return -1;
   }
 
-  pcb_init(new_pcb, &process_wrapper, code, process_manager->next_pid, ppid,
-           argv, argc, name, priority, killable, in_fg);
+  pcb_init(process_manager, scheduler, new_pcb, &process_wrapper, code,
+           process_manager->next_pid, ppid, argv, argc, name, priority,
+           killable, in_fg);
 
   process_manager->process_table[process_manager->next_pid].pcb = new_pcb;
 
@@ -80,7 +86,8 @@ uint64_t create_process(schedulerADT scheduler,
   return new_pcb->pid;
 }
 
-static void pcb_init(process_control_block *pcb, wrapper_fn wrapper,
+static void pcb_init(processManagerADT pm, schedulerADT scheduler,
+                     process_control_block *pcb, wrapper_fn wrapper,
                      main_fn code, uint64_t pid, uint64_t ppid, uint8_t **argv,
                      uint64_t argc, uint8_t *name, uint8_t priority,
                      uint8_t killable, uint8_t in_fg) {
@@ -97,11 +104,11 @@ static void pcb_init(process_control_block *pcb, wrapper_fn wrapper,
   sp->rbp = (uint64_t)pcb->stack_base_pointer;
   sp->rax = 0;
   sp->rbx = 0;
-  sp->rcx = 0;
-  sp->rdx = (uint64_t)argv;
+  sp->rcx = (uint64_t)pm;
+  sp->rdx = (uint64_t)name;
   sp->rdi = (uint64_t)code;
   sp->rsi = (uint64_t)argc;
-  sp->r8 = 0;
+  sp->r8 = (uint64_t)scheduler;
   sp->r9 = 0;
   sp->r10 = 0;
   sp->r11 = 0;
@@ -124,9 +131,9 @@ static void pcb_init(process_control_block *pcb, wrapper_fn wrapper,
   pcb->in_fg = in_fg;
 }
 
-static void process_wrapper(main_fn code, uint64_t argc, uint8_t **argv,
+static void process_wrapper(uint64_t code, uint64_t argc, uint8_t **argv,
                             processManagerADT pm, schedulerADT scheduler) {
-  code(argc, argv);
+  ((main_fn)code)(argc, argv);
   exit(pm, scheduler, getpid(pm));
 }
 
