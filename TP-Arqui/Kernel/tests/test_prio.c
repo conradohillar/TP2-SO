@@ -21,20 +21,20 @@
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
 void holaquetal(uint64_t argc, uint8_t **argv);
 
-void test_prio(uint64_t argc, char *argv[], processManagerADT pm,
+void test_prio(uint64_t argc, uint8_t *argv[], processManagerADT pm,
                schedulerADT scheduler) {
   int64_t pids[TOTAL_PROCESSES];
   uint64_t i;
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     pids[i] = create_process(scheduler, pm, &holaquetal, argv, 10,
-                             "endless_loop_print", INIT_PID, LOWEST, 1, 1);
+                             "endless_loop_print", 1);
 
   bussy_wait(WAIT);
   // printf("\nCHANGING PRIORITIES...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    setpriority(pm, pids[i], prio[i]);
+    set_priority(pm, pids[i], prio[i]);
 
   bussy_wait(WAIT);
   // printf("\nBLOCKING...\n");
@@ -45,7 +45,7 @@ void test_prio(uint64_t argc, char *argv[], processManagerADT pm,
   // printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
-    setpriority(pm, pids[i], MEDIUM);
+    set_priority(pm, pids[i], MEDIUM);
 
   // printf("UNBLOCKING...\n");
 

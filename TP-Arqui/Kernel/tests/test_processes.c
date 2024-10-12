@@ -32,8 +32,8 @@ int64_t test_processes(uint64_t argc, char *argv[], processManagerADT pm,
   // while (1) {
   // Create max_processes processes
   for (rq = 0; rq < max_processes; rq++) {
-    p_rqs[rq].pid = create_process(scheduler, pm, &endless_loop, argvAux, 0,
-                                   "endless_loop", 0, 1, 1, 1);
+    p_rqs[rq].pid = create_process(pm, scheduler, &endless_loop, 0, argvAux,
+                                   "endless_loop", 0);
 
     if (p_rqs[rq].pid == -1) {
       put_string_nt("test_processes: ERROR creating process\n", 0xFF0000,

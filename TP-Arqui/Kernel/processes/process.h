@@ -30,17 +30,12 @@ processManagerADT create_process_manager(schedulerADT scheduler);
  * @param argv The arguments.
  * @param argc The number of arguments.
  * @param name The name of the process.
- * @param ppid The PID of the parent process.
- * @param priority The priority of the process.
- * @param killable Whether the process is killable.
  * @param in_fg Whether the process is in the foreground.
  * @return The PID of the new process. -1 if the process could not be created.
  */
-uint64_t create_process(schedulerADT scheduler,
-                        processManagerADT process_manager, main_fn code,
-                        uint8_t **argv, uint64_t argc, uint8_t *name,
-                        uint64_t ppid, uint8_t priority, uint8_t killable,
-                        uint8_t in_fg);
+uint64_t create_process(processManagerADT process_manager,
+                        schedulerADT scheduler, main_fn code, uint64_t argc,
+                        uint8_t **argv, uint8_t *name, uint8_t in_fg);
 
 void init_process(int argc, char **argv);
 
@@ -87,7 +82,7 @@ uint64_t getppid();
  * @param pid The PID of the process.
  * @param priority The new priority.
  */
-uint16_t setpriority(processManagerADT pm, uint64_t pid, uint8_t priority);
+uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority);
 
 /**
  * Yields the CPU to the next process.
