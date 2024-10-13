@@ -2,6 +2,7 @@
 #define PROCESS_H
 
 #include "../include/interrupts.h"
+#include "../include/lib.h"
 #include "./processManager.h"
 
 #define USERLAND_ADDRESS 0x400000
@@ -24,7 +25,6 @@ processManagerADT create_process_manager(schedulerADT scheduler);
 
 /**
  * Creates a new process.
- * @param scheduler The scheduler.
  * @param process_manager The process manager.
  * @param code The code to execute.
  * @param argv The arguments.
@@ -33,8 +33,7 @@ processManagerADT create_process_manager(schedulerADT scheduler);
  * @param in_fg Whether the process is in the foreground.
  * @return The PID of the new process. -1 if the process could not be created.
  */
-uint64_t create_process(processManagerADT process_manager,
-                        schedulerADT scheduler, main_fn code, uint64_t argc,
+uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
                         uint8_t **argv, uint8_t *name, uint8_t in_fg);
 
 void init_process(int argc, char **argv);
@@ -42,30 +41,30 @@ void init_process(int argc, char **argv);
 /**
  * Exits the current process.
  */
-uint8_t exit(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+uint8_t exit(processManagerADT pm, uint64_t pid);
 
 /**
  * Kills a process.
  * @param pid The PID of the process to kill.
  */
-uint8_t kill(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+uint8_t kill(processManagerADT pm, uint64_t pid);
 
 /**
  * Waits for all child processes to finish.
  */
-void wait(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+void wait(processManagerADT pm, uint64_t pid);
 
 /**
  * Blocks a process.
  * @param pid The PID of the process to block.
  */
-uint8_t block(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+uint8_t block(processManagerADT pm, uint64_t pid);
 
 /**
  * Unblocks a process.
  * @param pid The PID of the process to unblock.
  */
-uint8_t unblock(processManagerADT pm, schedulerADT scheduler, uint64_t pid);
+uint8_t unblock(processManagerADT pm, uint64_t pid);
 
 /**
  * Returns the PID of the current process.

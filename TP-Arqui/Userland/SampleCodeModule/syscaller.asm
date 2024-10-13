@@ -12,6 +12,7 @@ GLOBAL sys_get_ticks_asm
 GLOBAL sys_check_keyboard_asm
 GLOBAL sys_make_sound_asm
 GLOBAL sys_sleep_asm
+GLOBAL sys_create_process_asm
 
 
 
@@ -232,6 +233,27 @@ sys_sleep_asm:
     mov rdx,rsi                ;millis 
     mov rsi,rdi                ;secs
     mov rdi,11                 ;id syscall make_sound
+
+    int 80h
+
+    call popState
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+sys_create_process_asm:
+    push rbp
+    mov rbp, rsp
+
+    call pushState
+
+    mov r9, r8
+    mov r8, rcx
+    mov rcx, rdx
+    mov rdx, rsi
+    mov rsi, rdi
+    mov rdi, 12                  ;id syscall create_process
 
     int 80h
 

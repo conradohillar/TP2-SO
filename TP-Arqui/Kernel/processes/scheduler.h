@@ -6,17 +6,12 @@
 
 #define NULL ((void *)0)
 
-typedef struct scheduler_data {
-  process_control_block *pcb;
-  uint64_t remaining_quantum;
-} scheduler_data;
-
 /**
  * Creates a new scheduler.
  */
 schedulerADT create_scheduler();
 
-scheduler_data *schedule(schedulerADT scheduler);
+process_control_block *schedule(schedulerADT scheduler);
 
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 

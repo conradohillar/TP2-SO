@@ -10,6 +10,7 @@ EXTERN sys_get_ticks
 EXTERN sys_check_keyboard
 EXTERN sys_make_sound
 EXTERN sys_sleep
+EXTERN sys_create_process
 
 GLOBAL syscalls_dispatcher
 
@@ -44,6 +45,8 @@ syscalls_dispatcher:
     je make_sound
     cmp rdi,11
     je sleep
+    cmp rdi,12
+    je create_process
 end:
     cli
     mov rsp, rbp
@@ -145,5 +148,16 @@ sleep:
     mov rsi,rdx     ; frequency
 
     call sys_sleep
+
+    jmp end
+
+create_process:
+    mov rdi, rsi                ;code
+    mov rsi, rdx                ;argc
+    mov rdx, rcx                ;argv
+    mov rcx, r8                 ;name
+    mov r8, r9                  ;in_fg
+    
+    call sys_create_process
 
     jmp end

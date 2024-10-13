@@ -6,6 +6,8 @@
 
 static uint64_t scale = 1;
 
+uint64_t testing(uint64_t argc, uint8_t *argv[]);
+
 void help() {
   uint8_t *supertab = (uint8_t *)"\t\t\t\t";
   printcolor((uint8_t *)"help      ", ORANGE, BLACK);
@@ -25,6 +27,9 @@ void help() {
   print((uint8_t *)"\t\t\t ");
   printcolor((uint8_t *)"press Ctrl + r to save the register states\n", GRAY,
              BLACK);
+  printcolor((uint8_t *)"textprocesses ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
+             GRAY, BLACK);
   printcolor((uint8_t *)"eliminator", ORANGE, BLACK);
   printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
   printcolor((uint8_t *)"inctext   ", ORANGE, BLACK);
@@ -91,20 +96,26 @@ void get_time() {
 
 void clear() { sys_clear_screen_asm(); }
 
+void test_processes() {
+  uint8_t *argv[] = {(uint8_t *)"50"};
+  sys_create_process_asm(testing, 0, argv, (uint8_t *)"test_processes", 1);
+}
+
 void play_song(uint8_t idx) { song_dispatcher(idx); }
 
 static uint8_t *commands[] = {
-    (uint8_t *)"help",    (uint8_t *)"divzero",   (uint8_t *)"inopcode",
-    (uint8_t *)"time",    (uint8_t *)"regstatus", (uint8_t *)"eliminator",
-    (uint8_t *)"inctext", (uint8_t *)"dectext",   (uint8_t *)"clear"};
+    (uint8_t *)"help",         (uint8_t *)"divzero",   (uint8_t *)"inopcode",
+    (uint8_t *)"time",         (uint8_t *)"regstatus", (uint8_t *)"eliminator",
+    (uint8_t *)"inctext",      (uint8_t *)"dectext",   (uint8_t *)"clear",
+    (uint8_t *)"testprocesses"};
 
 static void (*functions[])(void) = {
     help,          check_div_by_zero, check_invalid_opcode, get_time,
     get_registers, run_eliminator,    increase_text_size,   decrease_text_size,
-    clear};
+    clear,         test_processes};
 
 uint64_t get_command(uint8_t *str) {
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
     if (strcmp(commands[i], str) == 0) {
       functions[i]();
       return 1;
@@ -163,4 +174,9 @@ void run_shell() {
       printcolor((uint8_t *)" is not a command\n", RED, BLACK);
     }
   }
+}
+
+uint64_t testing(uint64_t argc, uint8_t *argv[]) {
+  printcolor((uint8_t *)"Testing\n", GREEN, BLACK);
+  return 0;
 }

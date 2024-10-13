@@ -63,7 +63,7 @@ int main() {
   // Testeo de los procesos
   my_scheduler = create_scheduler();
   if (my_scheduler == NULL) {
-    put_string_nt("Error creando my_scheduler\n", 0xFF0000, 0x000000);
+    put_string_nt("Error creando scheduler\n", 0xFF0000, 0x000000);
     return -1;
   }
 
@@ -74,38 +74,9 @@ int main() {
   }
 
   _sti();
-  while (1) {
-    _hlt();
-  }
-
-  // // TESTS DE LA CÁTEDRA
-  // put_string_nt("Ejecutando test_processes\n", 0x00FF00, 0x000000);
-  // char *argv[] = {"64"};
-  // test_processes(1, argv, my_pm, my_scheduler);
-
-  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0, "1",
-  // 0,
-  //                1, 1, 1);
-  // create_process(my_scheduler, my_pm, &initializeKernelBinary, NULL, 0, "3",
-  // 0,
-  //                3, 1, 1);
-
-  // put_string_nt("\nScheduling ... \n", 0x00FF00, 0x000000);
-  // uint8_t count = 30;
-  // scheduler_data *aux = NULL;
-  // while (count) {
-  //   aux = schedule(my_scheduler);
-  //   put_string_nt("  ", ORANGE, 0x000000);
-  //   put_string_nt(aux->pcb->name, ORANGE, 0x000000);
-  //   put_string_nt("\n", ORANGE, 0x000000);
-  //   count--;
-  // }
 
   destroy_process_table(my_pm);
   put_string_nt("\nLiberando my_pm\n", 0x00FF00, 0x000000);
-  destroy_scheduler(my_scheduler);
-  put_string_nt("Liberando my_scheduler\n", 0x00FF00, 0x000000);
-  /////////////////////////////////////////////////////////////////////////////////////////////////
 
   return 0;
 }

@@ -1,13 +1,16 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stdint.h>
-#include <shell.h>
-#include <libc.h>
 #include <eliminator.h>
-#include <syscaller.h>
-#include <song_book.h>
 #include <exceptionsTester.h>
+#include <libc.h>
+#include <shell.h>
+#include <song_book.h>
+#include <stdint.h>
+#include <syscaller.h>
+#include <tests.h>
+
+#define NULL (void *)0
 
 void check_div_by_zero();
 
@@ -29,7 +32,7 @@ void clear();
 
 void play_song(uint8_t idx);
 
-uint64_t get_command(uint8_t * str);
+uint64_t get_command(uint8_t *str);
 
 void run_shell();
 
