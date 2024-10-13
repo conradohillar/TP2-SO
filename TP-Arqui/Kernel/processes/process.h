@@ -88,6 +88,8 @@ uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority);
  */
 void yield();
 
+void free_process(process_control_block *pcb);
+
 /**
  * Destroys the process table.
  */

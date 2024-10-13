@@ -5,6 +5,7 @@
 #define COMM_BUFF_SIZE 128
 
 static uint64_t scale = 1;
+uint64_t testing(uint64_t argc, uint8_t **argv);
 
 void help() {
   uint8_t *supertab = (uint8_t *)"\t\t\t\t";
@@ -95,7 +96,7 @@ void get_time() {
 void clear() { sys_clear_screen_asm(); }
 
 void test_processes() {
-  uint8_t *argv[] = {(uint8_t *)"20"};
+  uint8_t *argv[] = {(uint8_t *)"15"};
   sys_create_process_asm(test_processes_fn, 1, argv,
                          (uint8_t *)"test_processes", 1);
 }
@@ -173,4 +174,9 @@ void run_shell() {
       printcolor((uint8_t *)" is not a command\n", RED, BLACK);
     }
   }
+}
+
+uint64_t testing(uint64_t argc, uint8_t **argv) {
+  printcolor("TESTING\n", GREEN, BLACK);
+  return 0;
 }

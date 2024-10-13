@@ -10,5 +10,9 @@
     "scheduler.h": "c",
     "memorymanager.h": "c",
     "list.h": "c",
+    "shell.h": "c",
+    "libc.h": "c",
+    "syscalls.h": "c",
+    "syscaller.h": "c"
   }
 }

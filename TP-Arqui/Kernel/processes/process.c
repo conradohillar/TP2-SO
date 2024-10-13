@@ -20,7 +20,6 @@ struct processManagerCDT {
   process_node process_table[MAX_PROCESS_COUNT];
   uint64_t process_count;
   uint64_t next_pid;
-  uint64_t current_pid;
   schedulerADT scheduler;
 } processManagerCDT;
 
@@ -38,7 +37,6 @@ processManagerADT create_process_manager(schedulerADT scheduler) {
   pm->process_table[MAX_PROCESS_COUNT - 1].next_index = -1;
 
   pm->next_pid = 0;
-  pm->current_pid = -1;
   pm->process_count = 0;
 
   pm->scheduler = scheduler;
@@ -78,8 +76,6 @@ uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
 
   pm->next_pid = pm->process_table[pm->next_pid].next_index;
 
-  pm->current_pid = new_pcb->pid;
-
   pm->process_count++;
 
   add_to_scheduler(pm->scheduler, new_pcb);
@@ -117,7 +113,7 @@ static void pcb_init(processManagerADT pm, process_control_block *pcb,
   sp->r15 = 0;
 
   pcb->pid = pm->next_pid;
-  pcb->parent_pid = getppid(pm);
+  pcb->parent_pid = getpid(pm);
 
   pcb->name = name;
   pcb->argv = argv;
@@ -184,10 +180,12 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
   }
 
   // If it's INIT's child, remove from process_table and free
-  if (pm->process_table[pid].pcb->parent_pid == INIT_PID) {
+  if (pm->process_table[pid].pcb->status == KILLED ||
+      pm->process_table[pid].pcb->parent_pid == INIT_PID) {
     // IMPLEMENTAR UN free_process
-    mm_free(pm->process_table[pid].pcb);
+    free_process(pm->process_table[pid].pcb);
     pm->process_table[pid].pcb = NULL;
+    pm->process_count--;
 
     uint64_t aux_pid = pm->next_pid;
     pm->next_pid = pid;
@@ -245,16 +243,14 @@ uint8_t unblock(processManagerADT pm, uint64_t pid) {
   return 0;
 }
 
-uint64_t getpid(processManagerADT pm) { return pm->current_pid; }
+uint64_t getpid(processManagerADT pm) {
+  process_control_block *current = get_running(pm->scheduler);
+  return current->pid;
+}
 
 uint64_t getppid(processManagerADT pm) {
   process_control_block *current = get_running(pm->scheduler);
-  for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-    if (pm->process_table[i].pcb != NULL &&
-        pm->process_table[i].pcb == current) {
-      return pm->process_table[i].pcb->pid;
-    }
-  }
+  return current->parent_pid;
 }
 
 uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
@@ -268,10 +264,17 @@ uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
   return 0;
 }
 
+void free_process(process_control_block *pcb) {
+  for (int i = 0; i < pcb->argc; i++) {
+    mm_free(pcb->argv[i]);
+  }
+  mm_free(pcb->argv);
+}
+
 void destroy_process_table(processManagerADT pm) {
   for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
     if (pm->process_table[i].pcb != NULL) {
-      mm_free(pm->process_table[i].pcb);
+      free_process(pm->process_table[i].pcb);
     }
   }
   destroy_scheduler(pm->scheduler);
@@ -280,6 +283,9 @@ void destroy_process_table(processManagerADT pm) {
 
 void init_process(int argc, char **argv) {
   while (1) {
+    // for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
+    //   if (pm)
+    // }
     _hlt();
   }
 }

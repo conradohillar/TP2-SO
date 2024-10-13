@@ -48,7 +48,7 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
     sys_kill_asm(p_rqs[i].pid);
     printcolor((uint8_t *)"Killed process number: ", RED, 0x000000);
     uint8_t num[20] = {0};
-    itoa(i, num);
+    itoa(p_rqs[i].pid, num);
     printcolor((uint8_t *)num, ORANGE, 0x000000);
     printcolor((uint8_t *)"\n", ORANGE, 0x000000);
     sleep(0, 100);
