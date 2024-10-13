@@ -5,6 +5,7 @@ GLOBAL picMasterMask
 GLOBAL picSlaveMask
 GLOBAL haltcpu
 GLOBAL _hlt
+GLOBAL asm_yield
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
@@ -106,6 +107,12 @@ _cli:
 _sti:
 	sti
 	ret
+
+
+asm_yield:
+	int 0x20
+	ret
+
 
 picMasterMask:
 	push	rbp

@@ -50,7 +50,7 @@ uint8_t exit(processManagerADT pm, uint64_t pid);
 uint8_t kill(processManagerADT pm, uint64_t pid);
 
 /**
- * Waits for all child processes to finish.
+ * Process with PID pid waits for any child to finish.
  */
 void wait(processManagerADT pm, uint64_t pid);
 
@@ -69,12 +69,12 @@ uint8_t unblock(processManagerADT pm, uint64_t pid);
 /**
  * Returns the PID of the current process.
  */
-uint64_t getpid();
+uint64_t getpid(processManagerADT pm);
 
 /**
  * Returns the PID of the parent process.
  */
-uint64_t getppid();
+uint64_t getppid(processManagerADT pm);
 
 /**
  * Sets the priority of a process.

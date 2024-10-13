@@ -38,10 +38,6 @@ void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb) {
   if (!remove_from_list(scheduler->list, pcb)) {
     put_string_nt("Error removing from scheduler\n", 0xFF0000, 0x000000);
   }
-  if (scheduler->running == pcb) {
-    scheduler->running = list_next(scheduler->list);
-    scheduler->running->status = RUNNING;
-  }
 }
 
 process_control_block *schedule(schedulerADT scheduler) {
@@ -74,6 +70,17 @@ uint64_t context_switch(schedulerADT scheduler, uint64_t stack_pointer) {
   process_control_block *next_process = schedule(scheduler);
 
   return (uint64_t)next_process->stack_pointer;
+}
+
+void running_ended(schedulerADT scheduler) {
+  if (scheduler->running == NULL) {
+    return;
+  }
+  scheduler->running = NULL;
+}
+
+process_control_block *get_running(schedulerADT scheduler) {
+  return scheduler->running;
 }
 
 void destroy_scheduler(schedulerADT scheduler) {

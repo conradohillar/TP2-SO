@@ -17,6 +17,10 @@ void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
 void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb);
 
+process_control_block *get_running(schedulerADT scheduler);
+
+void running_ended(schedulerADT scheduler);
+
 void destroy_scheduler(schedulerADT scheduler);
 
 #endif

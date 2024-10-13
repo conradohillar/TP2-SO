@@ -117,7 +117,7 @@ static void pcb_init(processManagerADT pm, process_control_block *pcb,
   sp->r15 = 0;
 
   pcb->pid = pm->next_pid;
-  pcb->parent_pid = pm->current_pid;
+  pcb->parent_pid = getppid(pm);
 
   pcb->name = name;
   pcb->argv = argv;
@@ -135,6 +135,8 @@ static void process_wrapper(processManagerADT pm, uint64_t code, uint64_t argc,
                             uint8_t **argv) {
   ((main_fn)code)(argc, argv);
   exit(pm, getpid(pm));
+  running_ended(pm->scheduler);
+  yield();
 }
 
 uint8_t exit(processManagerADT pm, uint64_t pid) {
@@ -176,8 +178,8 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
     uint32_t ppid = pm->process_table[pid].pcb->parent_pid;
     if (pm->process_table[ppid].pcb->waiting) {
       pm->process_table[ppid].pcb->waiting = 0;
-      pm->process_table[ppid].pcb->status = READY;
-      add_to_scheduler(pm->scheduler, pm->process_table[ppid].pcb);
+      unblock(pm, ppid);
+      pm->process_table[pid].pcb->status = KILLED;
     }
   }
 
@@ -226,6 +228,8 @@ uint8_t block(processManagerADT pm, uint64_t pid) {
 
   pm->process_table[pid].pcb->status = BLOCKED;
   remove_from_scheduler(pm->scheduler, pm->process_table[pid].pcb);
+  pm->process_table[pid].pcb->remaining_quantum = 0;
+  yield();
   return 0;
 }
 
@@ -244,7 +248,13 @@ uint8_t unblock(processManagerADT pm, uint64_t pid) {
 uint64_t getpid(processManagerADT pm) { return pm->current_pid; }
 
 uint64_t getppid(processManagerADT pm) {
-  return pm->process_table[pm->current_pid].pcb->parent_pid;
+  process_control_block *current = get_running(pm->scheduler);
+  for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
+    if (pm->process_table[i].pcb != NULL &&
+        pm->process_table[i].pcb == current) {
+      return pm->process_table[i].pcb->pid;
+    }
+  }
 }
 
 uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
@@ -273,6 +283,8 @@ void init_process(int argc, char **argv) {
     _hlt();
   }
 }
+
+void yield() { asm_yield(); }
 
 process_control_block *getPCB(processManagerADT pm, uint64_t pid) {
   return pm->process_table[pid].pcb;
