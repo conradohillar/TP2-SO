@@ -12,6 +12,8 @@ EXTERN sys_make_sound
 EXTERN sys_sleep
 EXTERN sys_create_process
 EXTERN sys_kill
+EXTERN sys_block
+EXTERN sys_unblock
 
 GLOBAL syscalls_dispatcher
 
@@ -50,6 +52,10 @@ syscalls_dispatcher:
     je create_process
     cmp rdi,13
     je kill
+    cmp rdi,14
+    je block
+    cmp rdi,15
+    je unblock
 
 end:
     cli
@@ -168,6 +174,15 @@ create_process:
 
 kill:
     mov rdi, rsi                ;pid
-
     call sys_kill
+    jmp end 
+
+block:
+    mov rdi, rsi                ;pid
+    call sys_block
+    jmp end 
+
+unblock:
+    mov rdi, rsi                ;pid
+    call sys_unblock
     jmp end 

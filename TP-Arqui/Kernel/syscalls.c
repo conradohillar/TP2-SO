@@ -69,3 +69,7 @@ int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
 }
 
 int64_t sys_kill(uint64_t pid) { return kill(my_pm, pid); }
+
+int64_t sys_block(uint64_t pid) { return block(my_pm, pid); }
+
+int64_t sys_unblock(uint64_t pid) { return unblock(my_pm, pid); }

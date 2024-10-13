@@ -14,6 +14,8 @@ GLOBAL sys_make_sound_asm
 GLOBAL sys_sleep_asm
 GLOBAL sys_create_process_asm
 GLOBAL sys_kill_asm
+GLOBAL sys_block_asm
+GLOBAL sys_unblock_asm
 
 %macro pushState 0
 	push rbx
@@ -312,5 +314,44 @@ sys_kill_asm:
     pop rbp
 
     ret
+
+sys_block_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi
+    mov rdi, 14                  ;id syscall block
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_unblock_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi
+    mov rdi, 15                  ;id syscall unblock
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+    
+
 
 

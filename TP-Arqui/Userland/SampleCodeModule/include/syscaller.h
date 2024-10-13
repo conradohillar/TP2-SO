@@ -39,3 +39,7 @@ int64_t sys_create_process_asm(fn code, uint64_t argc, uint8_t **argv,
                                uint8_t *name, uint8_t in_fg);
 
 uint64_t sys_kill_asm(uint64_t pid);
+
+uint64_t sys_block_asm(uint64_t pid);
+
+uint64_t sys_unblock_asm(uint64_t pid);
