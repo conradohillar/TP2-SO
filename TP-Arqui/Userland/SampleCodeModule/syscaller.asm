@@ -13,6 +13,7 @@ GLOBAL sys_check_keyboard_asm
 GLOBAL sys_make_sound_asm
 GLOBAL sys_sleep_asm
 GLOBAL sys_create_process_asm
+GLOBAL sys_kill_asm
 
 
 
@@ -263,6 +264,24 @@ sys_create_process_asm:
     pop rbp
     ret
     
+sys_kill_asm:
+    push rbp    
+    mov rbp, rsp
+
+    call pushState
+
+    mov rsi, rdi
+    mov rdi, 13                  ;id syscall kill
+
+    int 80h
+
+    call popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
 
 pushState:
     push rbp
@@ -289,6 +308,8 @@ pushState:
 popState:
     push rbp
     mov rbp,rsp
+
+    sub rsp,0x68    ; pushed params size
 
     pop r15
 	pop r14

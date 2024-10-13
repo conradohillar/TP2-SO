@@ -67,3 +67,5 @@ int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
   }
   return res;
 }
+
+int64_t sys_kill(uint64_t pid) { return kill(my_pm, pid); }

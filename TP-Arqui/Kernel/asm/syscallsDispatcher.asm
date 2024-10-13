@@ -11,6 +11,7 @@ EXTERN sys_check_keyboard
 EXTERN sys_make_sound
 EXTERN sys_sleep
 EXTERN sys_create_process
+EXTERN sys_kill
 
 GLOBAL syscalls_dispatcher
 
@@ -47,11 +48,14 @@ syscalls_dispatcher:
     je sleep
     cmp rdi,12
     je create_process
+    cmp rdi,13
+    je kill
+
 end:
     cli
     mov rsp, rbp
     pop rbp
-    ret
+    iretq
 
 
 read:
@@ -161,3 +165,9 @@ create_process:
     call sys_create_process
 
     jmp end
+
+kill:
+    mov rdi, rsi                ;pid
+
+    call sys_kill
+    jmp end 
