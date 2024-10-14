@@ -200,8 +200,6 @@ void run_shell() {
 
   play_startsound();
 
-  sys_create_process_asm(testing, 0, NULL, (uint8_t *)"testing", 0);
-
   sys_set_text_size_asm(1);
   scale = 1;
   printcolor((uint8_t *)"Type \"help\" to see a list of commands\n", WHITE,
@@ -240,7 +238,6 @@ void run_shell() {
 }
 
 uint64_t testing(uint64_t argc, uint8_t **argv) {
-  while (1) {
-    sleep(0, 1000);
-  }
+  printcolor((uint8_t *)"Testing\n", ORANGE, BLACK);
+  return 0;
 }
