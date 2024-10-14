@@ -41,9 +41,15 @@ int64_t sys_create_process_asm(fn code, uint64_t argc, uint8_t **argv,
 
 uint64_t sys_kill_asm(uint64_t pid);
 
+void sys_wait_asm();
+
 uint64_t sys_block_asm(uint64_t pid);
 
 uint64_t sys_unblock_asm(uint64_t pid);
+
+uint64_t sys_getpid_asm();
+
+void sys_set_priority_asm(uint64_t pid, uint8_t new_priority);
 
 uint64_t sys_ps_asm();
 

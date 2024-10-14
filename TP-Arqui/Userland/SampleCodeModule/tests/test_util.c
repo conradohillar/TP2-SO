@@ -2,8 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
+#include "../include/tests.h"
 #include <stdint.h>
-#include <stdio.h>
 
 // Random
 static uint32_t m_z = 362436069;
@@ -67,11 +67,14 @@ void endless_loop() {
     ;
 }
 
-void endless_loop_print(uint64_t wait) {
-  // int64_t pid = my_getpid();
+uint64_t endless_loop_print(uint64_t argc, char **argv) {
+  uint64_t wait = satoi(argv[0]);
+  uint8_t pid_s[20] = {0};
+  itoa(sys_getpid_asm(), pid_s);
 
   while (1) {
-    // printf("%ld ", pid);
+    print(pid_s);
     bussy_wait(wait);
   }
+  return 0;
 }

@@ -63,16 +63,20 @@ int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
                            uint8_t *name, uint8_t in_fg) {
   int32_t res = create_process(my_pm, code, argc, argv, name, in_fg);
   if (in_fg) {
-    wait(my_pm, getpid(my_pm));
+    wait(my_pm);
   }
   return res;
 }
 
 int64_t sys_kill(uint64_t pid) { return kill(my_pm, pid); }
 
+void sys_wait() { wait(my_pm); }
+
 int64_t sys_block(uint64_t pid) { return block(my_pm, pid); }
 
 int64_t sys_unblock(uint64_t pid) { return unblock(my_pm, pid); }
+
+uint64_t sys_getpid() { return getpid(my_pm); }
 
 uint64_t sys_ps() {
   ps_struct *ps = send_ps_info(my_pm);

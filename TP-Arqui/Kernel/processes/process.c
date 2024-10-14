@@ -195,7 +195,8 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
   return 0;
 }
 
-void wait(processManagerADT pm, uint64_t pid) {
+void wait(processManagerADT pm) {
+  uint64_t pid = getpid(pm);
   if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
       pm->process_table[pid].pcb == NULL) {
     return;
