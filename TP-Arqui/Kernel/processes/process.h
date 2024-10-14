@@ -88,6 +88,19 @@ uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority);
  */
 void yield();
 
+/**
+ * Sends all processes info to the shell.
+ */
+ps_struct *send_ps_info(processManagerADT pm);
+
+/**
+ * Frees the memory used by the process info struct.
+ */
+void free_ps(ps_struct *ps);
+
+/**
+ * Frees the memory used by a process.
+ */
 void free_process(process_control_block *pcb);
 
 /**

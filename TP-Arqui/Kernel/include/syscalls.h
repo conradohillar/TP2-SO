@@ -1,6 +1,7 @@
 #ifndef _SYSCALLS_H
 #define _SYSCALLS_H
 
+#include "../../processUtils.h"
 #include "../processes/process.h"
 #include "../processes/processManager.h"
 #include <keyboardDriver.h>
@@ -49,5 +50,15 @@ int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
                            uint8_t *name, uint8_t in_fg);
 
 int64_t sys_kill(uint64_t pid);
+
+int64_t sys_block(uint64_t pid);
+
+int64_t sys_unblock(uint64_t pid);
+
+uint64_t sys_ps();
+
+void sys_free_ps(ps_struct *ps);
+
+void sys_set_priority(uint64_t pid, uint8_t new_priority);
 
 #endif

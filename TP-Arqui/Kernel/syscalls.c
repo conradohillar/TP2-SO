@@ -73,3 +73,14 @@ int64_t sys_kill(uint64_t pid) { return kill(my_pm, pid); }
 int64_t sys_block(uint64_t pid) { return block(my_pm, pid); }
 
 int64_t sys_unblock(uint64_t pid) { return unblock(my_pm, pid); }
+
+uint64_t sys_ps() {
+  ps_struct *ps = send_ps_info(my_pm);
+  return (uint64_t)ps;
+}
+
+void sys_free_ps(ps_struct *ps) { free_ps(ps); }
+
+void sys_set_priority(uint64_t pid, uint8_t new_priority) {
+  set_priority(my_pm, pid, new_priority);
+}

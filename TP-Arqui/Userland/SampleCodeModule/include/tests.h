@@ -1,6 +1,7 @@
 #ifndef USERLAND_TESTS_H
 #define USERLAND_TESTS_H
 
+#include "../../../processUtils.h"
 #include "./syscaller.h"
 #include "libc.h"
 

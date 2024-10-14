@@ -14,6 +14,9 @@ EXTERN sys_create_process
 EXTERN sys_kill
 EXTERN sys_block
 EXTERN sys_unblock
+EXTERN sys_ps
+EXTERN sys_free_ps
+EXTERN sys_set_priority
 
 GLOBAL syscalls_dispatcher
 
@@ -56,7 +59,12 @@ syscalls_dispatcher:
     je block
     cmp rdi,15
     je unblock
-
+    cmp rdi,16
+    je ps
+    cmp rdi,17
+    je free_ps
+    cmp rdi,18
+    je set_priority
 end:
     cli
     mov rsp, rbp
@@ -186,3 +194,18 @@ unblock:
     mov rdi, rsi                ;pid
     call sys_unblock
     jmp end 
+
+ps:
+    call sys_ps
+    jmp end 
+
+free_ps:
+    mov rdi, rsi                ;ps
+    call sys_free_ps
+    jmp end 
+
+set_priority:
+    mov rdi, rsi                ;pid
+    mov rsi, rdx                ;priority
+    call sys_set_priority
+    jmp end

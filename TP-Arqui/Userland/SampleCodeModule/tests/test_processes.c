@@ -1,10 +1,8 @@
 #include "../include/tests.h"
 
-typedef enum { RUNNING, BLOCKED, KILLED } status;
-
 typedef struct P_rq {
   int64_t pid;
-  status state;
+  process_status state;
 } p_rq;
 
 uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {

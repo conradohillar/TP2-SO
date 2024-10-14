@@ -16,6 +16,10 @@ GLOBAL sys_create_process_asm
 GLOBAL sys_kill_asm
 GLOBAL sys_block_asm
 GLOBAL sys_unblock_asm
+GLOBAL sys_ps_asm
+GLOBAL sys_free_ps_asm
+GLOBAL sys_set_priority_asm
+
 
 %macro pushState 0
 	push rbx
@@ -351,7 +355,59 @@ sys_unblock_asm:
 
     ret
 
+sys_ps_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rdi, 16                  ;id syscall ps
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret  
+
+sys_free_ps_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 ; ps
+    mov rdi, 17                  ;id syscall free_ps
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_set_priority_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
     
+    mov rdx, rsi
+    mov rsi, rdi                ;size
+    mov rdi, 18                 ;id syscall set_priority
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret    
 
 
 

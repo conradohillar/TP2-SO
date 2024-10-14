@@ -271,6 +271,32 @@ void free_process(process_control_block *pcb) {
   mm_free(pcb->argv);
 }
 
+ps_struct *send_ps_info(processManagerADT pm) {
+  ps_info *info = mm_malloc(pm->process_count * sizeof(ps_info));
+  int j = 0;
+  for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
+    if (pm->process_table[i].pcb != NULL) {
+      info[j].pid = pm->process_table[i].pcb->pid;
+      info[j].name = pm->process_table[i].pcb->name;
+      info[j].sp = pm->process_table[i].pcb->stack_pointer;
+      info[j].bp = pm->process_table[i].pcb->stack_base_pointer;
+      info[j].state = pm->process_table[i].pcb->status;
+      info[j].priority = pm->process_table[i].pcb->priority;
+      info[j].in_fg = pm->process_table[i].pcb->in_fg;
+      j++;
+    }
+  }
+  ps_struct *ps = mm_malloc(sizeof(ps_struct));
+  ps->info = info;
+  ps->count = pm->process_count;
+  return ps;
+}
+
+void free_ps(ps_struct *ps) {
+  mm_free(ps->info);
+  mm_free(ps);
+}
+
 void destroy_process_table(processManagerADT pm) {
   for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
     if (pm->process_table[i].pcb != NULL) {
@@ -283,9 +309,6 @@ void destroy_process_table(processManagerADT pm) {
 
 void init_process(int argc, char **argv) {
   while (1) {
-    // for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-    //   if (pm)
-    // }
     _hlt();
   }
 }

@@ -1,9 +1,8 @@
 #ifndef PROCESS_MANAGER_H
 #define PROCESS_MANAGER_H
 
+#include "../../processUtils.h"
 #include <stdint.h>
-
-typedef enum { READY, RUNNING, BLOCKED, KILLED, ZOMBIE } process_status;
 
 typedef uint32_t pid_t;
 

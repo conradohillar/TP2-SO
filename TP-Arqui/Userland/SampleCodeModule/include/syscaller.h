@@ -1,3 +1,4 @@
+#include <../../../processUtils.h>
 #include <stdint.h>
 
 #define STDIN 0
@@ -43,3 +44,7 @@ uint64_t sys_kill_asm(uint64_t pid);
 uint64_t sys_block_asm(uint64_t pid);
 
 uint64_t sys_unblock_asm(uint64_t pid);
+
+uint64_t sys_ps_asm();
+
+void sys_free_ps_asm(ps_struct *ps);

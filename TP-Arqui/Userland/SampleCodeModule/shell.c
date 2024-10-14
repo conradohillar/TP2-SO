@@ -6,6 +6,7 @@
 
 static uint64_t scale = 1;
 uint64_t testing(uint64_t argc, uint8_t **argv);
+static char *status_to_string(process_status status);
 
 void help() {
   uint8_t *supertab = (uint8_t *)"\t\t\t\t";
@@ -29,6 +30,8 @@ void help() {
   printcolor((uint8_t *)"textprocesses ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
              GRAY, BLACK);
+  printcolor((uint8_t *)"ps        ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
   printcolor((uint8_t *)"eliminator", ORANGE, BLACK);
   printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
   printcolor((uint8_t *)"inctext   ", ORANGE, BLACK);
@@ -101,18 +104,76 @@ void test_processes() {
                          (uint8_t *)"test_processes", 1);
 }
 
+static char *status_to_string(process_status status) {
+  switch (status) {
+  case RUNNING:
+    return "RUNNING";
+  case READY:
+    return "READY";
+  case BLOCKED:
+    return "BLOCKED";
+  case KILLED:
+    return "KILLED";
+  case ZOMBIE:
+    return "ZOMBIE";
+
+  default:
+    "invalid-status";
+  }
+}
+
+void ps() {
+  ps_struct *ps = (ps_struct *)sys_ps_asm();
+
+  printcolor((uint8_t *)"PID\tNAME\t\t\t\tSTACK_POINTER\t\t BASE_"
+                        "POINTER\t\t  STATE\t   PRIORITY\tIN_FG\n",
+             GRAY, BLACK);
+  for (int i = 0; i < ps->count; i++) {
+    uint8_t pid[20] = {0};
+    itoa(ps->info[i].pid, pid);
+    print(pid);
+    print_spaces(7 - strlen(pid));
+    print(ps->info[i].name);
+    print_spaces(20 - strlen(ps->info[i].name));
+    uint8_t sp[20] = {0};
+    itoh(ps->info[i].sp, sp);
+    print(sp);
+    print((uint8_t *)"\t");
+    uint8_t bp[20] = {0};
+    itoh(ps->info[i].bp, bp);
+    print(bp);
+    print((uint8_t *)"\t");
+    print((uint8_t *)status_to_string(ps->info[i].state));
+    print_spaces(12 - strlen(status_to_string(ps->info[i].state)));
+    uint8_t prio[20] = {0};
+    itoa(ps->info[i].priority, prio);
+    print(prio);
+    print((uint8_t *)"\t\t   ");
+    print(ps->info[i].in_fg ? "FG" : "BG");
+    print((uint8_t *)"\n");
+  }
+  sys_free_ps_asm(ps);
+}
+
 void play_song(uint8_t idx) { song_dispatcher(idx); }
 
 static uint8_t *commands[] = {
-    (uint8_t *)"help",         (uint8_t *)"divzero",   (uint8_t *)"inopcode",
-    (uint8_t *)"time",         (uint8_t *)"regstatus", (uint8_t *)"eliminator",
-    (uint8_t *)"inctext",      (uint8_t *)"dectext",   (uint8_t *)"clear",
-    (uint8_t *)"testprocesses"};
+    (uint8_t *)"help",          (uint8_t *)"divzero",   (uint8_t *)"inopcode",
+    (uint8_t *)"time",          (uint8_t *)"regstatus", (uint8_t *)"eliminator",
+    (uint8_t *)"inctext",       (uint8_t *)"dectext",   (uint8_t *)"clear",
+    (uint8_t *)"testprocesses", (uint8_t *)"ps"};
 
-static void (*functions[])(void) = {
-    help,          check_div_by_zero, check_invalid_opcode, get_time,
-    get_registers, run_eliminator,    increase_text_size,   decrease_text_size,
-    clear,         test_processes};
+static void (*functions[])(void) = {help,
+                                    check_div_by_zero,
+                                    check_invalid_opcode,
+                                    get_time,
+                                    get_registers,
+                                    run_eliminator,
+                                    increase_text_size,
+                                    decrease_text_size,
+                                    clear,
+                                    test_processes,
+                                    ps};
 
 uint64_t get_command(uint8_t *str) {
   for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
@@ -138,6 +199,8 @@ void run_shell() {
   uint8_t command_buffer[COMM_BUFF_SIZE];
 
   play_startsound();
+
+  sys_create_process_asm(testing, 0, NULL, (uint8_t *)"testing", 0);
 
   sys_set_text_size_asm(1);
   scale = 1;
@@ -177,6 +240,7 @@ void run_shell() {
 }
 
 uint64_t testing(uint64_t argc, uint8_t **argv) {
-  printcolor("TESTING\n", GREEN, BLACK);
-  return 0;
+  while (1) {
+    sleep(0, 1000);
+  }
 }
