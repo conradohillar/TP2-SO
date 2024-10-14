@@ -50,9 +50,9 @@ uint8_t exit(processManagerADT pm, uint64_t pid);
 uint8_t kill(processManagerADT pm, uint64_t pid);
 
 /**
- * Process with PID pid waits for any child to finish.
+ * Running process for any child to finish.
  */
-void wait(processManagerADT pm, uint64_t pid);
+void wait(processManagerADT pm);
 
 /**
  * Blocks a process.

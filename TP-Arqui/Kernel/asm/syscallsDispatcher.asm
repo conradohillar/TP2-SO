@@ -12,8 +12,10 @@ EXTERN sys_make_sound
 EXTERN sys_sleep
 EXTERN sys_create_process
 EXTERN sys_kill
+EXTERN sys_wait
 EXTERN sys_block
 EXTERN sys_unblock
+EXTERN sys_getpid
 EXTERN sys_ps
 EXTERN sys_free_ps
 EXTERN sys_set_priority
@@ -56,15 +58,20 @@ syscalls_dispatcher:
     cmp rdi,13
     je kill
     cmp rdi,14
-    je block
+    je my_wait
     cmp rdi,15
-    je unblock
+    je block
     cmp rdi,16
-    je ps
+    je unblock
     cmp rdi,17
-    je free_ps
+    je getpid
     cmp rdi,18
+    je ps
+    cmp rdi,19
+    je free_ps
+    cmp rdi,20
     je set_priority
+
 end:
     cli
     mov rsp, rbp
@@ -185,6 +192,10 @@ kill:
     call sys_kill
     jmp end 
 
+my_wait:
+    call sys_wait
+    jmp end 
+
 block:
     mov rdi, rsi                ;pid
     call sys_block
@@ -194,6 +205,10 @@ unblock:
     mov rdi, rsi                ;pid
     call sys_unblock
     jmp end 
+
+getpid:
+    call sys_getpid
+    jmp end
 
 ps:
     call sys_ps

@@ -46,7 +46,6 @@ process_control_block *schedule(schedulerADT scheduler) {
   }
 
   if (scheduler->running == NULL) {
-    scheduler->running->status = READY;
     scheduler->running = list_next(scheduler->list);
     scheduler->running->status = RUNNING;
     scheduler->running->remaining_quantum--;
@@ -54,7 +53,9 @@ process_control_block *schedule(schedulerADT scheduler) {
   }
 
   if (scheduler->running->remaining_quantum == 0) {
-    scheduler->running->status = READY;
+    if (scheduler->running->status == RUNNING) {
+      scheduler->running->status = READY;
+    }
     scheduler->running->remaining_quantum = scheduler->running->priority;
     scheduler->running = list_next(scheduler->list);
     scheduler->running->status = RUNNING;

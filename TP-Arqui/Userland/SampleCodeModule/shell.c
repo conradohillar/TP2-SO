@@ -99,9 +99,7 @@ void get_time() {
 void clear() { sys_clear_screen_asm(); }
 
 void test_processes() {
-  uint8_t *argv[] = {(uint8_t *)"8"};
-  sys_create_process_asm(test_processes_fn, 1, argv,
-                         (uint8_t *)"test_processes", 1);
+  sys_create_process_asm(test_prio, 0, NULL, (uint8_t *)"test_priority", 1);
 }
 
 static char *status_to_string(process_status status) {
@@ -199,8 +197,6 @@ void run_shell() {
   uint8_t command_buffer[COMM_BUFF_SIZE];
 
   play_startsound();
-
-  sys_create_process_asm(testing, 0, NULL, (uint8_t *)"testing", 0);
 
   sys_set_text_size_asm(1);
   scale = 1;

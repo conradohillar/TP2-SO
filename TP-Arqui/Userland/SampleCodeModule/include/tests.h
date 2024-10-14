@@ -11,10 +11,10 @@ uint8_t memcheck(void *start, uint8_t value, uint32_t size);
 int64_t satoi(char *str);
 void bussy_wait(uint64_t n);
 void endless_loop();
-void endless_loop_print(uint64_t wait);
+uint64_t endless_loop_print(uint64_t argc, char **argv);
 
 void test_mm(uint64_t argc, uint8_t *argv[]);
 uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]);
-void test_prio(uint64_t argc, uint8_t *argv[]);
+uint64_t test_prio(uint64_t argc, uint8_t *argv[]);
 
 #endif
