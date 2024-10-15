@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <registers.h>
 
 static uint64_t registers[17] = {0}; // 15,14,13,12,11,10,9,8,si,di,bp,d,c,b,a,ip,sp

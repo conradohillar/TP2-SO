@@ -1,4 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
@@ -147,8 +149,7 @@ uint8_t kill(processManagerADT pm, uint64_t pid) {
 
 static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
                                  process_status status) {
-  if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
-      pm->process_table[pid].pcb == NULL ||
+  if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->killable == 0) {
     return -1;
   }
@@ -202,8 +203,7 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
 
 void wait(processManagerADT pm) {
   uint64_t pid = getpid(pm);
-  if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
-      pm->process_table[pid].pcb == NULL) {
+  if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL) {
     return;
   }
 
@@ -225,8 +225,7 @@ void wait(processManagerADT pm) {
 void waitpid(processManagerADT pm, uint64_t pid) {
   uint64_t ppid = getpid(pm);
 
-  if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
-      pm->process_table[pid].pcb == NULL ||
+  if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->parent_pid != ppid) {
     return;
   }
@@ -244,8 +243,7 @@ void waitpid(processManagerADT pm, uint64_t pid) {
 }
 
 uint8_t block(processManagerADT pm, uint64_t pid) {
-  if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
-      pm->process_table[pid].pcb == NULL ||
+  if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->status == BLOCKED ||
       pm->process_table[pid].pcb->status == KILLED) {
     return -1;
@@ -259,8 +257,7 @@ uint8_t block(processManagerADT pm, uint64_t pid) {
 }
 
 uint8_t unblock(processManagerADT pm, uint64_t pid) {
-  if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
-      pm->process_table[pid].pcb == NULL ||
+  if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->status != BLOCKED) {
     return -1;
   }
@@ -281,8 +278,7 @@ uint64_t getppid(processManagerADT pm) {
 }
 
 uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
-  if (pid < 0 || pid >= MAX_PROCESS_COUNT ||
-      pm->process_table[pid].pcb == NULL ||
+  if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->status == KILLED || priority > MAX_PRIORITY) {
     return -1;
   }
