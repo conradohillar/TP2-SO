@@ -15,6 +15,7 @@ GLOBAL sys_sleep_asm
 GLOBAL sys_create_process_asm
 GLOBAL sys_kill_asm
 GLOBAL sys_wait_asm
+GLOBAL sys_waitpid_asm
 GLOBAL sys_block_asm
 GLOBAL sys_unblock_asm
 GLOBAL sys_getpid_asm
@@ -338,6 +339,24 @@ sys_wait_asm:
 
     ret
 
+sys_waitpid_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi
+    mov rdi, 15                 ;id syscall wait
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
 sys_block_asm:
     push rbp    
     mov rbp, rsp
@@ -345,7 +364,7 @@ sys_block_asm:
     pushState
 
     mov rsi, rdi
-    mov rdi, 15                  ;id syscall block
+    mov rdi, 16                  ;id syscall block
 
     int 80h
 
@@ -363,7 +382,7 @@ sys_unblock_asm:
     pushState
 
     mov rsi, rdi
-    mov rdi, 16                  ;id syscall unblock
+    mov rdi, 17                  ;id syscall unblock
 
     int 80h
 
@@ -380,7 +399,7 @@ sys_getpid_asm:
 
     pushState
 
-    mov rdi, 17                  ;id syscall getpid
+    mov rdi, 18                  ;id syscall getpid
 
     int 80h
 
@@ -397,7 +416,7 @@ sys_ps_asm:
 
     pushState
 
-    mov rdi, 18                  ;id syscall ps
+    mov rdi, 19                  ;id syscall ps
 
     int 80h
 
@@ -415,7 +434,7 @@ sys_free_ps_asm:
     pushState
 
     mov rsi, rdi                 ; ps
-    mov rdi, 19                  ;id syscall free_ps
+    mov rdi, 20                  ;id syscall free_ps
 
     int 80h
 
@@ -434,7 +453,7 @@ sys_set_priority_asm:
     
     mov rdx, rsi
     mov rsi, rdi                ;size
-    mov rdi, 20                ;id syscall set_priority
+    mov rdi, 21                ;id syscall set_priority
 
     int 80h
 

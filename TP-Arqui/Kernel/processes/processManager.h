@@ -26,6 +26,7 @@ typedef struct process_control_block {
   uint8_t remaining_quantum;
   process_status status;
   uint8_t waiting;
+  int32_t waiting_pid;
 
 } process_control_block;
 

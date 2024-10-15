@@ -10,7 +10,7 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
   uint8_t alive = 0;
   uint8_t action;
   uint64_t max_processes;
-  char *argvAux[] = {0};
+  uint8_t *argvAux[] = {0};
 
   if (argc != 1)
     return -1;
@@ -24,11 +24,12 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
   // Create max_processes processes
   for (rq = 0; rq < max_processes; rq++) {
 
-    p_rqs[rq].pid = sys_create_process_asm((uint64_t)endless_loop, 0, argvAux,
-                                           "endless_loop", 0);
+    p_rqs[rq].pid = sys_create_process_asm((fn)endless_loop, 0, argvAux,
+                                           (uint8_t *)"endless_loop", 0);
 
     if (p_rqs[rq].pid == -1) {
-      printcolor("test_processes: ERROR creating process\n", 0xFF0000, 0x000);
+      printcolor((uint8_t *)"test_processes: ERROR creating process\n",
+                 0xFF0000, 0x000);
       return -1;
     } else {
       printcolor((uint8_t *)"Created process pid: ", ORANGE, 0x000000);
@@ -41,16 +42,6 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
       sleep(0, 100);
     }
   }
-
-  // for (uint32_t i = 0; i < alive; i++) {
-  //   sys_kill_asm(p_rqs[i].pid);
-  //   printcolor((uint8_t *)"Killed process number: ", RED, 0x000000);
-  //   uint8_t num[20] = {0};
-  //   itoa(p_rqs[i].pid, num);
-  //   printcolor((uint8_t *)num, ORANGE, 0x000000);
-  //   printcolor((uint8_t *)"\n", ORANGE, 0x000000);
-  //   sleep(0, 100);
-  // }
 
   // Randomly kills, blocks or unblocks processes until every one has been
   //   killed
@@ -67,8 +58,8 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
       case 0:
         if (p_rqs[rq].state == RUNNING || p_rqs[rq].state == BLOCKED) {
           if (sys_kill_asm(p_rqs[rq].pid) == -1) {
-            printcolor("test_processes:  ERROR killing process\n", 0xFF0000,
-                       0x000000);
+            printcolor((uint8_t *)"test_processes:  ERROR killing process\n",
+                       0xFF0000, 0x000000);
             return -1;
           }
 
@@ -88,9 +79,9 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
       case 1:
         if (p_rqs[rq].state == RUNNING) {
           if (sys_block_asm(p_rqs[rq].pid) == -1) {
-            printcolor("test_processes:  ERROR blocking process\n", 0xFF0000,
-                       0x000000);
-            // printf("test_processes: ERROR blocking process\n");
+            printcolor((uint8_t *)"test_processes:  ERROR blocking process\n",
+                       0xFF0000, 0x000000);
+            // printf((uint8_t *)"test_processes: ERROR blocking process\n");
             return -1;
           }
 
@@ -112,8 +103,8 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
     for (rq = 0; rq < max_processes; rq++)
       if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2) {
         if (sys_unblock_asm(p_rqs[rq].pid) == -1) {
-          printcolor("test_processes:  ERROR unblocking process\n", 0xFF0000,
-                     0x000000);
+          printcolor((uint8_t *)"test_processes:  ERROR unblocking process\n",
+                     0xFF0000, 0x000000);
           return -1;
         }
 
@@ -127,28 +118,28 @@ uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
         printcolor((uint8_t *)"\n", GREEN, 0x000000);
         sleep(0, 100);
       }
-    printcolor("Blocked processes count: ", ORANGE, BLACK);
+    printcolor((uint8_t *)"Blocked processes count: ", ORANGE, BLACK);
     uint8_t num[20] = {0};
     itoa(blocked_processes, num);
     printcolor((uint8_t *)num, ORANGE, 0x000000);
     printcolor((uint8_t *)"\n", BLUE, 0x000000);
 
-    printcolor("Killed processes count: ", RED, BLACK);
+    printcolor((uint8_t *)"Killed processes count: ", RED, BLACK);
     itoa(killed_processes, num);
     printcolor((uint8_t *)num, RED, 0x000000);
     printcolor((uint8_t *)"\n", BLUE, 0x000000);
 
-    printcolor("Unblocked processes count: ", GREEN, BLACK);
+    printcolor((uint8_t *)"Unblocked processes count: ", GREEN, BLACK);
     itoa(unblocked_processes, num);
     printcolor((uint8_t *)num, GREEN, 0x000000);
     printcolor((uint8_t *)"\n", BLUE, 0x000000);
 
-    printcolor("Remaining alive processes: ", BLUE, BLACK);
+    printcolor((uint8_t *)"Remaining alive processes: ", BLUE, BLACK);
     itoa(alive, num);
     printcolor((uint8_t *)num, BLUE, 0x000000);
     printcolor((uint8_t *)"\n", BLUE, 0x000000);
     sleep(3, 0);
   }
-  printcolor("Test: Success\n", GREEN, BLACK);
+  printcolor((uint8_t *)"Test: Success\n", GREEN, BLACK);
   return 0;
 }

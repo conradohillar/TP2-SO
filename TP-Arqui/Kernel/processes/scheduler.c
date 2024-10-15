@@ -30,13 +30,14 @@ schedulerADT create_scheduler() {
 
 void add_to_scheduler(schedulerADT scheduler, process_control_block *pcb) {
   if (!add_to_list(scheduler->list, pcb)) {
-    put_string_nt("Error adding to scheduler\n", 0xFF0000, 0x000000);
+    put_string_nt((uint8_t *)"Error adding to scheduler\n", 0xFF0000, 0x000000);
   }
 }
 
 void remove_from_scheduler(schedulerADT scheduler, process_control_block *pcb) {
   if (!remove_from_list(scheduler->list, pcb)) {
-    put_string_nt("Error removing from scheduler\n", 0xFF0000, 0x000000);
+    put_string_nt((uint8_t *)"Error removing from scheduler\n", 0xFF0000,
+                  0x000000);
   }
 }
 

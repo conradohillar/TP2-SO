@@ -1,10 +1,11 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
-// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
+// https://pvs-studio.com
 
-#include <stdint.h>
-#include <stdio.h>
-#include "syscall.h"
 #include "test_util.h"
+#include "../include/textMode.h"
+#include "syscall.h"
+#include <stdint.h>
 
 // Random
 static uint32_t m_z = 362436069;
@@ -34,7 +35,7 @@ uint8_t memcheck(void *start, uint8_t value, uint32_t size) {
 }
 
 // Parameters
-int64_t satoi(char *str) {
+int64_t satoi(uint8_t *str) {
   uint64_t i = 0;
   int64_t res = 0;
   int8_t sign = 1;
@@ -69,29 +70,30 @@ void endless_loop() {
 }
 
 void endless_loop_print(uint64_t wait) {
-  int64_t pid = my_getpid();
 
   while (1) {
-    // printf("%ld ", pid);
+
+    put_string_nt((uint8_t *)"HOLA", 0x00FF00, 0x000000);
     bussy_wait(wait);
   }
 }
 
-uint32_t itoa(uint32_t num, uint8_t * str) {
-    uint32_t digits = 1;
-	for (uint32_t n = num / 10; n != 0; digits++, n /= 10);
+uint32_t itoa(uint32_t num, uint8_t *str) {
+  uint32_t digits = 1;
+  for (uint32_t n = num / 10; n != 0; digits++, n /= 10)
+    ;
 
-    if(digits == 1) {
-        str[0] = num + '0';
-        str[1] = '\0';
-        return digits;
-    }
-	
-	str[digits] = '\0';    
-	for (int32_t i = digits - 1; i >= 0; i--) {
-		str[i] = (num % 10) + '0';
-		num /= 10;
-	}
-	
-	return digits;
+  if (digits == 1) {
+    str[0] = num + '0';
+    str[1] = '\0';
+    return digits;
+  }
+
+  str[digits] = '\0';
+  for (int32_t i = digits - 1; i >= 0; i--) {
+    str[i] = (num % 10) + '0';
+    num /= 10;
+  }
+
+  return digits;
 }

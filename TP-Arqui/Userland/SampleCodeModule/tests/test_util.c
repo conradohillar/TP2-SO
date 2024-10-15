@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
+#include "../include/syscaller.h"
 #include "../include/tests.h"
 #include <stdint.h>
 
@@ -33,7 +34,7 @@ uint8_t memcheck(void *start, uint8_t value, uint32_t size) {
 }
 
 // Parameters
-int64_t satoi(char *str) {
+int64_t satoi(uint8_t *str) {
   uint64_t i = 0;
   int64_t res = 0;
   int8_t sign = 1;
@@ -67,8 +68,10 @@ void endless_loop() {
     ;
 }
 
-uint64_t endless_loop_print(uint64_t argc, char **argv) {
+uint64_t endless_loop_print(uint64_t argc, uint8_t *argv[]) {
+
   uint64_t wait = satoi(argv[0]);
+
   uint8_t pid_s[20] = {0};
   itoa(sys_getpid_asm(), pid_s);
 

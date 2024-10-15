@@ -42,10 +42,10 @@ processManagerADT create_process_manager(schedulerADT scheduler) {
   pm->scheduler = scheduler;
 
   // INIT process (unkillable)
-  create_process(pm, init_process, NULL, 0, "init", 0);
+  create_process(pm, (main_fn)init_process, 0, NULL, (uint8_t *)"init", 0);
 
   // SHELL
-  create_process(pm, (main_fn)USERLAND_ADDRESS, NULL, 0, "shell", 1);
+  create_process(pm, (main_fn)USERLAND_ADDRESS, 0, NULL, (uint8_t *)"shell", 1);
   set_priority(pm, 1, 5);
 
   return pm;
@@ -70,7 +70,8 @@ uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
     strcpy(argv_copy[i], argv[i]);
   }
 
-  pcb_init(pm, new_pcb, process_wrapper, code, argc, argv_copy, name, in_fg);
+  pcb_init(pm, new_pcb, (wrapper_fn)process_wrapper, code, argc, argv_copy,
+           name, in_fg);
 
   pm->process_table[pm->next_pid].pcb = new_pcb;
 
@@ -124,6 +125,7 @@ static void pcb_init(processManagerADT pm, process_control_block *pcb,
   pcb->remaining_quantum = 1;
   pcb->status = READY;
   pcb->waiting = 0;
+  pcb->waiting_pid = -1;
   pcb->in_fg = in_fg;
 }
 
@@ -172,8 +174,11 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
 
     // Check if parent was waiting
     uint32_t ppid = pm->process_table[pid].pcb->parent_pid;
-    if (pm->process_table[ppid].pcb->waiting) {
+    if (pm->process_table[ppid].pcb->waiting &&
+        (pm->process_table[ppid].pcb->waiting_pid == pid ||
+         pm->process_table[ppid].pcb->waiting_pid == -1)) {
       pm->process_table[ppid].pcb->waiting = 0;
+      pm->process_table[ppid].pcb->waiting_pid = -1;
       unblock(pm, ppid);
       pm->process_table[pid].pcb->status = KILLED;
     }
@@ -217,6 +222,27 @@ void wait(processManagerADT pm) {
   block(pm, pid);
 }
 
+void waitpid(processManagerADT pm, uint64_t pid) {
+  uint64_t ppid = getpid(pm);
+
+  if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
+      pm->process_table[pid].pcb == NULL ||
+      pm->process_table[pid].pcb->parent_pid != ppid) {
+    return;
+  }
+
+  if (pm->process_table[pid].pcb->status == ZOMBIE) {
+    unblock(pm, ppid);
+    kill(pm, pid);
+    return;
+  }
+
+  // In case child with PID pid hasn't finished, block parent
+  pm->process_table[ppid].pcb->waiting = 1;
+  pm->process_table[ppid].pcb->waiting_pid = pid;
+  block(pm, ppid);
+}
+
 uint8_t block(processManagerADT pm, uint64_t pid) {
   if (pid >= MAX_PROCESS_COUNT || pid < 0 ||
       pm->process_table[pid].pcb == NULL ||
@@ -257,7 +283,7 @@ uint64_t getppid(processManagerADT pm) {
 uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
   if (pid < 0 || pid >= MAX_PROCESS_COUNT ||
       pm->process_table[pid].pcb == NULL ||
-      pm->process_table[pid].pcb->status == KILLED) {
+      pm->process_table[pid].pcb->status == KILLED || priority > MAX_PRIORITY) {
     return -1;
   }
 
@@ -279,8 +305,8 @@ ps_struct *send_ps_info(processManagerADT pm) {
     if (pm->process_table[i].pcb != NULL) {
       info[j].pid = pm->process_table[i].pcb->pid;
       info[j].name = pm->process_table[i].pcb->name;
-      info[j].sp = pm->process_table[i].pcb->stack_pointer;
-      info[j].bp = pm->process_table[i].pcb->stack_base_pointer;
+      info[j].sp = (uint64_t)pm->process_table[i].pcb->stack_pointer;
+      info[j].bp = (uint64_t)pm->process_table[i].pcb->stack_base_pointer;
       info[j].state = pm->process_table[i].pcb->status;
       info[j].priority = pm->process_table[i].pcb->priority;
       info[j].in_fg = pm->process_table[i].pcb->in_fg;
@@ -308,7 +334,7 @@ void destroy_process_table(processManagerADT pm) {
   mm_free(pm);
 }
 
-void init_process(int argc, char **argv) {
+void init_process(uint64_t argc, uint8_t **argv) {
   while (1) {
     _hlt();
   }

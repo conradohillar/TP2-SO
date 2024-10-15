@@ -8,10 +8,10 @@
 uint32_t GetUint();
 uint32_t GetUniform(uint32_t max);
 uint8_t memcheck(void *start, uint8_t value, uint32_t size);
-int64_t satoi(char *str);
+int64_t satoi(uint8_t *str);
 void bussy_wait(uint64_t n);
 void endless_loop();
-uint64_t endless_loop_print(uint64_t argc, char **argv);
+uint64_t endless_loop_print(uint64_t argc, uint8_t **argv);
 
 void test_mm(uint64_t argc, uint8_t *argv[]);
 uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]);

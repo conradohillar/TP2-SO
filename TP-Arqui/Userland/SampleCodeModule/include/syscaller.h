@@ -43,6 +43,8 @@ uint64_t sys_kill_asm(uint64_t pid);
 
 void sys_wait_asm();
 
+void sys_waitpid_asm(uint64_t pid);
+
 uint64_t sys_block_asm(uint64_t pid);
 
 uint64_t sys_unblock_asm(uint64_t pid);

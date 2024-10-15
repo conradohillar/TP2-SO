@@ -52,7 +52,7 @@ uint64_t putchar(uint8_t c) {
 
 void print_spaces(uint64_t spaces) {
   for (int i = 0; i < spaces; i++) {
-    print(" ");
+    print((uint8_t *)" ");
   }
 }
 

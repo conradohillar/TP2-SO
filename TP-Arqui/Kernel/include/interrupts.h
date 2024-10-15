@@ -1,4 +1,4 @@
- /*
+/*
  *   interrupts.h
  *
  *  Created on: Apr 18, 2010
@@ -27,11 +27,13 @@ void _sti(void);
 
 void _hlt(void);
 
+void asm_yield(void);
+
 void picMasterMask(uint8_t mask);
 
 void picSlaveMask(uint8_t mask);
 
-//Termina la ejecución de la cpu.
+// Termina la ejecución de la cpu.
 void haltcpu(void);
 
 #endif /* INTERRUPS_H_ */

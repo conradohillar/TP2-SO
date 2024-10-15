@@ -9,6 +9,7 @@
 #define MAX_PROCESS_COUNT 64
 #define STACK_SIZE_BYTES 4096
 #define INIT_PID 0
+#define MAX_PRIORITY 5
 
 typedef struct process_node {
   process_control_block *pcb;
@@ -36,7 +37,7 @@ processManagerADT create_process_manager(schedulerADT scheduler);
 uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
                         uint8_t **argv, uint8_t *name, uint8_t in_fg);
 
-void init_process(int argc, char **argv);
+void init_process(uint64_t argc, uint8_t **argv);
 
 /**
  * Exits the current process.
@@ -50,9 +51,16 @@ uint8_t exit(processManagerADT pm, uint64_t pid);
 uint8_t kill(processManagerADT pm, uint64_t pid);
 
 /**
- * Running process for any child to finish.
+ * Running process waits for any child to finish.
  */
 void wait(processManagerADT pm);
+
+/**
+ * Running process waits for a specific
+ * child to finish.
+ * @param pid The PID of the child.
+ */
+void waitpid(processManagerADT pm, uint64_t pid);
 
 /**
  * Blocks a process.

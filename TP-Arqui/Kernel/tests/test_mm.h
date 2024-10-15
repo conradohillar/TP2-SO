@@ -1,11 +1,7 @@
 #include "../memory/memoryManager.h"
-#include "test_util.h"
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <unistd.h>
 #include "syscall.h"
+#include "test_util.h"
 
 #define MAX_BLOCKS 128
 
-uint64_t test_mm(uint64_t argc, char *argv[]);
+uint64_t test_mm(uint64_t argc, uint8_t *argv[]);

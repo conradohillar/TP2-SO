@@ -12,7 +12,7 @@ typedef struct MM_rq {
 
 uint64_t total_allocated_blocks = 0;
 
-uint64_t test_mm(uint64_t argc, char *argv[]) {
+uint64_t test_mm(uint64_t argc, uint8_t *argv[]) {
 
   mm_rq mm_rqs[MAX_BLOCKS];
   uint8_t rq;
@@ -24,7 +24,7 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
     return -1;
   }
 
-  if ((max_memory = satoi(argv[0])) <= 0) {
+  if ((max_memory = satoi((uint8_t *)argv[0])) <= 0) {
     put_string_nt((uint8_t *)"Failed 2\n", 0xFF0000, 0x000000);
     return -1;
   }
@@ -42,8 +42,8 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
         itoa(total_allocated_blocks, num);
         put_string_nt((uint8_t *)num, 0x00FF00, 0x000000);
         put_string_nt((uint8_t *)"\n", 0x00FF00, 0x000000);
-        itoa(mm_rqs[rq].address, num);
-        put_string_nt("last address: ", 0x00FF00, 0x000000);
+        itoa((uint64_t)mm_rqs[rq].address, num);
+        put_string_nt((uint8_t *)"last address: ", 0x00FF00, 0x000000);
         put_string_nt((uint8_t *)num, 0x00FF00, 0x000000);
         put_string_nt((uint8_t *)"\n", 0x00FF00, 0x000000);
       }

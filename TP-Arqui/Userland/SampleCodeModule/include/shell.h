@@ -30,6 +30,12 @@ void get_time();
 
 void clear();
 
+void test_processes();
+
+void test_priority();
+
+void ps();
+
 void play_song(uint8_t idx);
 
 uint64_t get_command(uint8_t *str);
