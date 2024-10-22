@@ -16,6 +16,7 @@
     "syscaller.h": "c",
     "tests.h": "c",
     "syscall.h": "c",
-    "test_util.h": "c"
+    "test_util.h": "c",
+    "semaphore.h": "c"
   }
 }
