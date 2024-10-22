@@ -17,6 +17,7 @@
     "tests.h": "c",
     "syscall.h": "c",
     "test_util.h": "c",
-    "semaphore.h": "c"
+    "semaphore.h": "c",
+    "processutils.h": "c"
   }
 }

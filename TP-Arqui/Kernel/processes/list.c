@@ -2,11 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./list.h"
 
-typedef struct node node;
-struct node {
+typedef struct node {
   void *data;
   node *next;
-};
+} node;
 
 struct listT {
   node *first;
@@ -92,6 +91,24 @@ uint8_t remove_from_list(listADT list, void *data) {
     list->last = NULL;
   }
   return 1;
+}
+
+void *remove_first(listADT list) {
+  if (list == NULL || is_empty(list))
+    return NULL;
+
+  node *current = list->first;
+  void *data = current->data;
+  list->first = current->next;
+  list->last->next = list->first;
+  mm_free(current);
+  list->size--;
+  if (list->size == 0) {
+    list->first = NULL;
+    list->next = NULL;
+    list->last = NULL;
+  }
+  return data;
 }
 
 void *list_next(const listADT list) {
