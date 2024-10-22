@@ -49,6 +49,8 @@ while (rq < MAX_BLOCKS && total < max_memory) {
     }
 }
 
+    print_memory_state();
+    fflush(stdout);
     // Set
     printf("Seteando...\n");
 
@@ -74,4 +76,5 @@ while (rq < MAX_BLOCKS && total < max_memory) {
       if (mm_rqs[i].address)
         mm_free(mm_rqs[i].address);
   }
+  print_memory_state();
 }
