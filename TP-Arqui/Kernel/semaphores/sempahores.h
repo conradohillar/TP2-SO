@@ -19,6 +19,9 @@ typedef struct sem_t {
 
 typedef struct semaphoreManagerCDT *semaphoreManagerADT;
 
+semaphoreManagerADT create_semaphore_manager();
+void destroy_semaphore_manager(semaphoreManagerADT sm);
+
 void acquire(uint8_t *lock);
 void release(uint8_t *lock);
 
@@ -33,5 +36,7 @@ void sem_wait(semaphoreManagerADT sm, process_control_block *running_pcb,
               sem_t *sem);
 void sem_post(semaphoreManagerADT sm, sem_t *sem);
 void sem_destroy(semaphoreManagerADT sm, sem_t *sem);
+
+sem_t *get_sem(semaphoreManagerADT sm, uint8_t id);
 
 #endif

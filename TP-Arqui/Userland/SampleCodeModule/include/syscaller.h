@@ -56,3 +56,11 @@ void sys_set_priority_asm(uint64_t pid, uint8_t new_priority);
 uint64_t sys_ps_asm();
 
 void sys_free_ps_asm(ps_struct *ps);
+
+int8_t sys_sem_init_asm(uint8_t id, uint8_t count);
+
+void sys_sem_wait_asm(semaphore sem);
+
+void sys_sem_post_asm(semaphore sem);
+
+void sys_sem_destroy_asm(semaphore sem);

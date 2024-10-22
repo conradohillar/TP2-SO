@@ -3,6 +3,8 @@
 #include <syscalls.h>
 
 extern processManagerADT my_pm;
+extern schedulerADT my_scheduler;
+extern semaphoreManagerADT my_sm;
 
 uint64_t sys_read(uint8_t fd, uint8_t *buffer, uint64_t size) {
   if (fd != STDIN) {
@@ -92,3 +94,19 @@ void sys_free_ps(ps_struct *ps) { free_ps(ps); }
 void sys_set_priority(uint64_t pid, uint8_t new_priority) {
   set_priority(my_pm, pid, new_priority);
 }
+
+int8_t sys_sem_init(uint8_t id, uint8_t count) {
+  sem_t *sem = sem_init(my_sm, id, count);
+  if (sem == NULL) {
+    return -1;
+  }
+  return (int8_t)id;
+}
+
+void sys_sem_wait(uint8_t id) {
+  sem_wait(my_sm, get_running(my_scheduler), get_sem(my_sm, id));
+}
+
+void sys_sem_post(uint8_t id) { sem_post(my_sm, get_sem(my_sm, id)); }
+
+void sys_sem_destroy(uint8_t id) { sem_destroy(my_sm, get_sem(my_sm, id)); }

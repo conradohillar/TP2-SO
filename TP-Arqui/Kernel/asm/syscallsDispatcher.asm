@@ -20,6 +20,10 @@ EXTERN sys_getpid
 EXTERN sys_ps
 EXTERN sys_free_ps
 EXTERN sys_set_priority
+EXTERN sys_sem_init
+EXTERN sys_sem_wait
+EXTERN sys_sem_post
+EXTERN sys_sem_destroy
 
 GLOBAL syscalls_dispatcher
 
@@ -74,6 +78,14 @@ syscalls_dispatcher:
     je free_ps
     cmp rdi,21
     je set_priority
+    cmp rdi,22
+    je sem_init
+    cmp rdi,23
+    je sem_wait
+    cmp rdi,24
+    je sem_post
+    cmp rdi,25
+    je sem_destroy
 
 end:
     cli
@@ -231,4 +243,25 @@ set_priority:
     mov rdi, rsi                ;pid
     mov rsi, rdx                ;priority
     call sys_set_priority
+    jmp end
+
+sem_init:
+    mov rdi, rsi                ;count
+    mov rsi, rdx                ;id
+    call sys_sem_init
+    jmp end
+
+sem_wait:
+    mov rdi, rsi                ;id
+    call sys_sem_wait
+    jmp end
+
+sem_post:
+    mov rdi, rsi                ;id
+    call sys_sem_post
+    jmp end
+
+sem_destroy:
+    mov rdi, rsi                ;id
+    call sys_sem_destroy
     jmp end

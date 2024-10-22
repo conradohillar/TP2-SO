@@ -12,6 +12,7 @@ extern uint8_t endOfKernel;
 
 schedulerADT my_scheduler = NULL;
 processManagerADT my_pm = NULL;
+semaphoreManagerADT my_sm = NULL;
 
 static const uint64_t PageSize = 0x1000;
 
@@ -77,8 +78,17 @@ int main() {
     return -1;
   }
 
+  my_sm = create_semaphore_manager();
+  if (my_sm == NULL) {
+    put_string_nt((uint8_t *)"Error creando semaphore manager\n", 0xFF0000,
+                  0x000000);
+    return -1;
+  }
+
   _sti();
 
+  destroy_semaphore_manager(my_sm);
+  put_string_nt((uint8_t *)"\nLiberando my_sm\n", 0x00FF00, 0x000000);
   destroy_process_table(my_pm);
   put_string_nt((uint8_t *)"\nLiberando my_pm\n", 0x00FF00, 0x000000);
 

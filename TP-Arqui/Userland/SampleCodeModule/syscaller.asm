@@ -22,6 +22,10 @@ GLOBAL sys_getpid_asm
 GLOBAL sys_ps_asm
 GLOBAL sys_free_ps_asm
 GLOBAL sys_set_priority_asm
+GLOBAL sys_sem_init_asm
+GLOBAL sys_sem_wait_asm
+GLOBAL sys_sem_post_asm
+GLOBAL sys_sem_destroy_asm
 
 
 %macro pushState 0
@@ -462,7 +466,80 @@ sys_set_priority_asm:
     mov rsp, rbp
     pop rbp
 
-    ret    
+    ret   
+
+sys_sem_init_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rdx, rsi                 ; count
+    mov rsi, rdi                 ; id
+    mov rdi, 22                  ;id syscall sem_init
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 
+
+sys_sem_wait_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 ; sem
+    mov rdi, 23                  ;id syscall sem_wait
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 
+
+sys_sem_post_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 ; sem
+    mov rdi, 24                  ;id syscall sem_post
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 
+
+sys_sem_destroy_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 ; sem
+    mov rdi, 25                  ;id syscall sem_destroy
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 
 
 
 

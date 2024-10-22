@@ -7,6 +7,7 @@ typedef int (*EntryPoint)();
 #include <../processes/process.h>
 #include <../processes/processManager.h>
 #include <../processes/scheduler.h>
+#include <../semaphores/sempahores.h>
 #include <idtLoader.h>
 #include <lib.h>
 #include <moduleLoader.h>

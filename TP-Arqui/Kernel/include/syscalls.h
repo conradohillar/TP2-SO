@@ -4,6 +4,7 @@
 #include "../../processUtils.h"
 #include "../processes/process.h"
 #include "../processes/processManager.h"
+#include "../semaphores/sempahores.h"
 #include <keyboardDriver.h>
 #include <mytime.h>
 #include <registers.h>
@@ -66,5 +67,13 @@ uint64_t sys_ps();
 void sys_free_ps(ps_struct *ps);
 
 void sys_set_priority(uint64_t pid, uint8_t new_priority);
+
+int8_t sys_sem_init(uint8_t id, uint8_t count);
+
+void sys_sem_wait(uint8_t id);
+
+void sys_sem_post(uint8_t id);
+
+void sys_sem_destroy(uint8_t id);
 
 #endif

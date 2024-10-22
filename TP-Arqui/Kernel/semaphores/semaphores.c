@@ -8,6 +8,20 @@ typedef struct semaphoreManagerCDT {
   uint8_t count;
 } semaphoreManagerCDT;
 
+semaphoreManagerADT create_semaphore_manager() {
+  semaphoreManagerADT sm =
+      (semaphoreManagerADT)mm_malloc(sizeof(semaphoreManagerCDT));
+  if (sm == NULL) {
+    // TODO: MANEJAR ERROR DE MALLOC
+    return NULL;
+  }
+  sm->count = 0;
+  for (int i = 0; i < MAX_SEM_COUNT; i++) {
+    sm->semaphores[i] = NULL;
+  }
+  return sm;
+}
+
 sem_t *sem_init(semaphoreManagerADT sm, uint8_t id, uint8_t count) {
   if (sm == NULL || sm->semaphores[id] != NULL) {
     // TODO: MANEJAR ERRORES DE CREACION DE SEMAFOROS
@@ -35,8 +49,8 @@ void sem_wait(semaphoreManagerADT sm, process_control_block *running_pcb,
     release(&sem->lock);
   } else {
     release(&sem->lock);
-    add_to_list(sem->blocked_processes, running_pcb);
-    block(my_pm, running_pcb);
+    add_to_list(sem->blocked_processes, (void *)running_pcb);
+    block(my_pm, running_pcb->pid);
   }
 }
 
@@ -46,11 +60,18 @@ void sem_post(semaphoreManagerADT sm, sem_t *sem) {
     release(&sem->lock);
     process_control_block *pcb =
         (process_control_block *)remove_first(sem->blocked_processes);
-    unblock(my_pm, pcb);
+    unblock(my_pm, pcb->pid);
   } else {
     sem->count++;
     release(&sem->lock);
   }
+}
+
+sem_t *get_sem(semaphoreManagerADT sm, uint8_t id) {
+  if (sm == NULL || id >= MAX_SEM_COUNT) {
+    return NULL;
+  }
+  return sm->semaphores[id];
 }
 
 void sem_destroy(semaphoreManagerADT sm, sem_t *sem) {
@@ -59,4 +80,16 @@ void sem_destroy(semaphoreManagerADT sm, sem_t *sem) {
   }
   sm->semaphores[sem->id] = NULL;
   mm_free(sem);
+}
+
+void destroy_semaphore_manager(semaphoreManagerADT sm) {
+  if (sm == NULL) {
+    return;
+  }
+  for (int i = 0; i < MAX_SEM_COUNT; i++) {
+    if (sm->semaphores[i] != NULL) {
+      sem_destroy(sm, sm->semaphores[i]);
+    }
+  }
+  mm_free(sm);
 }

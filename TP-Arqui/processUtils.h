@@ -20,4 +20,6 @@ typedef struct ps_struct {
   uint64_t count;
 } ps_struct;
 
+typedef uint8_t semaphore;
+
 #endif
