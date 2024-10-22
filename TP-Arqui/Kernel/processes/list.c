@@ -2,10 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./list.h"
 
-typedef struct node {
+typedef struct node node;
+
+struct node {
   void *data;
   node *next;
-} node;
+};
 
 struct listT {
   node *first;
