@@ -30,7 +30,7 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
   }
 
   while (1) {
-    if (total_allocated_blocks % 5000 == 0) {
+    if (total_allocated_blocks % 50 == 0) {
       put_string_nt((uint8_t *)"Allocated blocks: ", 0x00FF00, 0x000000);
       uint8_t num[20] = {0};
       itoa(total_allocated_blocks, num);

@@ -9,7 +9,7 @@
 #define MEM_MANAGER_ADDRESS                                                    \
   0x050000 // Dirección de memoria para el Memory Manager (segun Pure64 alli
            // esta libre)
-#define MEMORY_SIZE 65536 //
+#define MEMORY_SIZE 4194304 //
 typedef struct MemoryManagerCDT *MemoryManagerADT;
 
 MemoryManagerADT *mm_init(void *mem_start_address, void *mem_manager_address,

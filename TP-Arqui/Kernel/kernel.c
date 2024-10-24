@@ -50,7 +50,7 @@ int main() {
   put_string_nt("Creando variables\n", 0x00FF00, 0x000000);
 
   uint64_t argc = 2;
-  char *argv[] = {"4096"};
+  char *argv[] = {"2097152"};
 
   put_string_nt("Ejecutando test_mm\n", 0x00FF00, 0x000000);
 
