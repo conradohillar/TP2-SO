@@ -67,3 +67,7 @@ ls
 exit
 exit
 exit
+ls root
+cd root
+ls
+exit
