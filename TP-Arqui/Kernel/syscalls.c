@@ -66,9 +66,9 @@ void sys_sleep(uint64_t secs, uint64_t millis) {
 int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
                            uint8_t *name, uint8_t in_fg) {
   int32_t res = create_process(my_pm, code, argc, argv, name, in_fg);
-  if (in_fg) {
-    waitpid(my_pm, res);
-  }
+//   if (in_fg) {
+//     waitpid(my_pm, res);
+//   }
   return res;
 }
 
@@ -76,7 +76,7 @@ int64_t sys_kill(uint64_t pid) { return kill(my_pm, pid); }
 
 void sys_wait() { wait(my_pm); }
 
-void sys_waitpid(uint64_t pid) { waitpid(my_pm, pid); }
+int64_t sys_waitpid(uint64_t pid) { return waitpid(my_pm, pid); }
 
 int64_t sys_block(uint64_t pid) { return block(my_pm, pid); }
 

@@ -27,6 +27,7 @@ typedef struct process_control_block {
   process_status status;
   uint8_t waiting;
   int32_t waiting_pid;
+  int64_t return_value;
 
 } process_control_block;
 

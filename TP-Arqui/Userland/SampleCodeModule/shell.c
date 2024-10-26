@@ -243,8 +243,35 @@ void run_shell() {
 }
 
 void test_semaphores() {
-  char *argv[] = {"1", "1", NULL};
-  sys_create_process_asm(test_sem_synchro_fn, 2, argv, "test_semaphores", 1);
+  print("Running synchronization test...\n");
+  char *argv_synchro[] = {"1", "1", NULL};
+  char *argv_asynchro[] = {"1", "0", NULL};
+
+  int64_t value;
+  int64_t pid = sys_create_process_asm(test_sem_synchro_fn, 2, argv_synchro, "test_semaphores", 1);
+  value = sys_waitpid_asm(pid);
+  // Desde aca
+  char aux[10];
+  itoa(value, aux);
+  print(aux);
+  // Hasta aca, se puede borrar cuando funcione
+  if(value == 0){
+    print("(1 / 2) Successfully Passed\n");
+  } else{
+    print("(1 / 2) NOT Passed\n");
+  }
+  pid = sys_create_process_asm(test_sem_synchro_fn, 2, argv_asynchro, "test_semaphores", 1);
+  value = sys_waitpid_asm(pid);
+  // Desde aca
+  itoa(value, aux);
+  print(aux);
+  // Hasta aca, se puede borrar cuando funcione
+  if(value != 0){
+    print("(2 / 2) Successfully Passed\n");
+  } else{
+    print("(2 / 2) NOT Passed\n");
+  }
+  return;
 }
 // TODO
 // Hacer que los procesos devuelvan su valor y sea almacenado en su pcb.

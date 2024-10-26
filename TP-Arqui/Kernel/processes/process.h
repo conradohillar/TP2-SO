@@ -16,7 +16,7 @@ typedef struct process_node {
   uint16_t next_index;
 } process_node;
 
-typedef void (*main_fn)(uint64_t argc, uint8_t **argv);
+typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
 typedef void (*wrapper_fn)(main_fn code, uint64_t argc, uint8_t **argv);
 
 /**
@@ -60,7 +60,7 @@ void wait(processManagerADT pm);
  * child to finish.
  * @param pid The PID of the child.
  */
-void waitpid(processManagerADT pm, uint64_t pid);
+int64_t waitpid(processManagerADT pm, uint64_t pid);
 
 /**
  * Blocks a process.

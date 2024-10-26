@@ -1,3 +1,4 @@
+#include "../include/syscaller.h"
 #include "../include/tests.h"
 
 #define SEM_ID 1
@@ -5,6 +6,7 @@
 #define NULL 0
 
 int64_t global; // shared memory
+void ps();
 
 void slowInc(int64_t *p, int64_t inc) {
   uint64_t aux = *p;
@@ -38,7 +40,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   for (i = 0; i < n; i++) {
     if (use_sem)
       sys_sem_wait_asm(SEM_ID);
-    print("At inc/dec\n");
+    // print("At inc/dec\n");
     slowInc(&global, inc);
     if (use_sem)
       sys_sem_post_asm(SEM_ID);
@@ -51,8 +53,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   return 0;
 }
 
-uint64_t test_sem_synchro_fn(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
-  print("Running synchronization test...\n");
+int64_t test_sem_synchro_fn(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
   uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 
   if (argc != 2)
@@ -69,15 +70,16 @@ uint64_t test_sem_synchro_fn(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
                                      "my_process_inc", 0);
     pids[i + TOTAL_PAIR_PROCESSES] = sys_create_process_asm(
         &my_process_inc, 3, argvInc, "my_process_inc", 0);
-    print("Process created\n");
+    // print("Process created\n");
   }
-
+  // ps();
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    print("Process waiting\n");
+    // print("Process waiting\n");
     sys_waitpid_asm(pids[i]);
     sys_waitpid_asm(pids[i + TOTAL_PAIR_PROCESSES]);
-    print("Process waited\n");
+    // print("Process waited\n");
   }
-
+  //   ps();
+  sys_sem_destroy_asm(sys_sem_open_asm(SEM_ID));
   return global;
 }

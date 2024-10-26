@@ -14,7 +14,7 @@
 #include <textMode.h>
 #include <videoDriver.h>
 
-typedef void (*main_fn)(uint64_t argc, uint8_t **argv);
+typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
 
 #define STDOUT 1
 #define STDIN 0
@@ -54,7 +54,7 @@ int64_t sys_kill(uint64_t pid);
 
 void sys_wait();
 
-void sys_waitpid(uint64_t pid);
+int64_t sys_waitpid(uint64_t pid);
 
 int64_t sys_block(uint64_t pid);
 
