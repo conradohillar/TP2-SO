@@ -70,7 +70,7 @@ int main() {
     put_string_nt((uint8_t *)"Error creando scheduler\n", 0xFF0000, 0x000000);
     return -1;
   }
-
+  
   my_pm = create_process_manager(my_scheduler);
   if (my_pm == NULL) {
     put_string_nt((uint8_t *)"Error creando process manager\n", 0xFF0000,

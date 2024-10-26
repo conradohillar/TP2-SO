@@ -34,7 +34,7 @@ sem_t *sem_init(semaphoreManagerADT sm, uint8_t id, uint8_t count) {
     return NULL;
   }
   sem->id = id;
-  sem->lock = 0;
+  sem->lock = 1;
   sem->count = count;
   sem->blocked_processes = NULL;
   sm->semaphores[id] = sem;

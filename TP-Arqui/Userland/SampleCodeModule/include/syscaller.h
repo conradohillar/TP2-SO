@@ -64,3 +64,7 @@ void sys_sem_wait_asm(semaphore sem);
 void sys_sem_post_asm(semaphore sem);
 
 void sys_sem_destroy_asm(semaphore sem);
+
+int8_t sys_sem_open_asm(semaphore sem);
+
+void sys_yield();

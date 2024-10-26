@@ -26,6 +26,8 @@ GLOBAL sys_sem_init_asm
 GLOBAL sys_sem_wait_asm
 GLOBAL sys_sem_post_asm
 GLOBAL sys_sem_destroy_asm
+GLOBAL sys_sem_open_asm
+GLOBAL sys_yield
 
 
 %macro pushState 0
@@ -277,7 +279,7 @@ sys_sleep_asm:
 
     mov rdx,rsi                ;millis 
     mov rsi,rdi                ;secs
-    mov rdi,11                 ;id syscall make_sound
+    mov rdi,11                 ;id syscall sleep
 
     int 80h
 
@@ -541,5 +543,38 @@ sys_sem_destroy_asm:
 
     ret 
 
+sys_sem_open_asm:
+    push rbp    
+    mov rbp, rsp
 
+    pushState
 
+    mov rsi, rdi                 ; sem
+    mov rdi, 26                  ;id syscall sem_open
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 
+
+sys_yield:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 ; sem
+    mov rdi, 27                  ;id syscall yield
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 

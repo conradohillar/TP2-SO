@@ -110,3 +110,16 @@ void sys_sem_wait(uint8_t id) {
 void sys_sem_post(uint8_t id) { sem_post(my_sm, get_sem(my_sm, id)); }
 
 void sys_sem_destroy(uint8_t id) { sem_destroy(my_sm, get_sem(my_sm, id)); }
+
+int8_t sys_sem_open(uint8_t id) {
+  if (my_sm == NULL) {
+    return -1;
+  }
+  if (get_sem(my_sm, id) == NULL) {
+    sem_init(my_sm, id, 1);
+  }
+  if (get_sem(my_sm, id) == NULL) {
+    return -1;
+  }
+  return (int8_t)id;
+}

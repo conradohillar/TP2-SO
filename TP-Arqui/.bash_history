@@ -306,3 +306,22 @@ ls
 ./pvs.sh
 eixt
 exit
+cd root
+ls
+exit
+cd root
+gdb
+exit
+cd root
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+exit
+exit

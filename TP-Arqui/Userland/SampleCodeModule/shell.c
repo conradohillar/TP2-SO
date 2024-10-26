@@ -28,12 +28,14 @@ void help() {
   print((uint8_t *)"\t\t\t ");
   printcolor((uint8_t *)"press Ctrl + r to save the register states\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"textprocesses ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testproc ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
              GRAY, BLACK);
-  printcolor((uint8_t *)"textpriority  ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testprio  ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for changing process priorities\n", GRAY,
              BLACK);
+  printcolor((uint8_t *)"testsem ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
   printcolor((uint8_t *)"ps        ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
   printcolor((uint8_t *)"eliminator", ORANGE, BLACK);
@@ -166,17 +168,17 @@ void ps() {
 void play_song(uint8_t idx) { song_dispatcher(idx); }
 
 static uint8_t *commands[] = {
-    (uint8_t *)"help",         (uint8_t *)"divzero",
-    (uint8_t *)"inopcode",     (uint8_t *)"time",
-    (uint8_t *)"regstatus",    (uint8_t *)"eliminator",
-    (uint8_t *)"inctext",      (uint8_t *)"dectext",
-    (uint8_t *)"clear",        (uint8_t *)"testprocesses",
-    (uint8_t *)"testpriority", (uint8_t *)"ps"};
+    (uint8_t *)"help",     (uint8_t *)"divzero",   (uint8_t *)"inopcode",
+    (uint8_t *)"time",     (uint8_t *)"regstatus", (uint8_t *)"eliminator",
+    (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
+    (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
+    (uint8_t *)"testsem"};
 
 static void (*functions[])(void) = {
-    help,          check_div_by_zero, check_invalid_opcode, get_time,
-    get_registers, run_eliminator,    increase_text_size,   decrease_text_size,
-    clear,         test_processes,    test_priority,        ps};
+    help,           check_div_by_zero, check_invalid_opcode, get_time,
+    get_registers,  run_eliminator,    increase_text_size,   decrease_text_size,
+    clear,          test_processes,    test_priority,        ps,
+    test_semaphores};
 
 uint64_t get_command(uint8_t *str) {
   for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
@@ -238,4 +240,9 @@ void run_shell() {
       printcolor((uint8_t *)" is not a command\n", RED, BLACK);
     }
   }
+}
+
+void test_semaphores() {
+  char *argv[] = {"1", "1", NULL};
+  sys_create_process_asm(test_sem_synchro_fn, 2, argv, "test_semaphores", 1);
 }

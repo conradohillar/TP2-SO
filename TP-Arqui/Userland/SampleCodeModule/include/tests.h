@@ -16,5 +16,6 @@ uint64_t endless_loop_print(uint64_t argc, uint8_t **argv);
 void test_mm(uint64_t argc, uint8_t *argv[]);
 uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]);
 uint64_t test_prio(uint64_t argc, uint8_t *argv[]);
+uint64_t test_sem_synchro_fn(uint64_t argc, char *argv[]);
 
 #endif

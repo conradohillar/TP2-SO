@@ -11,7 +11,7 @@
 
 typedef struct sem_t {
   uint8_t id;
-  uint8_t lock;              // 0 = free, 1 = taken
+  uint8_t lock;              // 1 = free, 0 = taken
   uint8_t count;             // sem value (shared resource)
   listADT blocked_processes; // list
 
