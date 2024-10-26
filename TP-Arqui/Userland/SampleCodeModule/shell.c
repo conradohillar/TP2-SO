@@ -246,3 +246,8 @@ void test_semaphores() {
   char *argv[] = {"1", "1", NULL};
   sys_create_process_asm(test_sem_synchro_fn, 2, argv, "test_semaphores", 1);
 }
+// TODO
+// Hacer que los procesos devuelvan su valor y sea almacenado en su pcb.
+// Luego anadir a test_semaphores que se llame a este test con use_sem 1 y
+// global (valor que devuelve) Sea 0 y repetir con use_sem en 1 y ver que no da
+// 0, es el comportamiento esperado

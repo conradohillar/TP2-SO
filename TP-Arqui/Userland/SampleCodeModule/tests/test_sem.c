@@ -38,13 +38,13 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
   for (i = 0; i < n; i++) {
     if (use_sem)
       sys_sem_wait_asm(SEM_ID);
-  print("At inc/dec\n");
+    print("At inc/dec\n");
     slowInc(&global, inc);
     if (use_sem)
       sys_sem_post_asm(SEM_ID);
   }
 
-  if (use_sem){
+  if (use_sem) {
     // sys_sem_close_asm(SEM_ID);
   }
 
@@ -52,7 +52,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
 }
 
 uint64_t test_sem_synchro_fn(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
-print("Running synchronization test...\n");
+  print("Running synchronization test...\n");
   uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 
   if (argc != 2)
@@ -65,10 +65,11 @@ print("Running synchronization test...\n");
 
   uint64_t i;
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    pids[i] = sys_create_process_asm(&my_process_inc, 3, argvDec, "my_process_inc", 0);
-    pids[i + TOTAL_PAIR_PROCESSES] =
-        sys_create_process_asm(&my_process_inc,  3, argvInc, "my_process_inc", 0);
-        print("Process created\n");
+    pids[i] = sys_create_process_asm(&my_process_inc, 3, argvDec,
+                                     "my_process_inc", 0);
+    pids[i + TOTAL_PAIR_PROCESSES] = sys_create_process_asm(
+        &my_process_inc, 3, argvInc, "my_process_inc", 0);
+    print("Process created\n");
   }
 
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
@@ -78,11 +79,5 @@ print("Running synchronization test...\n");
     print("Process waited\n");
   }
 
-    if(!global){
-        print("Test successfully passed\n");
-    } else {
-        print("Test NOT passed\n");
-    }
-
-  return 0;
+  return global;
 }

@@ -57,12 +57,12 @@ uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
                        uint8_t **argv, uint8_t *name, uint8_t in_fg) {
 
   if (pm->process_count == MAX_PROCESS_COUNT) {
-    // MANEJAR ERRORES DESPUES
+    // TODO ERRORES DESPUES
     return -1;
   }
   process_control_block *new_pcb = mm_malloc(sizeof(process_control_block));
   if (new_pcb == NULL) {
-    // MANEJAR ERRORES DESPUES
+    // TODO ERRORES DESPUES
     return -1;
   }
 
