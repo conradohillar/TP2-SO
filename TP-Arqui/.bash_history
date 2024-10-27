@@ -325,3 +325,7 @@ gdb
 gdb
 exit
 exit
+cd root
+gdb
+gdb
+exit

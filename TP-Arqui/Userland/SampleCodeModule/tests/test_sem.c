@@ -2,7 +2,7 @@
 #include "../include/tests.h"
 
 #define SEM_ID 1
-#define TOTAL_PAIR_PROCESSES 10
+#define TOTAL_PAIR_PROCESSES 4
 #define NULL 0
 
 int64_t global; // shared memory
@@ -13,6 +13,11 @@ void slowInc(int64_t *p, int64_t inc) {
   sys_yield(); // This makes the race condition highly probable
   aux += inc;
   *p = aux;
+
+    char aux2[10];
+    itoa(*p, aux2);
+    print(aux2);
+    print("\n");
 }
 
 uint64_t my_process_inc(uint64_t argc, char *argv[]) {
@@ -63,8 +68,8 @@ int64_t test_sem_synchro_fn(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
   char *argvInc[] = {argv[0], "1", argv[1], NULL};
 
   global = 0;
-
-  uint64_t i;
+  sys_sem_init_asm(SEM_ID, 1);
+  uint64_t i = 0;
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
     pids[i] = sys_create_process_asm(&my_process_inc, 3, argvDec,
                                      "my_process_inc", 0);
@@ -72,7 +77,7 @@ int64_t test_sem_synchro_fn(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
         &my_process_inc, 3, argvInc, "my_process_inc", 0);
     // print("Process created\n");
   }
-  // ps();
+  ps();
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
     // print("Process waiting\n");
     sys_waitpid_asm(pids[i]);

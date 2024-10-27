@@ -78,6 +78,7 @@ void sem_destroy(semaphoreManagerADT sm, sem_t *sem) {
   if (sm == NULL || sem == NULL) {
     return;
   }
+  mm_free(sem->blocked_processes);
   sm->semaphores[sem->id] = NULL;
   mm_free(sem);
 }
