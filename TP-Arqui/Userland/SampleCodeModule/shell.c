@@ -117,6 +117,54 @@ void test_priority() {
   sys_waitpid_asm(pid);
 }
 
+void test_semaphores() {
+  print((uint8_t *)"Running synchronization test...\n");
+  char *argv_synchro[] = {"3", "1", NULL};
+  char *argv_asynchro[] = {"3", "0", NULL};
+
+  int64_t value;
+  int64_t pid =
+      sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_synchro,
+                             (uint8_t *)"test_semaphores", 1);
+  value = sys_waitpid_asm(pid);
+  // Desde aca
+  print((uint8_t *)"\n Using semaphore -> Global: ");
+  uint8_t aux[10];
+  if (value < 0) {
+    print((uint8_t *)"negativo\n");
+    return;
+  } else {
+    itoa(value, aux);
+    print(aux);
+  }
+  // Hasta aca, se puede borrar cuando funcione
+  if (value == 0) {
+    print((uint8_t *)"\n (1 / 2) Successfully Passed\n");
+  } else {
+    print((uint8_t *)"\n(1 / 2) NOT Passed\n");
+  }
+  pid =
+      sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_asynchro,
+                             (uint8_t *)"test_semaphores", 1);
+  value = sys_waitpid_asm(pid);
+  // Desde aca
+  print((uint8_t *)"\n Without semaphore -> Global: ");
+  if (value < 0) {
+    print((uint8_t *)"negativo\n");
+    return;
+  } else {
+    itoa(value, aux);
+    print(aux);
+  }
+  // Hasta aca, se puede borrar cuando funcione
+  if (value != 0) {
+    print((uint8_t *)"\n (2 / 2) Successfully Passed\n");
+  } else {
+    print((uint8_t *)"(2 / 2) NOT Passed\n");
+  }
+  return;
+}
+
 static uint8_t *status_to_string(process_status status) {
   switch (status) {
   case RUNNING:
@@ -244,56 +292,3 @@ void run_shell() {
     }
   }
 }
-
-void test_semaphores() {
-  print((uint8_t *)"Running synchronization test...\n");
-  char *argv_synchro[] = {"3", "1", NULL};
-  char *argv_asynchro[] = {"3", "0", NULL};
-
-  int64_t value;
-  int64_t pid =
-      sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_synchro,
-                             (uint8_t *)"test_semaphores", 1);
-  value = sys_waitpid_asm(pid);
-  // Desde aca
-  print((uint8_t *)"Global: ");
-  uint8_t aux[10];
-  if (value < 0) {
-    print((uint8_t *)"negativo\n");
-    return;
-  } else {
-    itoa(value, aux);
-    print(aux);
-  }
-  // Hasta aca, se puede borrar cuando funcione
-  if (value == 0) {
-    print((uint8_t *)"\n(1 / 2) Successfully Passed\n");
-  } else {
-    print((uint8_t *)"(1 / 2) NOT Passed\n");
-  }
-  pid =
-      sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_asynchro,
-                             (uint8_t *)"test_semaphores", 1);
-  value = sys_waitpid_asm(pid);
-  // Desde aca
-  print((uint8_t *)"Global: ");
-  if (value < 0) {
-    print((uint8_t *)"negativo\n");
-    return;
-  } else {
-    itoa(value, aux);
-    print(aux);
-  }
-  // Hasta aca, se puede borrar cuando funcione
-  if (value != 0) {
-    print((uint8_t *)"\n(2 / 2) Successfully Passed\n");
-  } else {
-    print((uint8_t *)"(2 / 2) NOT Passed\n");
-  }
-  return;
-}
-// TODO
-// Hacer que los procesos devuelvan su valor y sea almacenado en su pcb.
-// Luego anadir a test_semaphores que se llame a este test con use_sem 1 y
-// global (valor que devuelve) Sea 0 y repetir con use_sem en 1 y ver que no da
-// 0, es el comportamiento esperado

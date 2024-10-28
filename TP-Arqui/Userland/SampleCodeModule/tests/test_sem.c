@@ -45,9 +45,9 @@ int64_t my_process_inc(uint64_t argc, uint8_t *argv[]) {
       sys_sem_post_asm(SEM_ID);
   }
 
-  if (use_sem) {
-    // sys_sem_close_asm(SEM_ID);
-  }
+  // if (use_sem) {
+  //    sys_sem_close_asm(SEM_ID);
+  // }
 
   return 0;
 }
@@ -74,11 +74,8 @@ int64_t test_sem_synchro_fn(uint64_t argc, uint8_t *argv[]) { //{n, use_sem}
   //   correctly created
   // ps();
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    print((uint8_t *)"Waiting for process 1...\n");
     sys_waitpid_asm(pids[i]);
-    print((uint8_t *)"Waiting for process 2...\n");
     sys_waitpid_asm(pids[i + TOTAL_PAIR_PROCESSES]);
-    print((uint8_t *)"Process waited\n");
   }
   // ps();
   sys_sem_destroy_asm(SEM_ID);

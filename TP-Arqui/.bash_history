@@ -329,3 +329,26 @@ cd root
 gdb
 gdb
 exit
+cd ~
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+clear
+quit
+exit

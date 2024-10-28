@@ -185,7 +185,6 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
       pm->process_table[ppid].pcb->waiting = 0;
       pm->process_table[ppid].pcb->waiting_pid = -1;
       unblock(pm, ppid);
-      // pm->process_table[pid].pcb->status = KILLED;
     }
   }
 

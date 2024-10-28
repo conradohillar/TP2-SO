@@ -66,9 +66,6 @@ void sys_sleep(uint64_t secs, uint64_t millis) {
 int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
                            uint8_t *name, uint8_t in_fg) {
   int32_t res = create_process(my_pm, code, argc, argv, name, in_fg);
-//   if (in_fg) {
-//     waitpid(my_pm, res);
-//   }
   return res;
 }
 
