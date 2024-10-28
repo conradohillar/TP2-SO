@@ -54,7 +54,7 @@ int64_t my_process_inc(uint64_t argc, uint8_t *argv[]) {
 
 int64_t test_sem_synchro_fn(uint64_t argc, uint8_t *argv[]) { //{n, use_sem}
   uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
-// ps();
+  // ps();
   if (argc != 2)
     return -1;
 
@@ -72,15 +72,15 @@ int64_t test_sem_synchro_fn(uint64_t argc, uint8_t *argv[]) { //{n, use_sem}
   }
   //   Uncomment the following line to see that all the processes are being
   //   correctly created
-    // ps();
+  // ps();
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    print("Waiting for process 1...\n");
+    print((uint8_t *)"Waiting for process 1...\n");
     sys_waitpid_asm(pids[i]);
-    print("Waiting for process 2...\n");
+    print((uint8_t *)"Waiting for process 2...\n");
     sys_waitpid_asm(pids[i + TOTAL_PAIR_PROCESSES]);
-    print("Process waited\n");
+    print((uint8_t *)"Process waited\n");
   }
-    // ps();
+  // ps();
   sys_sem_destroy_asm(SEM_ID);
   return global;
 }

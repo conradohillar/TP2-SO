@@ -10,5 +10,5 @@ acquire:
     ret
 
 release:
-    mov qword[rdi], 1    ; *lock in rdi
+    mov byte[rdi], 1    ; *lock in rdi
     ret 

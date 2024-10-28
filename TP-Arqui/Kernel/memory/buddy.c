@@ -31,13 +31,14 @@ static Block *create_block(void *block_pointer, uint8_t level);
 static void rem_block(Block *block, uint8_t level);
 static void split(uint8_t index);
 static Block *merge(Block *block, Block *buddy);
+void print_memory_state();
 
-memoryManagerADT create_memory_manager(void *memory_start_address,
-                                       memoryManagerADT memory_manager_address) {
+memoryManagerADT
+create_memory_manager(void *memory_start_address,
+                      memoryManagerADT memory_manager_address) {
   mem_manager = (memoryManagerADT)memory_manager_address;
   mem_manager->mem_start = memory_start_address;
   mem_manager->memory_size = MEMORY_SIZE;
-
 
   int current_size = 2, level = 1;
   while (current_size < MEMORY_SIZE) {
@@ -52,7 +53,7 @@ memoryManagerADT create_memory_manager(void *memory_start_address,
   }
 
   create_block(memory_start_address, level);
-  return;
+  return mem_manager;
 }
 
 void *mm_malloc(uint64_t size) {
@@ -101,16 +102,17 @@ void *mm_malloc(uint64_t size) {
   Block *new_block = mem_manager->free_blocks_per_level[level];
 
   rem_block(new_block, level);
-//   printf("size: %lu, block size: %d, level: %d, rel: %d\n", size, 1 << level,
-//          level, (void *)new_block - mem_manager->mem_start);
+  //   printf("size: %lu, block size: %d, level: %d, rel: %d\n", size, 1 <<
+  //   level,
+  //          level, (void *)new_block - mem_manager->mem_start);
   return (void *)((char *)new_block + sizeof(Block));
 }
 
 void mm_free(void *ptr) {
   Block *block = (Block *)(ptr - sizeof(Block));
-//   printf("Freeing: %d, size: %d\n",
-//          (void *)ptr - mem_manager->mem_start - sizeof(Block),
-//          1 << block->level);
+  //   printf("Freeing: %d, size: %d\n",
+  //          (void *)ptr - mem_manager->mem_start - sizeof(Block),
+  //          1 << block->level);
   if (block->is_free == 1)
     return;
   block->is_free = 1;
@@ -150,7 +152,7 @@ static Block *merge(Block *block, Block *buddy) {
   //   block,
   //          buddy);
   Block *leftBlock = block < buddy ? block : buddy;
-  Block *rightBlock = block < buddy ? buddy : block;
+  // Block *rightBlock = block < buddy ? buddy : block;
 
   rem_block(buddy, buddy->level);
 
@@ -246,7 +248,7 @@ void print_memory_state() {
   for (int level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
     Block *current = mem_manager->free_blocks_per_level[level];
     if (current != NULL) {
-    //   printf("Level %d:\n", level);
+      //   printf("Level %d:\n", level);
       // Imprimir cada bloque de la lista
       while (current != NULL) {
         // printf("  Block at address: %d, size: %lu, next: %d, is_free: %d\n",
@@ -257,8 +259,8 @@ void print_memory_state() {
         current = current->next; // Mover al siguiente bloque
       }
     } else {
-    //   printf("Level %d: No blocks available\n", level);
+      //   printf("Level %d: No blocks available\n", level);
     }
   }
-//   printf("\n\n");
+  //   printf("\n\n");
 }
