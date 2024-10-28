@@ -66,9 +66,10 @@ uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
     return -1;
   }
 
-  uint8_t **argv_copy = (uint8_t **)mm_malloc(argc * sizeof(uint8_t *));
+  uint8_t **argv_copy = (uint8_t **)mm_malloc((argc + 1) * sizeof(uint8_t *));
   for (int i = 0; i < argc; i++) {
-    argv_copy[i] = mm_malloc(strlen(argv[i]) + 1);
+    argv_copy[i] =
+        (uint8_t *)mm_malloc((strlen(argv[i]) + 1) * sizeof(uint8_t));
     strcpy(argv_copy[i], argv[i]);
   }
 
@@ -136,8 +137,8 @@ static void process_wrapper(processManagerADT pm, uint64_t code, uint64_t argc,
                             uint8_t **argv) {
   int64_t end_status = ((main_fn)code)(argc, argv);
   uint64_t aux = getpid(pm);
-  pm->process_table[getpid(pm)].pcb->return_value = end_status;
-  exit(pm, getpid(pm));
+  pm->process_table[aux].pcb->return_value = end_status;
+  exit(pm, aux);
   running_ended(pm->scheduler);
   yield();
 }
@@ -160,7 +161,6 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
   if (pm->process_table[pid].pcb->status == KILLED) {
     return 0;
 
-
   } else if (pm->process_table[pid].pcb->status != ZOMBIE) {
 
     // Remove from scheduler
@@ -176,7 +176,7 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
         pm->process_table[i].pcb->parent_pid = INIT_PID;
       }
     }
- 
+
     // Check if parent was waiting
     uint32_t ppid = pm->process_table[pid].pcb->parent_pid;
     if (pm->process_table[ppid].pcb->waiting &&
@@ -185,16 +185,16 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
       pm->process_table[ppid].pcb->waiting = 0;
       pm->process_table[ppid].pcb->waiting_pid = -1;
       unblock(pm, ppid);
-      //
-      //   pm->process_table[pid].pcb->status = KILLED;
+      // pm->process_table[pid].pcb->status = KILLED;
     }
   }
 
-
-  // If it's INIT's child, remove from process_table and free
-  if (pm->process_table[pid].pcb->status == KILLED ||
-      pm->process_table[pid].pcb->parent_pid == INIT_PID) {
-    // IMPLEMENTAR UN free_process
+  // If it's a ZOMBIE and parent killed it or it's INIT's child,
+  // Or it was killed while running or ready
+  // remove from process_table and free
+  if (pm->process_table[pid].pcb->parent_pid == INIT_PID ||
+      (pm->process_table[pid].pcb->status == ZOMBIE && status == KILLED) ||
+      pm->process_table[pid].pcb->status == KILLED) {
     free_process(pm->process_table[pid].pcb);
     pm->process_table[pid].pcb = NULL;
     pm->process_count--;
@@ -204,16 +204,6 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
     pm->process_table[pid].next_index = aux_pid;
   }
 
- if(pm->process_table[pid].pcb->status == ZOMBIE && status == KILLED){
-    free_process(pm->process_table[pid].pcb);
-    pm->process_table[pid].pcb = NULL;
-    pm->process_count--;
-
-    uint64_t aux_pid = pm->next_pid;
-    pm->next_pid = pid;
-    pm->process_table[pid].next_index = aux_pid;
-  }
-  
   return 0;
 }
 
@@ -298,6 +288,10 @@ uint64_t getppid(processManagerADT pm) {
   return current->parent_pid;
 }
 
+process_status get_status(processManagerADT pm, uint64_t pid) {
+  return pm->process_table[pid].pcb->status;
+}
+
 uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
   if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->status == KILLED || priority > MAX_PRIORITY) {
@@ -349,12 +343,6 @@ void destroy_process_table(processManagerADT pm) {
   }
   destroy_scheduler(pm->scheduler);
   mm_free(pm);
-}
-
-void init_process(uint64_t argc, uint8_t **argv) {
-  while (1) {
-    _hlt();
-  }
 }
 
 void yield() { asm_yield(); }

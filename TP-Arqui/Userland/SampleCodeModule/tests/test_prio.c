@@ -25,7 +25,7 @@
 
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, LOW, MEDIUM, HIGH, HIGHEST};
 
-uint64_t test_prio(uint64_t argc, uint8_t *argv[]) {
+int64_t test_prio(uint64_t argc, uint8_t *argv[]) {
   print((uint8_t *)"EXECUTING PRIORITY TEST\n");
   int64_t pids[TOTAL_PROCESSES];
   uint8_t *args[] = {WAIT_S};

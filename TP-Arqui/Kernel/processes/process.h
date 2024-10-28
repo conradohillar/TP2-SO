@@ -3,6 +3,7 @@
 
 #include "../include/interrupts.h"
 #include "../include/lib.h"
+#include "./initProcess.h"
 #include "./processManager.h"
 
 #define USERLAND_ADDRESS 0x400000
@@ -36,8 +37,6 @@ processManagerADT create_process_manager(schedulerADT scheduler);
  */
 uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
                         uint8_t **argv, uint8_t *name, uint8_t in_fg);
-
-void init_process(uint64_t argc, uint8_t **argv);
 
 /**
  * Exits the current process.
@@ -83,6 +82,12 @@ uint64_t getpid(processManagerADT pm);
  * Returns the PID of the parent process.
  */
 uint64_t getppid(processManagerADT pm);
+
+/**
+ * Returns the status of a process.
+ * @param pid The PID of the process.
+ */
+process_status get_status(processManagerADT pm, uint64_t pid);
 
 /**
  * Sets the priority of a process.

@@ -54,8 +54,11 @@ uint64_t strlen(const uint8_t *str) {
 }
 
 void strcpy(uint8_t *dest, const uint8_t *src) {
-  for (uint64_t i = 0; src[i] != '\0'; i++)
+  uint64_t i;
+  for (i = 0; src[i] != '\0'; i++) {
     dest[i] = src[i];
+  }
+  dest[i] = '\0';
 }
 
 int8_t strcmp(const uint8_t *str1, const uint8_t *str2) {

@@ -70,7 +70,7 @@ void endless_loop() {
     ;
 }
 
-uint64_t endless_loop_print(uint64_t argc, uint8_t *argv[]) {
+int64_t endless_loop_print(uint64_t argc, uint8_t *argv[]) {
 
   uint64_t wait = satoi(argv[0]);
 

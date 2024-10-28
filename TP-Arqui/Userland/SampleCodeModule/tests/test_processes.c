@@ -7,7 +7,7 @@ typedef struct P_rq {
   process_status state;
 } p_rq;
 
-uint64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
+int64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
   uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;

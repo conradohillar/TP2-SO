@@ -35,7 +35,7 @@ sem_t *sem_init(semaphoreManagerADT sm, uint8_t id, uint8_t count) {
   }
   sem->id = id;
   sem->lock = 1;
-  sem->count = count;  
+  sem->count = count;
   sem->blocked_processes = create_list();
   sm->semaphores[id] = sem;
   return sem;
@@ -78,7 +78,7 @@ void sem_destroy(semaphoreManagerADT sm, sem_t *sem) {
   if (sm == NULL || sem == NULL) {
     return;
   }
-  mm_free(sem->blocked_processes);
+  free_list(sem->blocked_processes);
   sm->semaphores[sem->id] = NULL;
   mm_free(sem);
 }
