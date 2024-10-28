@@ -6,6 +6,9 @@
 
 #include "memoryManager.h"
 
+#define TOTAL_BLOCKS 1000
+#define BLOCK_SIZE 4096
+
 typedef struct memoryManagerCDT {
   void *memory_start;           // Puntero al bloque de memoria inicial
   int free_array[TOTAL_BLOCKS]; // Array que representa los bloques libres

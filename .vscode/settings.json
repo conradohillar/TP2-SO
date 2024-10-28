@@ -19,6 +19,7 @@
         "test_util.h": "c",
         "semaphore.h": "c",
         "processutils.h": "c",
-        "textmode.h": "c"
+        "textmode.h": "c",
+        "test_mm.h": "c"
     }
 }

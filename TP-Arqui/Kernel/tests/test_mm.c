@@ -38,7 +38,7 @@ uint64_t test_mm(uint64_t argc, uint8_t *argv[]) {
 
     // Request as many blocks as we can
     while (rq < MAX_BLOCKS && total < max_memory) {
-      if (total_allocated_blocks % 500000 == 0) {
+      if (total_allocated_blocks % 1000 == 0) {
         put_string_nt((uint8_t *)"Allocated blocks: ", 0x00FF00, 0x000000);
         uint8_t num[20] = {0};
         itoa(total_allocated_blocks, num);

@@ -5,9 +5,6 @@
 
 #define NULL ((void *)0)
 
-#define TOTAL_BLOCKS 1000
-#define BLOCK_SIZE 4096
-
 typedef struct memoryManagerCDT *memoryManagerADT;
 
 /**

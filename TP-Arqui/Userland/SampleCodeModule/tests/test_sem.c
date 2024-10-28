@@ -13,11 +13,6 @@ void slowInc(int64_t *p, int64_t inc) {
   sys_yield(); // This makes the race condition highly probable
   aux += inc;
   *p = aux;
-
-  // uint8_t aux2[10];
-  // itoa(*p, aux2);
-  // print(aux2);
-  // print((uint8_t *)"\n");
 }
 
 int64_t my_process_inc(uint64_t argc, uint8_t *argv[]) {
@@ -45,7 +40,6 @@ int64_t my_process_inc(uint64_t argc, uint8_t *argv[]) {
   for (i = 0; i < n; i++) {
     if (use_sem)
       sys_sem_wait_asm(SEM_ID);
-    // print("At inc/dec\n");
     slowInc(&global, inc);
     if (use_sem)
       sys_sem_post_asm(SEM_ID);
@@ -60,7 +54,7 @@ int64_t my_process_inc(uint64_t argc, uint8_t *argv[]) {
 
 int64_t test_sem_synchro_fn(uint64_t argc, uint8_t *argv[]) { //{n, use_sem}
   uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
-
+// ps();
   if (argc != 2)
     return -1;
 
@@ -75,16 +69,18 @@ int64_t test_sem_synchro_fn(uint64_t argc, uint8_t *argv[]) { //{n, use_sem}
                                      (uint8_t *)"my_process_inc", 0);
     pids[i + TOTAL_PAIR_PROCESSES] = sys_create_process_asm(
         my_process_inc, 3, argvInc, (uint8_t *)"my_process_inc", 0);
-    // print("Process created\n");
   }
-  ps();
+  //   Uncomment the following line to see that all the processes are being
+  //   correctly created
+    // ps();
   for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-    // print("Process waiting\n");
+    print("Waiting for process 1...\n");
     sys_waitpid_asm(pids[i]);
+    print("Waiting for process 2...\n");
     sys_waitpid_asm(pids[i + TOTAL_PAIR_PROCESSES]);
-    // print("Process waited\n");
+    print("Process waited\n");
   }
-  //   ps();
+    // ps();
   sys_sem_destroy_asm(SEM_ID);
   return global;
 }

@@ -52,16 +52,16 @@ int main() {
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // Testeo del Memory Manager
 
-  //   put_string_nt ((uint8_t *)"Creando variables\n", 0x00FF00, 0x000000);
+    // put_string_nt ((uint8_t *)"Creando variables\n", 0x00FF00, 0x000000);
 
-  //   uint64_t argc = 2;
-  //   char *argv[] = {"1000"};
+    // uint64_t argc = 2;
+    // char *argv[] = {"2097152"};
 
-  //   put_string_nt ((uint8_t *)"Ejecutando test_mm\n", 0x00FF00, 0x000000);
+    // put_string_nt ((uint8_t *)"Ejecutando test_mm\n", 0x00FF00, 0x000000);
 
-  //   test_mm(argc - 1, argv);
+    // test_mm(argc - 1, argv);
 
-  //   put_string_nt ((uint8_t *)"Error de test_mm\n", 0xFF0000, 0x000000);
+    // put_string_nt ((uint8_t *)"Error de test_mm\n", 0xFF0000, 0x000000);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // Testeo de los procesos

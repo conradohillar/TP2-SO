@@ -1,7 +1,15 @@
 include Makefile.inc
+USE_BUDDY ?= 1
 
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c) $(wildcard ./drivers/*.c) $(wildcard ./memory/*.c) $(wildcard ./processes/*.c) $(wildcard ./semaphores/*.c) $(wildcard ./tests/*.c)
+SOURCES=$(wildcard *.c) $(wildcard ./drivers/*.c) $(wildcard ./processes/*.c) $(wildcard ./semaphores/*.c) $(wildcard ./tests/*.c)
+
+ifeq ($(USE_BUDDY), 1)
+    SOURCES += ./memory/buddy.c
+else
+    SOURCES += ./memory/freeArray.c
+endif
+
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
