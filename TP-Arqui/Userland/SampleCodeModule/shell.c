@@ -28,13 +28,13 @@ void help() {
   print((uint8_t *)"\t\t\t ");
   printcolor((uint8_t *)"press Ctrl + r to save the register states\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"testproc ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testproc  ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
              GRAY, BLACK);
   printcolor((uint8_t *)"testprio  ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for changing process priorities\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"testsem ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testsem   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
   printcolor((uint8_t *)"ps        ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);

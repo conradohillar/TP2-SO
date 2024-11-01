@@ -34,6 +34,5 @@ $(LOADEROBJECT):
 	$(ASM) $(ASMFLAGS) $(LOADERSRC) -o $(LOADEROBJECT)
 
 clean:
-	rm -rf $(OBJECTS) $(OBJECTS_ASM)
-
+	rm -rf $(OBJECTS) $(OBJECTS_ASM) $(LOADEROBJECT) $(KERNEL) kernel.elf $(wildcard memory/*.o)
 .PHONY: all clean
