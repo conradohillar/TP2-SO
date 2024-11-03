@@ -2,7 +2,7 @@ include Makefile.inc
 USE_BUDDY ?= 1
 
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c) $(wildcard ./drivers/*.c) $(wildcard ./processes/*.c) $(wildcard ./semaphores/*.c) $(wildcard ./tests/*.c)
+SOURCES=$(wildcard *.c) $(wildcard ./drivers/*.c) $(wildcard ./processes/*.c) $(wildcard ./semaphores/*.c) $(wildcard ./tests/*.c) $(wildcard ./pipes/*.c)
 
 ifeq ($(USE_BUDDY), 1)
     SOURCES += ./memory/buddy.c
