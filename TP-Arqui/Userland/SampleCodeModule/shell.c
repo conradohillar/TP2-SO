@@ -38,6 +38,8 @@ void help() {
   printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
   printcolor((uint8_t *)"ps        ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
+  printcolor((uint8_t *)"mem       ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - prints the current status of the memory\n", GRAY, BLACK);
   printcolor((uint8_t *)"eliminator", ORANGE, BLACK);
   printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
   printcolor((uint8_t *)"inctext   ", ORANGE, BLACK);
