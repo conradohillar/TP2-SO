@@ -281,6 +281,7 @@ uint64_t get_command(uint8_t *str) {
   uint8_t *command2 = (uint8_t *)"kill";
   uint8_t *command3 = (uint8_t *)"block";
   uint8_t *command4 = (uint8_t *)"unblock";
+  uint8_t *command5 = (uint8_t *)"nice";
 
   switch (str[0]) {
   case 'p':
@@ -299,6 +300,10 @@ uint64_t get_command(uint8_t *str) {
     command = command4;
     function = unblock;
     break;
+  case 'n':
+    command = command5;
+    function = nice;
+    break;
   default:
 
     break;
@@ -307,7 +312,12 @@ uint64_t get_command(uint8_t *str) {
     if (str[j] != command[j])
       return 0;
   uint8_t idx = str[strlen(command) + 1] - '0';
-  function(idx);
+  if (str[strlen(command) + 3] != 0) {
+    uint8_t aux = str[strlen(command) + 3] - '0';
+    function(idx, aux);
+    return 1;
+  }
+  function(idx, 0);
 
   return 1;
 }
@@ -355,8 +365,10 @@ void run_shell() {
   }
 }
 
-void kill(uint8_t id) { sys_kill_asm(id); }
+void kill(uint8_t id, uint8_t aux) { sys_kill_asm(id); }
 
-void block(uint8_t id) { sys_block_asm(id); }
+void block(uint8_t id, uint8_t aux) { sys_block_asm(id); }
 
-void unblock(uint8_t id) { sys_unblock_asm(id); }
+void unblock(uint8_t id, uint8_t aux) { sys_unblock_asm(id); }
+
+void nice(uint8_t id, uint8_t aux) { sys_set_priority_asm(id, aux); }

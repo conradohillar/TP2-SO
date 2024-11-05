@@ -44,11 +44,13 @@ void test_semaphores();
 
 void loop();
 
-void kill(uint8_t id);
+void kill(uint8_t id, uint8_t aux);
 
-void block(uint8_t id);
+void block(uint8_t id, uint8_t aux);
 
-void unblock(uint8_t id);
+void unblock(uint8_t id, uint8_t aux);
+
+void nice(uint8_t id, uint8_t aux);
 
 void play_song(uint8_t idx);
 

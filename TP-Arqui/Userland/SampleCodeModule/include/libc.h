@@ -6,7 +6,7 @@
 #define STD_FORE_COLOR WHITE
 #define STD_BACK_COLOR BLACK
 
-typedef int64_t (*shell_fn)(uint8_t id);
+typedef int64_t (*shell_fn)(uint8_t id, uint8_t aux);
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color);
 
