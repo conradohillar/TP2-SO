@@ -72,6 +72,13 @@ int main() {
     return -1;
   }
 
+  my_sm = create_semaphore_manager();
+  if (my_sm == NULL) {
+    put_string_nt((uint8_t *)"Error creando semaphore manager\n", 0xFF0000,
+                  0x000000);
+    return -1;
+  }
+
   my_pipe_manager = create_pipe_manager();
   if (my_pipe_manager == NULL) {
     put_string_nt((uint8_t *)"Error creando pipe manager\n", 0xFF0000,
@@ -82,13 +89,6 @@ int main() {
   my_pm = create_process_manager(my_scheduler);
   if (my_pm == NULL) {
     put_string_nt((uint8_t *)"Error creando process manager\n", 0xFF0000,
-                  0x000000);
-    return -1;
-  }
-
-  my_sm = create_semaphore_manager();
-  if (my_sm == NULL) {
-    put_string_nt((uint8_t *)"Error creando semaphore manager\n", 0xFF0000,
                   0x000000);
     return -1;
   }

@@ -67,6 +67,7 @@ void destroy_pipe(pipeManagerADT pipe_manager, pipe_t *pipe) {
     return;
   }
   sem_destroy(my_sm, pipe->mutex);
+  sem_destroy(my_sm, pipe->read_sem);
   pipe_manager->pipes[pipe->id] = NULL;
   mm_free(pipe);
   pipe_manager->count--;
@@ -110,10 +111,18 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   sem_wait(my_sm, running_pcb, pipe->mutex);
 
   uint64_t i = 0;
-  for (; i < bytes && pipe->to_read_count != 0; i++) {
-    buffer[i] = pipe->buffer[pipe->last_read_pos];
+  while (i < bytes && pipe->to_read_count != 0) {
+    buffer[i++] = pipe->buffer[pipe->last_read_pos];
     pipe->last_read_pos = (pipe->last_read_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count--;
+
+    // If the buffer is empty and we haven't reached bytes amount of chars read,
+    // we block the process until something is written
+    if (pipe->to_read_count == 0 && i < bytes) {
+      sem_post(my_sm, pipe->mutex);
+      sem_wait(my_sm, running_pcb, pipe->read_sem);
+      sem_wait(my_sm, running_pcb, pipe->mutex);
+    }
   }
 
   // We need to leave the semaphore as "ready to read" if the buffer isn't empty

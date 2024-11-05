@@ -33,12 +33,12 @@ void release(uint8_t *lock);
  *MAX_SEM_COUNT - 1
  *@param count the initial value assigned to the semaphore
  */
-sem_t *sem_init(semaphoreManagerADT sm, uint8_t id, uint8_t count);
+sem_t *sem_init(semaphoreManagerADT sm, uint16_t id, uint8_t count);
 void sem_wait(semaphoreManagerADT sm, process_control_block *running_pcb,
               sem_t *sem);
 void sem_post(semaphoreManagerADT sm, sem_t *sem);
 void sem_destroy(semaphoreManagerADT sm, sem_t *sem);
 
-sem_t *get_sem(semaphoreManagerADT sm, uint8_t id);
+sem_t *get_sem(semaphoreManagerADT sm, uint16_t id);
 
 #endif

@@ -22,7 +22,7 @@ semaphoreManagerADT create_semaphore_manager() {
   return sm;
 }
 
-sem_t *sem_init(semaphoreManagerADT sm, uint8_t id, uint8_t count) {
+sem_t *sem_init(semaphoreManagerADT sm, uint16_t id, uint8_t count) {
   if (sm == NULL || sm->semaphores[id] != NULL) {
     // TODO: MANEJAR ERRORES DE CREACION DE SEMAFOROS
     return NULL;
@@ -67,7 +67,7 @@ void sem_post(semaphoreManagerADT sm, sem_t *sem) {
   }
 }
 
-sem_t *get_sem(semaphoreManagerADT sm, uint8_t id) {
+sem_t *get_sem(semaphoreManagerADT sm, uint16_t id) {
   if (sm == NULL || id >= MAX_SEM_COUNT) {
     return NULL;
   }
