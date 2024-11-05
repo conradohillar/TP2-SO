@@ -6,8 +6,8 @@
 
 #include "memoryManager.h"
 
-#define TOTAL_BLOCKS 1000
-#define BLOCK_SIZE 4096
+#define TOTAL_BLOCKS 750
+#define BLOCK_SIZE 7000
 
 typedef struct memoryManagerCDT {
   void *memory_start;           // Puntero al bloque de memoria inicial
@@ -66,4 +66,24 @@ void mm_free(void *block) {
       mem_manager->free_index; // Apunta al anterior primer bloque libre
   mem_manager->free_index =
       block_idx; // El bloque liberado es ahora el primero libre
+}
+
+void mem_status() {
+  uint64_t counter = 0;
+  for (int64_t i = mem_manager->free_index; i != -1;) {
+    counter++;
+    i = mem_manager->free_array[i];
+  }
+
+  char aux[10];
+  itoa(counter, aux);
+  put_string_nt("There are ", WHITE, BLACK);
+  put_string_nt(aux, WHITE, BLACK);
+  put_string_nt(" of ", WHITE, BLACK);
+  itoa(TOTAL_BLOCKS, aux);
+  put_string_nt(aux, WHITE, BLACK);
+  put_string_nt(" free blocks available with size ", WHITE, BLACK);
+  itoa(BLOCK_SIZE, aux);
+  put_string_nt(aux, WHITE, BLACK);
+  put_string_nt(" each\n", WHITE, BLACK);
 }
