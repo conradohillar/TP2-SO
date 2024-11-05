@@ -28,6 +28,7 @@ GLOBAL sys_sem_post_asm
 GLOBAL sys_sem_destroy_asm
 GLOBAL sys_sem_open_asm
 GLOBAL sys_yield
+GLOBAL sys_mem_status_asm
 
 
 %macro pushState 0
@@ -578,3 +579,20 @@ sys_yield:
     pop rbp
 
     ret 
+
+sys_mem_status_asm:
+    push rbp
+    mov rbp, rsp
+
+    pushState
+
+    mov rdi, 31
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret

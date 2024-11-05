@@ -105,6 +105,7 @@ void *mm_malloc(uint64_t size) {
   //   printf("size: %lu, block size: %d, level: %d, rel: %d\n", size, 1 <<
   //   level,
   //          level, (void *)new_block - mem_manager->mem_start);
+  //   mem_status();
   return (void *)((char *)new_block + sizeof(Block));
 }
 
@@ -145,6 +146,7 @@ void mm_free(void *ptr) {
     //        buddy, buddy->level, block->level, buddy->is_free);
   }
   create_block((void *)block, block->level);
+  //   mem_status();
 }
 
 static Block *merge(Block *block, Block *buddy) {
@@ -163,7 +165,7 @@ static Block *merge(Block *block, Block *buddy) {
   //   leftBlock->level,
   //          leftBlock->is_free);
   //   printf("\n");
-  print_memory_state();
+  //   print_memory_state();
   return leftBlock;
 }
 
@@ -243,24 +245,41 @@ static Block *create_block(void *block_pointer, uint8_t level) {
   return new_block;
 }
 
-void print_memory_state() {
-  // printf("\nMemory State:\n");
+void mem_status(memoryManagerADT mm) {
+  put_string_nt("\nMemory State:\n", WHITE, BLACK);
+  void *null = NULL;
   for (int level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
     Block *current = mem_manager->free_blocks_per_level[level];
+    char aux[10];
     if (current != NULL) {
-      //   printf("Level %d:\n", level);
+      itoa(level, aux);
+      put_string_nt("Level: ", WHITE, BLACK);
+      put_string_nt(aux, WHITE, BLACK);
+      put_string_nt("\n", WHITE, BLACK);
       // Imprimir cada bloque de la lista
       while (current != NULL) {
-        // printf("  Block at address: %d, size: %lu, next: %d, is_free: %d\n",
-        //        (void *)current - (void *)mem_manager->mem_start,
-        //        (1UL << current->level),
-        //        (void *)current->next - mem_manager->mem_start,
-        //        current->is_free);
+        itoa((void *)current - (void *)mem_manager->mem_start, aux);
+        put_string_nt("  Block at address: ", WHITE, BLACK);
+        put_string_nt(aux, WHITE, BLACK);
+        itoa((1UL << current->level), aux);
+        put_string_nt(", size: ", WHITE, BLACK);
+        put_string_nt(aux, WHITE, BLACK);
+        itoa((void *)current->next - mem_manager->mem_start, aux);
+        put_string_nt(", next: ", WHITE, BLACK);
+        put_string_nt(aux, WHITE, BLACK);
+        itoa(current->is_free, aux);
+        put_string_nt(", is_free: ", WHITE, BLACK);
+        put_string_nt(aux, WHITE, BLACK);
+        put_string_nt("\n", WHITE, BLACK);
+
         current = current->next; // Mover al siguiente bloque
       }
     } else {
-      //   printf("Level %d: No blocks available\n", level);
+      itoa(level, aux);
+      put_string_nt("Level ", WHITE, BLACK);
+      put_string_nt(aux, WHITE, BLACK);
+      put_string_nt(": No blocks available\n", WHITE, BLACK);
     }
   }
-  //   printf("\n\n");
+  put_string_nt("\n", WHITE, BLACK);
 }

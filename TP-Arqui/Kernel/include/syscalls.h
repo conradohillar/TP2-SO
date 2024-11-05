@@ -78,4 +78,6 @@ void sys_sem_destroy(uint8_t id);
 
 int8_t sys_sem_open(uint8_t id);
 
+void sys_mem_status();
+
 #endif

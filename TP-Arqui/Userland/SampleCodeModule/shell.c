@@ -74,6 +74,8 @@ void check_invalid_opcode() { inopcode_excep_asm(); }
 
 void get_registers() { sys_get_registers_asm(); }
 
+void mem() { sys_mem_status_asm(); }
+
 void run_eliminator() {
   eliminator_menu();
   sys_clear_screen_asm();
@@ -223,13 +225,22 @@ static uint8_t *commands[] = {
     (uint8_t *)"time",     (uint8_t *)"regstatus", (uint8_t *)"eliminator",
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
-    (uint8_t *)"testsem"};
+    (uint8_t *)"testsem",  (uint8_t *)"mem"};
 
-static void (*functions[])(void) = {
-    help,           check_div_by_zero, check_invalid_opcode, get_time,
-    get_registers,  run_eliminator,    increase_text_size,   decrease_text_size,
-    clear,          test_processes,    test_priority,        ps,
-    test_semaphores};
+static void (*functions[])(void) = {help,
+                                    check_div_by_zero,
+                                    check_invalid_opcode,
+                                    get_time,
+                                    get_registers,
+                                    run_eliminator,
+                                    increase_text_size,
+                                    decrease_text_size,
+                                    clear,
+                                    test_processes,
+                                    test_priority,
+                                    ps,
+                                    test_semaphores,
+                                    mem};
 
 uint64_t get_command(uint8_t *str) {
   for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {

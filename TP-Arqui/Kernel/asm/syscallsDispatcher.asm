@@ -26,6 +26,7 @@ EXTERN sys_sem_post
 EXTERN sys_sem_destroy
 EXTERN sys_sem_open
 EXTERN asm_yield
+EXTERN sys_mem_status
 
 GLOBAL syscalls_dispatcher
 
@@ -92,6 +93,15 @@ syscalls_dispatcher:
     je sem_open
     cmp rdi,27
     je yield
+
+
+
+
+
+
+
+    cmp rdi, 31
+    je mem_status
 
 end:
     cli
@@ -280,4 +290,9 @@ sem_open:
 yield:
     mov rdi, rsi
     call asm_yield
+    jmp end
+
+mem_status:
+    mov rdi, rsi
+    call sys_mem_status
     jmp end

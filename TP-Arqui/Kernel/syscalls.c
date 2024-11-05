@@ -136,3 +136,5 @@ int8_t sys_sem_open(uint8_t id) {
   }
   return (int8_t)id;
 }
+
+void sys_mem_status() { mem_status(); }

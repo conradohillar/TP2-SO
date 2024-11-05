@@ -2,6 +2,7 @@
 #define MEMORY_MANAGER_H
 
 #include "../tests/test_mm.h"
+#include "../include/textMode.h"
 
 #define NULL ((void *)0)
 
@@ -26,5 +27,10 @@ void *mm_malloc(uint64_t size);
  * @param ptr Pointer to the memory to free
  */
 void mm_free(void *ptr);
+
+/**
+ * @brief Prints the current status of the memory
+ */
+void mem_status();
 
 #endif
