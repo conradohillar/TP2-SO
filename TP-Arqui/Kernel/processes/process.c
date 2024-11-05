@@ -5,6 +5,7 @@
 // https://pvs-studio.com
 
 #include "./process.h"
+#include "../include/pipes.h"
 #include "../memory/memoryManager.h"
 #include "./scheduler.h"
 

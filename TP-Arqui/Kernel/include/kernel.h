@@ -3,6 +3,7 @@
 
 typedef int (*EntryPoint)();
 
+#include <../include/pipes.h>
 #include <../memory/memoryManager.h>
 #include <../processes/process.h>
 #include <../processes/processManager.h>

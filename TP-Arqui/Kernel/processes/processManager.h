@@ -2,7 +2,6 @@
 #define PROCESS_MANAGER_H
 
 #include "../../processUtils.h"
-#include "../include/pipes.h"
 #include <stddef.h>
 #include <stdint.h>
 

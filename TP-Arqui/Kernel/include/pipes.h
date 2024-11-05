@@ -1,12 +1,14 @@
 #ifndef PIPES_H
 #define PIPES_H
 
-#include "../processes/process.h"
+// #include "../processes/process.h"
+#include "../semaphores/sempahores.h"
 #include <stdint.h>
 
-#define MAX_PIPES_COUNT                                                        \
-  256 // As there are 64 MAX_PROCESSES, we can have 4 pipes per process when
-      // using all processes
+// As there are 64 MAX_PROCESSES, we can have 4 pipes per process when using all
+// processes
+#define MAX_PIPES_COUNT 256
+
 #define PIPE_BUFFER_SIZE 256
 
 typedef struct pipeManagerCDT *pipeManagerADT;
