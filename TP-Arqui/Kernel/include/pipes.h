@@ -42,4 +42,6 @@ void destroy_pipe_manager(pipeManagerADT pipe_manager);
 
 uint8_t check_pipe_id(pipeManagerADT pipe_manager, uint16_t pipe_id);
 
+pipe_t *get_pipe(pipeManagerADT pipe_manager, uint16_t pipe_id);
+
 #endif

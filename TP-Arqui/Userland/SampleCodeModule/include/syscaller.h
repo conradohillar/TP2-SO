@@ -68,3 +68,9 @@ void sys_sem_destroy_asm(semaphore sem);
 int8_t sys_sem_open_asm(semaphore sem);
 
 void sys_yield();
+
+int8_t sys_set_fd_asm(uint16_t fd, uint16_t pipe_id);
+
+int16_t sys_create_pipe_asm();
+
+void sys_destroy_pipe_asm(uint16_t pipe_id);

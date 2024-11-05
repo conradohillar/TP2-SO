@@ -19,9 +19,9 @@ typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
 #define STDOUT 1
 #define STDIN 0
 
-uint64_t sys_read(uint8_t fd, uint8_t *buffer, uint64_t size);
+uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size);
 
-uint64_t sys_write(uint64_t fd, uint8_t *buffer, uint64_t size,
+uint64_t sys_write(uint16_t fd, uint8_t *buffer, uint64_t size,
                    uint32_t fore_color, uint32_t back_color);
 
 void sys_write_at(uint8_t *buffer, uint64_t size, uint64_t color, uint64_t pos,
@@ -77,5 +77,11 @@ void sys_sem_post(uint8_t id);
 void sys_sem_destroy(uint8_t id);
 
 int8_t sys_sem_open(uint8_t id);
+
+int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id);
+
+int16_t sys_create_pipe();
+
+void sys_destroy_pipe(uint16_t pipe_id);
 
 #endif

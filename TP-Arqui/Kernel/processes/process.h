@@ -129,6 +129,6 @@ process_control_block *get_PCB(processManagerADT pm, uint64_t pid);
 /**
  * Maps the file descriptor fd to pipe_id.
  */
-int8_t set_fd(processManagerADT pm, uint8_t fd, uint8_t pipe_id);
+int8_t set_fd(processManagerADT pm, uint16_t fd, uint16_t pipe_id);
 
 #endif

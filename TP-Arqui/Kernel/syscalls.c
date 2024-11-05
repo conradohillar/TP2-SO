@@ -1,32 +1,42 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+#include <pipes.h>
 #include <syscalls.h>
 
+extern pipeManagerADT my_pipe_manager;
 extern processManagerADT my_pm;
 extern schedulerADT my_scheduler;
 extern semaphoreManagerADT my_sm;
 
-uint64_t sys_read(uint8_t fd, uint8_t *buffer, uint64_t size) {
-  if (fd != STDIN) {
+uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size) {
+  if (fd == STDIN) {
+    int i;
+    for (i = 0; i < size; i++) {
+      uint8_t c = '\0';
+      while (c == '\0') {
+        c = get_ascii();
+      }
+      buffer[i] = c;
+    }
+    return i;
+  }
+  pipe_t *pipe = get_pipe(my_pipe_manager, fd);
+  if (pipe == NULL) {
     return 0;
   }
-  int i;
-  for (i = 0; i < size; i++) {
-    uint8_t c = '\0';
-    while (c == '\0') {
-      c = get_ascii();
-    }
-    buffer[i] = c;
-  }
-  return i;
+  return read_pipe(my_pipe_manager, pipe, buffer, size);
 }
 
-uint64_t sys_write(uint64_t fd, uint8_t *buffer, uint64_t size,
+uint64_t sys_write(uint16_t fd, uint8_t *buffer, uint64_t size,
                    uint32_t fore_color, uint32_t back_color) {
   if (fd == STDOUT) {
     return put_string(buffer, size, fore_color, back_color);
   }
-  return 0;
+  pipe_t *pipe = get_pipe(my_pipe_manager, fd);
+  if (pipe == NULL) {
+    return 0;
+  }
+  return write_pipe(my_pipe_manager, pipe, buffer, size);
 }
 
 void sys_write_at(uint8_t *buffer, uint64_t size, uint64_t color, uint64_t pos,
@@ -135,4 +145,24 @@ int8_t sys_sem_open(uint8_t id) {
     return -1;
   }
   return (int8_t)id;
+}
+
+int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id) {
+  return set_fd(my_pm, fd, pipe_id);
+}
+
+int16_t sys_create_pipe() {
+  pipe_t *pipe = create_pipe(my_pipe_manager);
+  if (pipe == NULL) {
+    return -1;
+  }
+  return pipe->id;
+}
+
+void sys_destroy_pipe(uint16_t pipe_id) {
+  pipe_t *pipe = get_pipe(my_pipe_manager, pipe_id);
+  if (pipe == NULL) {
+    return;
+  }
+  destroy_pipe(my_pipe_manager, pipe);
 }

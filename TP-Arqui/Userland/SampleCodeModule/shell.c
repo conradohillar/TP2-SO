@@ -36,6 +36,9 @@ void help() {
              BLACK);
   printcolor((uint8_t *)"testsem   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
+  printcolor((uint8_t *)"testipc   ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - Runs test for inter-process communication\n", GRAY,
+             BLACK);
   printcolor((uint8_t *)"ps        ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
   printcolor((uint8_t *)"eliminator", ORANGE, BLACK);
@@ -165,6 +168,12 @@ void test_semaphores() {
   return;
 }
 
+void test_ipc() {
+  uint64_t pid =
+      sys_create_process_asm(test_ipc_fn, 0, NULL, (uint8_t *)"test_ipc", 1);
+  sys_waitpid_asm(pid);
+}
+
 static uint8_t *status_to_string(process_status status) {
   switch (status) {
   case RUNNING:
@@ -223,13 +232,22 @@ static uint8_t *commands[] = {
     (uint8_t *)"time",     (uint8_t *)"regstatus", (uint8_t *)"eliminator",
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
-    (uint8_t *)"testsem"};
+    (uint8_t *)"testsem",  (uint8_t *)"testipc"};
 
-static void (*functions[])(void) = {
-    help,           check_div_by_zero, check_invalid_opcode, get_time,
-    get_registers,  run_eliminator,    increase_text_size,   decrease_text_size,
-    clear,          test_processes,    test_priority,        ps,
-    test_semaphores};
+static void (*functions[])(void) = {help,
+                                    check_div_by_zero,
+                                    check_invalid_opcode,
+                                    get_time,
+                                    get_registers,
+                                    run_eliminator,
+                                    increase_text_size,
+                                    decrease_text_size,
+                                    clear,
+                                    test_processes,
+                                    test_priority,
+                                    ps,
+                                    test_semaphores,
+                                    test_ipc};
 
 uint64_t get_command(uint8_t *str) {
   for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {

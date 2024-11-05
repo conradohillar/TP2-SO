@@ -38,6 +38,8 @@ void ps();
 
 void test_semaphores();
 
+void test_ipc();
+
 void play_song(uint8_t idx);
 
 uint64_t get_command(uint8_t *str);

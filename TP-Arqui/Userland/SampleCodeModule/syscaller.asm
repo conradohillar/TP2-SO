@@ -28,6 +28,9 @@ GLOBAL sys_sem_post_asm
 GLOBAL sys_sem_destroy_asm
 GLOBAL sys_sem_open_asm
 GLOBAL sys_yield
+GLOBAL sys_set_fd_asm
+GLOBAL sys_create_pipe_asm
+GLOBAL sys_destroy_pipe_asm
 
 
 %macro pushState 0
@@ -577,4 +580,58 @@ sys_yield:
     mov rsp, rbp
     pop rbp
 
-    ret 
+    ret
+
+sys_set_fd_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rdx, rsi                 
+    mov rsi, rdi                 
+    mov rdi, 28                  ;id syscall set_fd
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_create_pipe_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rdi, 29                  ;id syscall create_pipe
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_destroy_pipe_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 
+    mov rdi, 30                  ;id syscall destroy_pipe
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
