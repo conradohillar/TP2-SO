@@ -3,6 +3,6 @@
 #include <shell.h>
 
 int main() {
-    run_shell();
-    return 0;
+  run_shell();
+  return 0;
 }

@@ -38,4 +38,6 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
 
 void destroy_pipe_manager(pipeManagerADT pipe_manager);
 
+uint8_t check_pipe_id(pipeManagerADT pipe_manager, uint16_t pipe_id);
+
 #endif

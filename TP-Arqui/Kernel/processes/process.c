@@ -8,6 +8,8 @@
 #include "../memory/memoryManager.h"
 #include "./scheduler.h"
 
+extern pipeManagerADT my_pipe_manager;
+
 static void pcb_init(processManagerADT pm, process_control_block *pcb,
                      wrapper_fn wrapper, main_fn code, uint64_t argc,
                      uint8_t **argv, uint8_t *name, uint8_t in_fg);
@@ -131,6 +133,11 @@ static void pcb_init(processManagerADT pm, process_control_block *pcb,
   pcb->waiting = 0;
   pcb->waiting_pid = -1;
   pcb->in_fg = in_fg;
+
+  // Set STDIN, STDOUT and STDERR to known default pipe ids
+  pcb->fds[STDIN] = 0;
+  pcb->fds[STDOUT] = 1;
+  pcb->fds[STDERR] = 1;
 }
 
 static void process_wrapper(processManagerADT pm, uint64_t code, uint64_t argc,
@@ -346,6 +353,16 @@ void destroy_process_table(processManagerADT pm) {
 
 void yield() { asm_yield(); }
 
-process_control_block *getPCB(processManagerADT pm, uint64_t pid) {
+process_control_block *get_PCB(processManagerADT pm, uint64_t pid) {
   return pm->process_table[pid].pcb;
+}
+
+int8_t set_fd(processManagerADT pm, uint8_t fd, uint8_t pipe_id) {
+  process_control_block *pcb = get_running(pm->scheduler);
+  if (fd >= FD_COUNT || pipe_id >= MAX_PIPES_COUNT ||
+      !check_pipe_id(my_pipe_manager, pipe_id)) {
+    return -1;
+  }
+  pcb->fds[fd] = pipe_id;
+  return 0;
 }

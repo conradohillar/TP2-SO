@@ -13,6 +13,7 @@ extern uint8_t endOfKernel;
 schedulerADT my_scheduler = NULL;
 processManagerADT my_pm = NULL;
 semaphoreManagerADT my_sm = NULL;
+pipeManagerADT my_pipe_manager = NULL;
 
 static const uint64_t PageSize = 0x1000;
 
@@ -52,16 +53,16 @@ int main() {
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // Testeo del Memory Manager
 
-    // put_string_nt ((uint8_t *)"Creando variables\n", 0x00FF00, 0x000000);
+  // put_string_nt ((uint8_t *)"Creando variables\n", 0x00FF00, 0x000000);
 
-    // uint64_t argc = 2;
-    // char *argv[] = {"2097152"};
+  // uint64_t argc = 2;
+  // char *argv[] = {"2097152"};
 
-    // put_string_nt ((uint8_t *)"Ejecutando test_mm\n", 0x00FF00, 0x000000);
+  // put_string_nt ((uint8_t *)"Ejecutando test_mm\n", 0x00FF00, 0x000000);
 
-    // test_mm(argc - 1, argv);
+  // test_mm(argc - 1, argv);
 
-    // put_string_nt ((uint8_t *)"Error de test_mm\n", 0xFF0000, 0x000000);
+  // put_string_nt ((uint8_t *)"Error de test_mm\n", 0xFF0000, 0x000000);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // Testeo de los procesos
@@ -70,7 +71,14 @@ int main() {
     put_string_nt((uint8_t *)"Error creando scheduler\n", 0xFF0000, 0x000000);
     return -1;
   }
-  
+
+  my_pipe_manager = create_pipe_manager();
+  if (my_pipe_manager == NULL) {
+    put_string_nt((uint8_t *)"Error creando pipe manager\n", 0xFF0000,
+                  0x000000);
+    return -1;
+  }
+
   my_pm = create_process_manager(my_scheduler);
   if (my_pm == NULL) {
     put_string_nt((uint8_t *)"Error creando process manager\n", 0xFF0000,

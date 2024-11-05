@@ -19,6 +19,12 @@ pipeManagerADT create_pipe_manager() {
   for (int i = 0; i < MAX_PIPES_COUNT; i++) {
     pipe_manager->pipes[i] = NULL;
   }
+
+  // We create some pipes that all processes will read and write from
+  // respectively by default
+  create_pipe(pipe_manager);
+  create_pipe(pipe_manager);
+
   return pipe_manager;
 }
 
@@ -126,4 +132,8 @@ void destroy_pipe_manager(pipeManagerADT pipe_manager) {
     }
   }
   mm_free(pipe_manager);
+}
+
+uint8_t check_pipe_id(pipeManagerADT pipe_manager, uint16_t pipe_id) {
+  return (pipe_id < MAX_PIPES_COUNT && pipe_manager->pipes[pipe_id] != NULL);
 }
