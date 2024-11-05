@@ -11,46 +11,59 @@ static uint8_t *status_to_string(process_status status);
 
 void help() {
   uint8_t *supertab = (uint8_t *)"\t\t\t\t";
-  printcolor((uint8_t *)"help      ", ORANGE, BLACK);
+  printcolor((uint8_t *)"help       ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints a list of all possible commands\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"divzero   ", ORANGE, BLACK);
+  printcolor((uint8_t *)"divzero    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - tests the divide by zero exception\n", GRAY, BLACK);
-  printcolor((uint8_t *)"inopcode  ", ORANGE, BLACK);
+  printcolor((uint8_t *)"inopcode   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - tests the invalid opcode exception\n", GRAY, BLACK);
-  printcolor((uint8_t *)"time      ", ORANGE, BLACK);
+  printcolor((uint8_t *)"time       ", ORANGE, BLACK);
   printcolor(
       (uint8_t *)" - returns the current system time in HH:MM:SS format\n",
       GRAY, BLACK);
-  printcolor((uint8_t *)"regstatus ", ORANGE, BLACK);
+  printcolor((uint8_t *)"regstatus  ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the values of the CPU registers\n", GRAY,
              BLACK);
   print((uint8_t *)"\t\t\t ");
   printcolor((uint8_t *)"press Ctrl + r to save the register states\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"testproc  ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testproc   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
              GRAY, BLACK);
-  printcolor((uint8_t *)"testprio  ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testprio   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for changing process priorities\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"testsem   ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testsem    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
-  printcolor((uint8_t *)"ps        ", ORANGE, BLACK);
+  printcolor((uint8_t *)"ps         ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
-  printcolor((uint8_t *)"mem       ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints the current status of the memory\n", GRAY, BLACK);
-  printcolor((uint8_t *)"eliminator", ORANGE, BLACK);
+  printcolor((uint8_t *)"mem        ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - prints the current status of the memory\n", GRAY,
+             BLACK);
+  printcolor((uint8_t *)"loop       ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - prints hello and its pid every 3 seconds\n", GRAY,
+             BLACK);
+  printcolor((uint8_t *)"kill PID   ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - kills the process with specified PID\n", GRAY,
+             BLACK);
+  printcolor((uint8_t *)"block PID  ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - blocks the process with specified PID\n", GRAY,
+             BLACK);
+  printcolor((uint8_t *)"unblock PID", ORANGE, BLACK);
+  printcolor((uint8_t *)" - unblocks the process with specified PID\n", GRAY,
+             BLACK);
+  printcolor((uint8_t *)"eliminator ", ORANGE, BLACK);
   printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
-  printcolor((uint8_t *)"inctext   ", ORANGE, BLACK);
+  printcolor((uint8_t *)"inctext    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - increases the size of the text, (max: 2)\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"dectext   ", ORANGE, BLACK);
+  printcolor((uint8_t *)"dectext    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - decreases the size of the text, (min: 1)\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"clear     ", ORANGE, BLACK);
+  printcolor((uint8_t *)"clear      ", ORANGE, BLACK);
   printcolor((uint8_t *)" - clears the screen\n", GRAY, BLACK);
-  printcolor((uint8_t *)"playsong N", ORANGE, BLACK);
+  printcolor((uint8_t *)"playsong N ", ORANGE, BLACK);
   printcolor((uint8_t *)" - plays the N-th tune, being N:\n", GRAY, BLACK);
   print(supertab);
   printcolor((uint8_t *)"1: Starting beep sound\n", GRAY, BLACK);
@@ -220,14 +233,22 @@ void ps() {
   sys_free_ps_asm(ps);
 }
 
-void play_song(uint8_t idx) { song_dispatcher(idx); }
+void loop() {
+  sys_create_process_asm(loop_fn, 0, NULL, "loop", 0);
+  return;
+}
+
+void play_song(uint8_t id) {
+  if (id >= MIN_SONG_ID && id <= MAX_SONG_ID)
+    song_dispatcher(id);
+}
 
 static uint8_t *commands[] = {
     (uint8_t *)"help",     (uint8_t *)"divzero",   (uint8_t *)"inopcode",
     (uint8_t *)"time",     (uint8_t *)"regstatus", (uint8_t *)"eliminator",
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
-    (uint8_t *)"testsem",  (uint8_t *)"mem"};
+    (uint8_t *)"testsem",  (uint8_t *)"mem",       (uint8_t *)"loop"};
 
 static void (*functions[])(void) = {help,
                                     check_div_by_zero,
@@ -242,7 +263,8 @@ static void (*functions[])(void) = {help,
                                     test_priority,
                                     ps,
                                     test_semaphores,
-                                    mem};
+                                    mem,
+                                    loop};
 
 uint64_t get_command(uint8_t *str) {
   for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
@@ -251,16 +273,43 @@ uint64_t get_command(uint8_t *str) {
       return 1;
     }
   }
-  uint8_t *command10 = (uint8_t *)"playsong";
-  for (int j = 0; j < strlen(command10); j++)
-    if (str[j] != command10[j])
-      return 0;
-  uint8_t idx = str[9] - '0';
-  if (idx >= 1 && idx <= 8) {
-    play_song(idx);
-    return 1;
+
+  uint8_t *command;
+  shell_fn function;
+
+  uint8_t *command1 = (uint8_t *)"playsong";
+  uint8_t *command2 = (uint8_t *)"kill";
+  uint8_t *command3 = (uint8_t *)"block";
+  uint8_t *command4 = (uint8_t *)"unblock";
+
+  switch (str[0]) {
+  case 'p':
+    command = command1;
+    function = play_song;
+    break;
+  case 'k':
+    command = command2;
+    function = kill;
+    break;
+  case 'b':
+    command = command3;
+    function = block;
+    break;
+  case 'u':
+    command = command4;
+    function = unblock;
+    break;
+  default:
+
+    break;
   }
-  return 0;
+  for (int j = 0; j < strlen(command); j++)
+    if (str[j] != command[j])
+      return 0;
+  uint8_t idx = str[strlen(command) + 1] - '0';
+  function(idx);
+
+  return 1;
 }
 
 void run_shell() {
@@ -305,3 +354,9 @@ void run_shell() {
     }
   }
 }
+
+void kill(uint8_t id) { sys_kill_asm(id); }
+
+void block(uint8_t id) { sys_block_asm(id); }
+
+void unblock(uint8_t id) { sys_unblock_asm(id); }
