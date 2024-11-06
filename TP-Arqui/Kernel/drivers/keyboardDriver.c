@@ -4,6 +4,7 @@
 #include <process.h>
 
 extern processManagerADT my_pm;
+extern schedulerADT my_scheduler;
 
 static uint8_t qwerty_US[] = {
     '\0', '\e', '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8', '9',  '0',
@@ -62,7 +63,18 @@ void keyboard_handler() {
       save_registers();
     }
     if (state[0] && (ascii == KILL_PROCESS_SHORTCUT)) {
-      kill(my_pm, getpid(my_pm));
+      uint64_t pid = getpid(my_pm);
+      process_control_block *pcb;
+      while (pid != INIT_PID) {
+        pcb = get_PCB(my_pm, pid);
+        if (pcb->in_fg) {
+          break;
+        }
+        pid = pcb->parent_pid;
+      }
+      if (pid) {
+        kill(my_pm, pid);
+      }
     }
     if (state[0]) {
       ascii = 0;

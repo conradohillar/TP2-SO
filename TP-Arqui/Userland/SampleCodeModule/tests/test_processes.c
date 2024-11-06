@@ -44,8 +44,6 @@ int64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
       sleep(0, 100);
     }
   }
-  ps();
-  sleep(20, 0);
 
   // Randomly kills, blocks or unblocks processes until every one has been
   //   killed
