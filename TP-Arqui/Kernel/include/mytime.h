@@ -1,7 +1,7 @@
 #ifndef _MYTIME_H_
 #define _MYTIME_H_
 
-#include "../processes/processManager.h"
+#include <processManager.h>
 #include <stdint.h>
 
 uint64_t timer_handler(schedulerADT scheduler, uint64_t stack_pointer);

@@ -1,7 +1,12 @@
 #ifndef PROCESS_MANAGER_H
 #define PROCESS_MANAGER_H
 
+#include "../../processUtils.h"
+#include <stddef.h>
 #include <stdint.h>
+
+#define FD_COUNT 3
+#define STDERR 2
 
 typedef uint32_t pid_t;
 
@@ -26,6 +31,9 @@ typedef struct process_control_block {
   process_status status;
   uint8_t waiting;
   int32_t waiting_pid;
+  int64_t return_value;
+
+  uint16_t fds[FD_COUNT];
 
 } process_control_block;
 

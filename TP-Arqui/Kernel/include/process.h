@@ -1,9 +1,10 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
-#include "./interrupts.h"
-#include "./lib.h"
-#include "./processManager.h"
+#include <initProcess.h>
+#include <interrupts.h>
+#include <lib.h>
+#include <processManager.h>
 
 #define USERLAND_ADDRESS 0x400000
 #define MAX_PROCESS_COUNT 64
@@ -16,7 +17,7 @@ typedef struct process_node {
   uint16_t next_index;
 } process_node;
 
-typedef void (*main_fn)(uint64_t argc, uint8_t **argv);
+typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
 typedef void (*wrapper_fn)(main_fn code, uint64_t argc, uint8_t **argv);
 
 /**
@@ -36,8 +37,6 @@ processManagerADT create_process_manager(schedulerADT scheduler);
  */
 uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
                         uint8_t **argv, uint8_t *name, uint8_t in_fg);
-
-void init_process(uint64_t argc, uint8_t **argv);
 
 /**
  * Exits the current process.
@@ -60,7 +59,7 @@ void wait(processManagerADT pm);
  * child to finish.
  * @param pid The PID of the child.
  */
-void waitpid(processManagerADT pm, uint64_t pid);
+int64_t waitpid(processManagerADT pm, uint64_t pid);
 
 /**
  * Blocks a process.
@@ -83,6 +82,12 @@ uint64_t getpid(processManagerADT pm);
  * Returns the PID of the parent process.
  */
 uint64_t getppid(processManagerADT pm);
+
+/**
+ * Returns the status of a process.
+ * @param pid The PID of the process.
+ */
+process_status get_status(processManagerADT pm, uint64_t pid);
 
 /**
  * Sets the priority of a process.
@@ -115,5 +120,15 @@ void free_process(process_control_block *pcb);
  * Destroys the process table.
  */
 void destroy_process_table(processManagerADT pm);
+
+/**
+ * Returns the process control block with pid value of pid.
+ */
+process_control_block *get_PCB(processManagerADT pm, uint64_t pid);
+
+/**
+ * Maps the file descriptor fd to pipe_id.
+ */
+int8_t set_fd(processManagerADT pm, uint16_t fd, uint16_t pipe_id);
 
 #endif

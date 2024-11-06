@@ -44,6 +44,8 @@ int64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
       sleep(0, 100);
     }
   }
+  ps();
+  sleep(20, 0);
 
   // Randomly kills, blocks or unblocks processes until every one has been
   //   killed
@@ -140,7 +142,8 @@ int64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
     itoa(alive, num);
     printcolor((uint8_t *)num, BLUE, 0x000000);
     printcolor((uint8_t *)"\n", BLUE, 0x000000);
-    sleep(3, 0);
+
+    sleep(0, 500);
   }
   printcolor((uint8_t *)"Test: Success\n", GREEN, BLACK);
   return 0;

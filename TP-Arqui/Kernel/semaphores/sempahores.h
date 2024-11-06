@@ -3,8 +3,8 @@
 
 #include "../memory/memoryManager.h"
 #include "../processes/list.h"
-#include "../processes/process.h"
 #include "../processes/scheduler.h"
+#include <process.h>
 #include <stdint.h>
 
 #define MAX_SEM_COUNT 768

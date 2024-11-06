@@ -2,11 +2,11 @@
 #define _SYSCALLS_H
 
 #include "../../processUtils.h"
-#include "../processes/process.h"
-#include "../processes/processManager.h"
-#include "../semaphores/sempahores.h"
+#include <../semaphores/sempahores.h>
 #include <keyboardDriver.h>
 #include <mytime.h>
+#include <process.h>
+#include <processManager.h>
 #include <registers.h>
 #include <rtcDriver.h>
 #include <soundDriver.h>
@@ -14,10 +14,10 @@
 #include <textMode.h>
 #include <videoDriver.h>
 
-typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
-
 #define STDOUT 1
 #define STDIN 0
+
+typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
 
 uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size);
 

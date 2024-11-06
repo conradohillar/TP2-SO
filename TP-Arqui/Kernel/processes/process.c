@@ -4,10 +4,10 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
-#include "./process.h"
-#include "../include/pipes.h"
 #include "../memory/memoryManager.h"
 #include "./scheduler.h"
+#include <pipes.h>
+#include <process.h>
 
 extern pipeManagerADT my_pipe_manager;
 
