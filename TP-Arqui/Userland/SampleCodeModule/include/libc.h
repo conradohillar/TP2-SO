@@ -6,7 +6,7 @@
 #define STD_FORE_COLOR WHITE
 #define STD_BACK_COLOR BLACK
 
-typedef int64_t (*shell_fn)(uint8_t id, uint8_t aux);
+typedef void (*shell_fn)(uint8_t id, uint8_t aux);
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color);
 
@@ -41,4 +41,4 @@ void make_sound(uint64_t millis, uint32_t freq);
 
 void sleep(uint64_t secs, uint64_t millis);
 
-void loop_fn();
+int64_t loop_fn(uint64_t argc, uint8_t *argv[]);

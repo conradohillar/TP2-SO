@@ -148,14 +148,15 @@ void make_sound(uint64_t millis, uint32_t freq) {
   sys_make_sound_asm(millis, freq);
 }
 
-void loop_fn() {
+int64_t loop_fn(uint64_t argc, uint8_t *argv[]) {
   uint64_t pid = sys_getpid_asm();
   uint8_t aux[10];
   itoa(pid, aux);
   while (1) {
-    print("\nHola soy el proceso loop con pid: ");
+    print((uint8_t *)"\nHola soy el proceso loop con pid: ");
     print(aux);
-    print("\n");
-    sleep(3,0);
+    print((uint8_t *)"\n");
+    sleep(3, 0);
   }
+  return -1;
 }

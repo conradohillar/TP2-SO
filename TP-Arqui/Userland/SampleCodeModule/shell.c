@@ -36,7 +36,7 @@ void help() {
              BLACK);
   printcolor((uint8_t *)"testsem    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
-  printcolor((uint8_t *)"testipc   ", ORANGE, BLACK);
+  printcolor((uint8_t *)"testipc    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for inter-process communication\n", GRAY,
              BLACK);
   printcolor((uint8_t *)"ps         ", ORANGE, BLACK);
@@ -243,11 +243,11 @@ void ps() {
 }
 
 void loop() {
-  sys_create_process_asm(loop_fn, 0, NULL, "loop", 0);
+  sys_create_process_asm(loop_fn, 0, NULL, (uint8_t *)"loop", 0);
   return;
 }
 
-void play_song(uint8_t id) {
+void play_song(uint8_t id, uint8_t aux) {
   if (id >= MIN_SONG_ID && id <= MAX_SONG_ID)
     song_dispatcher(id);
 }
@@ -257,7 +257,8 @@ static uint8_t *commands[] = {
     (uint8_t *)"time",     (uint8_t *)"regstatus", (uint8_t *)"eliminator",
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
-    (uint8_t *)"testsem",  (uint8_t *)"testipc",  (uint8_t *)"mem",       (uint8_t *)"loop"};
+    (uint8_t *)"testsem",  (uint8_t *)"testipc",   (uint8_t *)"mem",
+    (uint8_t *)"loop"};
 
 static void (*functions[])(void) = {help,
                                     check_div_by_zero,

@@ -246,40 +246,40 @@ static Block *create_block(void *block_pointer, uint8_t level) {
 }
 
 void mem_status(memoryManagerADT mm) {
-  put_string_nt("\nMemory State:\n", WHITE, BLACK);
+  put_string_nt((uint8_t *)"\nMemory State:\n", WHITE, BLACK);
   void *null = NULL;
   for (int level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
     Block *current = mem_manager->free_blocks_per_level[level];
-    char aux[10];
-    if (current != NULL) {
+    uint8_t aux[10];
+    if (current != null) {
       itoa(level, aux);
-      put_string_nt("Level: ", WHITE, BLACK);
+      put_string_nt((uint8_t *)"Level: ", WHITE, BLACK);
       put_string_nt(aux, WHITE, BLACK);
-      put_string_nt("\n", WHITE, BLACK);
+      put_string_nt((uint8_t *)"\n", WHITE, BLACK);
       // Imprimir cada bloque de la lista
-      while (current != NULL) {
+      while (current != null) {
         itoa((void *)current - (void *)mem_manager->mem_start, aux);
-        put_string_nt("  Block at address: ", WHITE, BLACK);
+        put_string_nt((uint8_t *)"  Block at address: ", WHITE, BLACK);
         put_string_nt(aux, WHITE, BLACK);
         itoa((1UL << current->level), aux);
-        put_string_nt(", size: ", WHITE, BLACK);
+        put_string_nt((uint8_t *)", size: ", WHITE, BLACK);
         put_string_nt(aux, WHITE, BLACK);
         itoa((void *)current->next - mem_manager->mem_start, aux);
-        put_string_nt(", next: ", WHITE, BLACK);
+        put_string_nt((uint8_t *)", next: ", WHITE, BLACK);
         put_string_nt(aux, WHITE, BLACK);
         itoa(current->is_free, aux);
-        put_string_nt(", is_free: ", WHITE, BLACK);
+        put_string_nt((uint8_t *)", is_free: ", WHITE, BLACK);
         put_string_nt(aux, WHITE, BLACK);
-        put_string_nt("\n", WHITE, BLACK);
+        put_string_nt((uint8_t *)"\n", WHITE, BLACK);
 
         current = current->next; // Mover al siguiente bloque
       }
     } else {
       itoa(level, aux);
-      put_string_nt("Level ", WHITE, BLACK);
+      put_string_nt((uint8_t *)"Level ", WHITE, BLACK);
       put_string_nt(aux, WHITE, BLACK);
-      put_string_nt(": No blocks available\n", WHITE, BLACK);
+      put_string_nt((uint8_t *)": No blocks available\n", WHITE, BLACK);
     }
   }
-  put_string_nt("\n", WHITE, BLACK);
+  put_string_nt((uint8_t *)"\n", WHITE, BLACK);
 }

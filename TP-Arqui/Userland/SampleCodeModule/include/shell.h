@@ -54,7 +54,7 @@ void nice(uint8_t id, uint8_t aux);
 
 void test_ipc();
 
-void play_song(uint8_t idx);
+void play_song(uint8_t id, uint8_t aux);
 
 uint64_t get_command(uint8_t *str);
 
