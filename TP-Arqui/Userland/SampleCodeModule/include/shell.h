@@ -11,6 +11,8 @@
 #include <tests.h>
 
 #define NULL (void *)0
+#define MIN_SONG_ID 1
+#define MAX_SONG_ID 8
 
 void check_div_by_zero();
 
@@ -36,7 +38,19 @@ void test_priority();
 
 void ps();
 
+void mem_status();
+
 void test_semaphores();
+
+void loop();
+
+void kill(uint8_t id, uint8_t aux);
+
+void block(uint8_t id, uint8_t aux);
+
+void unblock(uint8_t id, uint8_t aux);
+
+void nice(uint8_t id, uint8_t aux);
 
 void test_ipc();
 

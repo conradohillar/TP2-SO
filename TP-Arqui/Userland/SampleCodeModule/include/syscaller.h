@@ -69,6 +69,8 @@ int8_t sys_sem_open_asm(semaphore sem);
 
 void sys_yield();
 
+void sys_mem_status_asm();
+
 int8_t sys_set_fd_asm(uint16_t fd, uint16_t pipe_id);
 
 int16_t sys_create_pipe_asm();

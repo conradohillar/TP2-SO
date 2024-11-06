@@ -78,6 +78,8 @@ void sys_sem_destroy(uint8_t id);
 
 int8_t sys_sem_open(uint8_t id);
 
+void sys_mem_status();
+
 int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id);
 
 int16_t sys_create_pipe();

@@ -147,6 +147,8 @@ int8_t sys_sem_open(uint8_t id) {
   return (int8_t)id;
 }
 
+void sys_mem_status() { mem_status(); }
+
 int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id) {
   return set_fd(my_pm, fd, pipe_id);
 }

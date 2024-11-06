@@ -28,6 +28,7 @@ GLOBAL sys_sem_post_asm
 GLOBAL sys_sem_destroy_asm
 GLOBAL sys_sem_open_asm
 GLOBAL sys_yield
+GLOBAL sys_mem_status_asm
 GLOBAL sys_set_fd_asm
 GLOBAL sys_create_pipe_asm
 GLOBAL sys_destroy_pipe_asm
@@ -572,6 +573,23 @@ sys_yield:
 
     mov rsi, rdi                 ; sem
     mov rdi, 27                  ;id syscall yield
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret 
+
+sys_mem_status_asm:
+    push rbp
+    mov rbp, rsp
+
+    pushState
+
+    mov rdi, 31
 
     int 80h
 

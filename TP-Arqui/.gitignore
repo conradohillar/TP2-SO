@@ -8,3 +8,4 @@ Toolchain/
 ./compile.sh
 .bash_history
 .gdb_history
+.gdbinit

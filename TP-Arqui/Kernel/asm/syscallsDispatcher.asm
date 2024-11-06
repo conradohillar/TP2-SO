@@ -26,6 +26,7 @@ EXTERN sys_sem_post
 EXTERN sys_sem_destroy
 EXTERN sys_sem_open
 EXTERN asm_yield
+EXTERN sys_mem_status
 EXTERN sys_set_fd
 EXTERN sys_create_pipe
 EXTERN sys_destroy_pipe
@@ -101,6 +102,8 @@ syscalls_dispatcher:
     je create_pipe
     cmp rdi,30
     je destroy_pipe
+    cmp rdi, 31
+    je mem_status
 
 end:
     cli
@@ -289,6 +292,11 @@ sem_open:
 yield:
     mov rdi, rsi
     call asm_yield
+    jmp end
+
+mem_status:
+    mov rdi, rsi
+    call sys_mem_status
     jmp end
 
 set_fd:
