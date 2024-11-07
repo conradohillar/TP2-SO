@@ -18,6 +18,7 @@ typedef struct pipe_t {
   uint8_t buffer[PIPE_BUFFER_SIZE];
   sem_t *mutex;
   sem_t *read_sem;
+  sem_t *write_sem;
   uint16_t last_write_pos;
   uint16_t last_read_pos;
   uint16_t to_read_count;

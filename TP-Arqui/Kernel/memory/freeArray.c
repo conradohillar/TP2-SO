@@ -5,6 +5,11 @@
 // https://pvs-studio.com
 
 #include "memoryManager.h"
+#include <pipes.h>
+#include <scheduler.h>
+
+extern schedulerADT my_scheduler;
+extern pipeManagerADT my_pipe_manager;
 
 #define TOTAL_BLOCKS 750
 #define BLOCK_SIZE 7000
@@ -69,21 +74,25 @@ void mm_free(void *block) {
 }
 
 void mem_status() {
+  uint16_t fd = get_running(my_scheduler)->fds[STDOUT];
+  pipe_t *pipe = get_pipe(my_pipe_manager, fd);
+
   uint64_t counter = 0;
   for (int64_t i = mem_manager->free_index; i != -1;) {
     counter++;
     i = mem_manager->free_array[i];
   }
 
-  char aux[10];
+  uint8_t aux[10];
   itoa(counter, aux);
-  put_string_nt("There are ", WHITE, BLACK);
-  put_string_nt(aux, WHITE, BLACK);
-  put_string_nt(" of ", WHITE, BLACK);
+  write_pipe(my_pipe_manager, pipe, (uint8_t *)"There are ", 10);
+  write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+  write_pipe(my_pipe_manager, pipe, (uint8_t *)" of ", 4);
   itoa(TOTAL_BLOCKS, aux);
-  put_string_nt(aux, WHITE, BLACK);
-  put_string_nt(" free blocks available with size ", WHITE, BLACK);
+  write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+  write_pipe(my_pipe_manager, pipe,
+             (uint8_t *)" free blocks available with size ", 34);
   itoa(BLOCK_SIZE, aux);
-  put_string_nt(aux, WHITE, BLACK);
-  put_string_nt(" each\n", WHITE, BLACK);
+  write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+  write_pipe(my_pipe_manager, pipe, (uint8_t *)" each\n", 6);
 }

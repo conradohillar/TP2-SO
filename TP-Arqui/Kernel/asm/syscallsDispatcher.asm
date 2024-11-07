@@ -295,7 +295,6 @@ yield:
     jmp end
 
 mem_status:
-    mov rdi, rsi
     call sys_mem_status
     jmp end
 

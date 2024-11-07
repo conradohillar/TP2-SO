@@ -583,23 +583,6 @@ sys_yield:
 
     ret 
 
-sys_mem_status_asm:
-    push rbp
-    mov rbp, rsp
-
-    pushState
-
-    mov rdi, 31
-
-    int 80h
-
-    popState
-
-    mov rsp, rbp
-    pop rbp
-
-    ret
-
 sys_set_fd_asm:
     push rbp    
     mov rbp, rsp
@@ -644,6 +627,23 @@ sys_destroy_pipe_asm:
 
     mov rsi, rdi                 
     mov rdi, 30                  ;id syscall destroy_pipe
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_mem_status_asm:
+    push rbp
+    mov rbp, rsp
+
+    pushState
+
+    mov rdi, 31                  ;id syscall mem_status
 
     int 80h
 

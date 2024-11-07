@@ -7,7 +7,7 @@
 #include <process.h>
 #include <stdint.h>
 
-#define MAX_SEM_COUNT 768
+#define MAX_SEM_COUNT 1024
 
 #define MAX_USER_SEM_ID 256
 

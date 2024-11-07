@@ -92,7 +92,39 @@ void check_invalid_opcode() { inopcode_excep_asm(); }
 
 void get_registers() { sys_get_registers_asm(); }
 
-void mem() { sys_mem_status_asm(); }
+int64_t mem_writer(uint64_t argc, uint8_t *argv[]) {
+  uint16_t new_fd = satoi(argv[0]);
+  sys_set_fd_asm(STDOUT, new_fd);
+  sys_mem_status_asm();
+  return 0;
+}
+
+int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
+  uint16_t new_fd = satoi(argv[0]);
+  sys_set_fd_asm(STDIN, new_fd);
+  while (1) {
+    uint8_t buffer[460];
+    uint64_t count = sys_read_asm(new_fd, buffer, 453);
+    buffer[count] = '\0';
+    print(buffer);
+  }
+  return -1;
+}
+
+void mem() {
+  uint16_t pipe_id = sys_create_pipe_asm();
+  uint8_t aux[10];
+  itoa(pipe_id, aux);
+  uint8_t *argv[] = {aux};
+  uint64_t pid =
+      sys_create_process_asm(mem_writer, 1, argv, (uint8_t *)"mem_writer", 0);
+  uint64_t pid2 =
+      sys_create_process_asm(mem_reader, 1, argv, (uint8_t *)"mem_reader", 0);
+  sys_waitpid_asm(pid);
+  sleep(1, 0);
+  sys_kill_asm(pid2);
+  sys_destroy_pipe_asm(pipe_id);
+}
 
 void run_eliminator() {
   eliminator_menu();
@@ -319,9 +351,12 @@ uint64_t get_command(uint8_t *str) {
 
     break;
   }
-  for (int j = 0; j < strlen(command); j++)
+
+  for (int j = 0; j < strlen(command); j++) {
     if (str[j] != command[j])
       return 0;
+  }
+
   uint8_t idx = str[strlen(command) + 1] - '0';
   if (str[strlen(command) + 3] != 0) {
     uint8_t aux = str[strlen(command) + 3] - '0';

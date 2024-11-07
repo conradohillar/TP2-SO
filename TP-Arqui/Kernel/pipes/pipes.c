@@ -40,17 +40,26 @@ pipe_t *create_pipe(pipeManagerADT pipe_manager) {
     if (pipe_manager->pipes[i] == NULL) {
       pipe->id = i;
       // We want to create semaphores outside the "user semaphore space"
-      pipe->mutex = sem_init(my_sm, MAX_USER_SEM_ID + 2 * i, 1);
+      pipe->mutex = sem_init(my_sm, MAX_USER_SEM_ID + 3 * i, 1);
       if (pipe->mutex == NULL) {
         mm_free(pipe);
         return NULL;
       }
-      pipe->read_sem = sem_init(my_sm, MAX_USER_SEM_ID + 2 * i + 1, 0);
+      pipe->read_sem = sem_init(my_sm, MAX_USER_SEM_ID + 3 * i + 1, 0);
       if (pipe->read_sem == NULL) {
         sem_destroy(my_sm, pipe->mutex);
         mm_free(pipe);
         return NULL;
       }
+
+      pipe->write_sem = sem_init(my_sm, MAX_USER_SEM_ID + 3 * i + 2, 0);
+      if (pipe->read_sem == NULL) {
+        sem_destroy(my_sm, pipe->mutex);
+        sem_destroy(my_sm, pipe->read_sem);
+        mm_free(pipe);
+        return NULL;
+      }
+
       pipe->last_write_pos = 0;
       pipe->last_read_pos = 0;
       pipe->to_read_count = 0;
@@ -68,6 +77,7 @@ void destroy_pipe(pipeManagerADT pipe_manager, pipe_t *pipe) {
   }
   sem_destroy(my_sm, pipe->mutex);
   sem_destroy(my_sm, pipe->read_sem);
+  sem_destroy(my_sm, pipe->write_sem);
   pipe_manager->pipes[pipe->id] = NULL;
   mm_free(pipe);
   pipe_manager->count--;
@@ -90,6 +100,14 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
     pipe->buffer[pipe->last_write_pos] = buffer[i];
     pipe->last_write_pos = (pipe->last_write_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count++;
+
+    if (pipe->to_read_count == PIPE_BUFFER_SIZE) {
+      sem_post(my_sm, pipe->mutex);
+      if (update_sem) {
+        sem_post(my_sm, pipe->read_sem);
+      }
+      sem_wait(my_sm, running_pcb, pipe->write_sem);
+    }
   }
 
   if (update_sem && pipe->to_read_count > 0) {
@@ -115,6 +133,10 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
     buffer[i++] = pipe->buffer[pipe->last_read_pos];
     pipe->last_read_pos = (pipe->last_read_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count--;
+
+    if (pipe->to_read_count == (PIPE_BUFFER_SIZE - 1)) {
+      sem_post(my_sm, pipe->write_sem);
+    }
 
     // If the buffer is empty and we haven't reached bytes amount of chars read,
     // we block the process until something is written

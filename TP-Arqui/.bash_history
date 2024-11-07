@@ -352,3 +352,44 @@ gdb
 clear
 quit
 exit
+cd ~
+gdb
+gdb
+ls
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+exit
+cd ~
+gdb
+ls
+gdb
+gdb
+cd ~
+ls
+cat .gdbinit 
+gdb
+gdb
+quit
+gdb
+gdb
+gdb
+quit
+gd
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+gd
+gdb
+gdb
+exit
