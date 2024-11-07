@@ -56,6 +56,11 @@ void help() {
   printcolor((uint8_t *)"unblock PID", ORANGE, BLACK);
   printcolor((uint8_t *)" - unblocks the process with specified PID\n", GRAY,
              BLACK);
+  printcolor((uint8_t *)"philos", ORANGE, BLACK);
+  printcolor((uint8_t *)" - invocates the philosophers synchronization problem "
+                        "starting with 5 diners, press 'a' to add one,\n'd' to "
+                        "delete one or 'q' to quit\n",
+             GRAY, BLACK);
   printcolor((uint8_t *)"eliminator ", ORANGE, BLACK);
   printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
   printcolor((uint8_t *)"inctext    ", ORANGE, BLACK);
@@ -290,7 +295,7 @@ static uint8_t *commands[] = {
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
     (uint8_t *)"testsem",  (uint8_t *)"testipc",   (uint8_t *)"mem",
-    (uint8_t *)"loop", (uint8_t *)"philos"};
+    (uint8_t *)"loop",     (uint8_t *)"philos"};
 
 static void (*functions[])(void) = {help,
                                     check_div_by_zero,
@@ -307,7 +312,8 @@ static void (*functions[])(void) = {help,
                                     test_semaphores,
                                     test_ipc,
                                     mem,
-                                    loop, philos};
+                                    loop,
+                                    philos};
 
 uint64_t get_command(uint8_t *str) {
   for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {

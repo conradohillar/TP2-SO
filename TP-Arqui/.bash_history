@@ -393,3 +393,5 @@ gd
 gdb
 gdb
 exit
+q
+exit
