@@ -7,6 +7,7 @@
 #define STD_BACK_COLOR BLACK
 
 typedef void (*shell_fn)(uint8_t id, uint8_t aux);
+typedef int8_t sem_t;
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color);
 

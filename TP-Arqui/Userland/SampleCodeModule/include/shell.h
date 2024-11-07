@@ -56,6 +56,8 @@ void test_ipc();
 
 void play_song(uint8_t id, uint8_t aux);
 
+int64_t philos(uint64_t argc, uint8_t *argv[]);
+
 uint64_t get_command(uint8_t *str);
 
 void run_shell();
