@@ -393,3 +393,7 @@ gd
 gdb
 gdb
 exit
+cd root
+gdb
+ifconfig
+exit

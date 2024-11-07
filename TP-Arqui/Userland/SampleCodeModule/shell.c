@@ -103,10 +103,12 @@ int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
   uint16_t new_fd = satoi(argv[0]);
   sys_set_fd_asm(STDIN, new_fd);
   while (1) {
-    uint8_t buffer[460];
-    uint64_t count = sys_read_asm(new_fd, buffer, 453);
-    buffer[count] = '\0';
-    print(buffer);
+    uint8_t buffer[2];
+    while (1) {
+      uint64_t count = sys_read_asm(new_fd, buffer, 1);
+      buffer[count] = '\0';
+      print(buffer);
+    }
   }
   return -1;
 }
@@ -121,7 +123,6 @@ void mem() {
   uint64_t pid2 =
       sys_create_process_asm(mem_reader, 1, argv, (uint8_t *)"mem_reader", 0);
   sys_waitpid_asm(pid);
-  sleep(1, 0);
   sys_kill_asm(pid2);
   sys_destroy_pipe_asm(pipe_id);
 }

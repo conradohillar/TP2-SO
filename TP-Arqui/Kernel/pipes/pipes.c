@@ -107,6 +107,7 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
         sem_post(my_sm, pipe->read_sem);
       }
       sem_wait(my_sm, running_pcb, pipe->write_sem);
+      sem_wait(my_sm, running_pcb, pipe->mutex);
     }
   }
 
@@ -125,8 +126,10 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   }
   process_control_block *running_pcb = get_running(my_scheduler);
 
-  sem_wait(my_sm, running_pcb, pipe->read_sem);
+  // sem_wait(my_sm, running_pcb, pipe->read_sem);
   sem_wait(my_sm, running_pcb, pipe->mutex);
+
+  uint8_t update_write_sem = pipe->to_read_count == PIPE_BUFFER_SIZE;
 
   uint64_t i = 0;
   while (i < bytes && pipe->to_read_count != 0) {
@@ -134,24 +137,21 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
     pipe->last_read_pos = (pipe->last_read_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count--;
 
-    if (pipe->to_read_count == (PIPE_BUFFER_SIZE - 1)) {
+    if (update_write_sem) {
       sem_post(my_sm, pipe->write_sem);
     }
 
     // If the buffer is empty and we haven't reached bytes amount of chars read,
     // we block the process until something is written
     if (pipe->to_read_count == 0 && i < bytes) {
+
       sem_post(my_sm, pipe->mutex);
       sem_wait(my_sm, running_pcb, pipe->read_sem);
       sem_wait(my_sm, running_pcb, pipe->mutex);
     }
   }
 
-  // We need to leave the semaphore as "ready to read" if the buffer isn't empty
-  if (pipe->to_read_count > 0) {
-    sem_post(my_sm, pipe->read_sem);
-  }
-
+  // sem_post(my_sm, pipe->read_sem);
   sem_post(my_sm, pipe->mutex);
   return i;
 }

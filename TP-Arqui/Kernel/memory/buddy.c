@@ -255,54 +255,53 @@ void mem_status(memoryManagerADT mm) {
   uint16_t fd = get_running(my_scheduler)->fds[STDOUT];
   pipe_t *pipe = get_pipe(my_pipe_manager, fd);
 
-  write_pipe(
-      my_pipe_manager, pipe,
-      "El aprendizaje continuo es clave para adaptarse a un mundo en constante "
-      "cambio. Cada dia surgen nuevas tecnologias y herramientas que "
-      "transforman nuestra manera de trabajar, comunicarnos y aprender. La "
-      "curiosidad y la disposicion a adquirir conocimientos nos permiten"
-      "mantenernos actualizados y competitivos. Al enfrentar desafios con una "
-      "mentalidad abierta y dispuesta a aprender, incrementamos nuestras "
-      "habilidades y ampliamos nuestras perspectivas.\n",
-      453);
+  // write_pipe(
+  //     my_pipe_manager, pipe,
+  //     "El aprendizaje continuo es clave para adaptarse a un mundo en
+  //     constante " "cambio. Cada dia surgen nuevas tecnologias y herramientas
+  //     que " "transforman nuestra manera de trabajar, comunicarnos y aprender.
+  //     La " "curiosidad y la disposicion a adquirir conocimientos nos
+  //     permiten" "mantenernos actualizados y competitivos. Al enfrentar
+  //     desafios con una " "mentalidad abierta y dispuesta a aprender,
+  //     incrementamos nuestras " "habilidades y ampliamos nuestras
+  //     perspectivas.\n", 453);
 
-  //   write_pipe(my_pipe_manager, pipe, (uint8_t *)"\nMemory State:\n", 15);
-  //   void *null = NULL;
-  //   for (int level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
-  //     Block *current = mem_manager->free_blocks_per_level[level];
-  //     uint8_t aux[10];
-  //     if (current != null) {
-  //       itoa(level, aux);
-  //       write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 7);
-  //       write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  //       write_pipe(my_pipe_manager, pipe, (uint8_t *)":\n", 1);
-  //       // Imprimir cada bloque de la lista
-  //       while (current != null) {
-  //         itoa((void *)current - (void *)mem_manager->mem_start, aux);
-  //         write_pipe(my_pipe_manager, pipe,
-  //                    (uint8_t *)"  Block at address: ", 20);
-  //         write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  //         itoa((1UL << current->level), aux);
-  //         write_pipe(my_pipe_manager, pipe, (uint8_t *)", size: ", 8);
-  //         write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  //         itoa((void *)current->next - mem_manager->mem_start, aux);
-  //         write_pipe(my_pipe_manager, pipe, (uint8_t *)", next: ", 8);
-  //         write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  //         itoa(current->is_free, aux);
-  //         write_pipe(my_pipe_manager, pipe, (uint8_t *)", is_free: ", 11);
-  //         write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  //         write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);
+  write_pipe(my_pipe_manager, pipe, (uint8_t *)"\nMEMORY STATE:\n", 15);
+  void *null = NULL;
+  for (int level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
+    Block *current = mem_manager->free_blocks_per_level[level];
+    uint8_t aux[10];
+    if (current != null) {
+      itoa(level, aux);
+      write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 7);
+      write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+      write_pipe(my_pipe_manager, pipe, (uint8_t *)":\n", 1);
+      // Imprimir cada bloque de la lista
+      while (current != null) {
+        itoa((void *)current - (void *)mem_manager->mem_start, aux);
+        write_pipe(my_pipe_manager, pipe,
+                   (uint8_t *)"  Block at address: ", 20);
+        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+        itoa((1UL << current->level), aux);
+        write_pipe(my_pipe_manager, pipe, (uint8_t *)", size: ", 8);
+        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+        itoa((void *)current->next - mem_manager->mem_start, aux);
+        write_pipe(my_pipe_manager, pipe, (uint8_t *)", next: ", 8);
+        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+        itoa(current->is_free, aux);
+        write_pipe(my_pipe_manager, pipe, (uint8_t *)", is_free: ", 11);
+        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+        write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);
 
-  //         current = current->next; // Mover al siguiente bloque
-  //       }
-  //     } else {
-  //       itoa(level, aux);
-  //       write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 6);
-  //       write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  //       write_pipe(my_pipe_manager, pipe, (uint8_t *)": No blocks
-  //       available\n",
-  //                  24);
-  //     }
-  //   }
-  //   write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);
+        current = current->next; // Mover al siguiente bloque
+      }
+    } else {
+      itoa(level, aux);
+      write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 6);
+      write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
+      write_pipe(my_pipe_manager, pipe, (uint8_t *)":  No blocks available\n",
+                 24);
+    }
+  }
+  write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);
 }
