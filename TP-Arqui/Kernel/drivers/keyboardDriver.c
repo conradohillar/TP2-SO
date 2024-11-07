@@ -1,10 +1,12 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <keyboardDriver.h>
+#include <pipes.h>
 #include <process.h>
 
 extern processManagerADT my_pm;
 extern schedulerADT my_scheduler;
+extern pipeManagerADT my_pipe_manager;
 
 static uint8_t qwerty_US[] = {
     '\0', '\e', '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8', '9',  '0',
@@ -79,6 +81,14 @@ void keyboard_handler() {
     if (state[0]) {
       ascii = 0;
     }
+  }
+
+  // Only write to the pipe if there is space
+  pipe_t *stdin_pipe = get_pipe(my_pipe_manager, STDIN);
+
+  if (ascii && stdin_pipe->to_read_count < PIPE_BUFFER_SIZE) {
+    write_pipe(my_pipe_manager, stdin_pipe, &ascii, 1);
+    ascii = 0;
   }
 }
 

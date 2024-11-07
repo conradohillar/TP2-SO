@@ -384,6 +384,7 @@ void run_shell() {
     uint64_t buff_pos = 0;
     printcolor((uint8_t *)">: ", GREEN, BLACK);
     uint8_t c;
+    uint8_t buff[1];
 
     while (((c = getchar()) != '\n' || buff_pos == 0) &&
            buff_pos < COMM_BUFF_SIZE) {

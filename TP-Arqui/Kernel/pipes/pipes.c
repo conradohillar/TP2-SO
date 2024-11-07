@@ -131,6 +131,12 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
 
   uint8_t update_write_sem = pipe->to_read_count == PIPE_BUFFER_SIZE;
 
+  if (pipe->to_read_count == 0) {
+    sem_post(my_sm, pipe->mutex);
+    sem_wait(my_sm, running_pcb, pipe->read_sem);
+    sem_wait(my_sm, running_pcb, pipe->mutex);
+  }
+
   uint64_t i = 0;
   while (i < bytes && pipe->to_read_count != 0) {
     buffer[i++] = pipe->buffer[pipe->last_read_pos];
