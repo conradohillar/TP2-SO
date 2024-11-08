@@ -35,7 +35,7 @@ static pipe_t *create_pipe_size(pipeManagerADT pipe_manager,
       }
 
       pipe->write_sem = sem_init(my_sm, MAX_USER_SEM_ID + 3 * i + 2, 1);
-      if (pipe->read_sem == NULL) {
+      if (pipe->write_sem == NULL) {
         sem_destroy(my_sm, pipe->mutex);
         sem_destroy(my_sm, pipe->read_sem);
         mm_free(pipe);
@@ -47,7 +47,7 @@ static pipe_t *create_pipe_size(pipeManagerADT pipe_manager,
       pipe->last_read_pos = 0;
       pipe->to_read_count = 0;
       pipe->write_waiting = 0;
-      pipe->read_waiting = 0;
+      pipe->read_waiting = 1;
       pipe_manager->pipes[i] = pipe;
       pipe_manager->count++;
       return pipe;
@@ -99,13 +99,8 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   }
   process_control_block *running_pcb = get_running(my_scheduler);
 
-  sem_wait(my_sm, running_pcb, pipe->mutex);
-  pipe->write_waiting = 1;
   sem_wait(my_sm, running_pcb, pipe->write_sem);
-  pipe->write_waiting = 0;
-
-  // We need to update the semaphore if the buffer was empty before writing and
-  // after writing it has data
+  sem_wait(my_sm, running_pcb, pipe->mutex);
 
   uint64_t i = 0;
   while (i < bytes) {
@@ -136,15 +131,13 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
 
 uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
                    uint64_t bytes) {
-  put_string_nt((uint8_t *)"Reading pipe\n", 0x00FF00, 0x000000);
   if (pipe == NULL || bytes == 0) {
     return 0;
   }
   process_control_block *running_pcb = get_running(my_scheduler);
 
-  sem_wait(my_sm, running_pcb, pipe->mutex);
-  pipe->read_waiting = 1;
   sem_wait(my_sm, running_pcb, pipe->read_sem);
+  sem_wait(my_sm, running_pcb, pipe->mutex);
   pipe->read_waiting = 0;
 
   // if (pipe->to_read_count == 0) {
@@ -183,6 +176,7 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   if (pipe->to_read_count > 0) {
     sem_post(my_sm, pipe->read_sem);
   }
+  pipe->read_waiting = 1;
   sem_post(my_sm, pipe->mutex);
   return i;
 }
