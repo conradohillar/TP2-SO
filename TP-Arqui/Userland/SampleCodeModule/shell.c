@@ -7,83 +7,15 @@
 #define COMM_BUFF_SIZE 128
 
 static uint64_t scale = 1;
-static uint8_t *status_to_string(process_status status);
 
 void help() {
-  uint8_t *supertab = (uint8_t *)"\t\t\t\t";
-  printcolor((uint8_t *)"help       ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints a list of all possible commands\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"divzero    ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - tests the divide by zero exception\n", GRAY, BLACK);
-  printcolor((uint8_t *)"inopcode   ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - tests the invalid opcode exception\n", GRAY, BLACK);
-  printcolor((uint8_t *)"time       ", ORANGE, BLACK);
-  printcolor(
-      (uint8_t *)" - returns the current system time in HH:MM:SS format\n",
-      GRAY, BLACK);
-  printcolor((uint8_t *)"regstatus  ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints the values of the CPU registers\n", GRAY,
-             BLACK);
-  print((uint8_t *)"\t\t\t ");
-  printcolor((uint8_t *)"press Ctrl + r to save the register states\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"testproc   ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
-             GRAY, BLACK);
-  printcolor((uint8_t *)"testprio   ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - Runs test for changing process priorities\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"testsem    ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - Runs test for semaphores\n", GRAY, BLACK);
-  printcolor((uint8_t *)"testipc    ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - Runs test for inter-process communication\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"ps         ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
-  printcolor((uint8_t *)"mem        ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints the current status of the memory\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"loop       ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints hello and its pid every 3 seconds\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"kill PID   ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - kills the process with specified PID\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"block PID  ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - blocks the process with specified PID\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"unblock PID", ORANGE, BLACK);
-  printcolor((uint8_t *)" - unblocks the process with specified PID\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"eliminator ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
-  printcolor((uint8_t *)"inctext    ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - increases the size of the text, (max: 2)\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"dectext    ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - decreases the size of the text, (min: 1)\n", GRAY,
-             BLACK);
-  printcolor((uint8_t *)"clear      ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - clears the screen\n", GRAY, BLACK);
-  printcolor((uint8_t *)"playsong N ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - plays the N-th tune, being N:\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"1: Starting beep sound\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"2: Happy birthday\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"3: La Cucaracha\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"4: The Imperial March\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"5: Dale Dale Bo'\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"6: Game Over! sound\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"7: Terraria - Day\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"8: Himno Nacional Argentino\n", GRAY, BLACK);
+  uint8_t in_fg = 1;
+  uint64_t pid =
+      sys_create_process_asm(help_fn, 0, NULL, (uint8_t *)"help", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
+  }
+  return;
 }
 
 void check_div_by_zero() { divzero_excep_asm(); }
@@ -92,39 +24,14 @@ void check_invalid_opcode() { inopcode_excep_asm(); }
 
 void get_registers() { sys_get_registers_asm(); }
 
-int64_t mem_writer(uint64_t argc, uint8_t *argv[]) {
-  uint16_t new_fd = satoi(argv[0]);
-  sys_set_fd_asm(STDOUT, new_fd);
-  sys_mem_status_asm();
-  return 0;
-}
-
-int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
-  uint16_t new_fd = satoi(argv[0]);
-  sys_set_fd_asm(STDIN, new_fd);
-  while (1) {
-    uint8_t buffer[2];
-    while (1) {
-      uint64_t count = sys_read_asm(new_fd, buffer, 1);
-      buffer[count] = '\0';
-      print(buffer);
-    }
-  }
-  return -1;
-}
-
 void mem() {
-  uint16_t pipe_id = sys_create_pipe_asm();
-  uint8_t aux[10];
-  itoa(pipe_id, aux);
-  uint8_t *argv[] = {aux};
+  uint8_t in_fg = 1;
   uint64_t pid =
-      sys_create_process_asm(mem_writer, 1, argv, (uint8_t *)"mem_writer", 0);
-  uint64_t pid2 =
-      sys_create_process_asm(mem_reader, 1, argv, (uint8_t *)"mem_reader", 0);
-  sys_waitpid_asm(pid);
-  sys_kill_asm(pid2);
-  sys_destroy_pipe_asm(pipe_id);
+      sys_create_process_asm(mem_fn, 0, NULL, (uint8_t *)"mem", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
+  }
+  return;
 }
 
 void run_eliminator() {
@@ -224,55 +131,13 @@ void test_ipc() {
   sys_waitpid_asm(pid);
 }
 
-static uint8_t *status_to_string(process_status status) {
-  switch (status) {
-  case RUNNING:
-    return (uint8_t *)"RUNNING";
-  case READY:
-    return (uint8_t *)"READY";
-  case BLOCKED:
-    return (uint8_t *)"BLOCKED";
-  case KILLED:
-    return (uint8_t *)"KILLED";
-  case ZOMBIE:
-    return (uint8_t *)"ZOMBIE";
-
-  default:
-    return (uint8_t *)"invalid-status";
-  }
-}
-
 void ps() {
-  ps_struct *ps = (ps_struct *)sys_ps_asm();
-
-  printcolor((uint8_t *)"PID\tNAME\t\t\t\tSTACK_POINTER\t\t BASE_"
-                        "POINTER\t\t  STATE\t   PRIORITY\tIN_FG\n",
-             GRAY, BLACK);
-  for (int i = 0; i < ps->count; i++) {
-    uint8_t pid[20] = {0};
-    itoa(ps->info[i].pid, pid);
-    print(pid);
-    print_spaces(7 - strlen(pid));
-    print(ps->info[i].name);
-    print_spaces(20 - strlen(ps->info[i].name));
-    uint8_t sp[20] = {0};
-    itoh(ps->info[i].sp, sp);
-    print(sp);
-    print((uint8_t *)"\t");
-    uint8_t bp[20] = {0};
-    itoh(ps->info[i].bp, bp);
-    print(bp);
-    print((uint8_t *)"\t");
-    print((uint8_t *)status_to_string(ps->info[i].state));
-    print_spaces(12 - strlen(status_to_string(ps->info[i].state)));
-    uint8_t prio[20] = {0};
-    itoa(ps->info[i].priority, prio);
-    print(prio);
-    print((uint8_t *)"\t\t   ");
-    print((uint8_t *)(ps->info[i].in_fg ? "FG" : "BG"));
-    print((uint8_t *)"\n");
+  uint8_t in_fg = 1;
+  uint64_t pid = sys_create_process_asm(ps_fn, 0, NULL, (uint8_t *)"ps", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
   }
-  sys_free_ps_asm(ps);
+  return;
 }
 
 void loop() {
@@ -403,18 +268,18 @@ void run_shell() {
     command_buffer[buff_pos] = '\0';
 
     if (get_command(command_buffer) == 0) {
-      putcharcolor('\"', RED, BLACK);
-      printcolor(command_buffer, RED, BLACK);
-      putcharcolor('\"', RED, BLACK);
-      printcolor((uint8_t *)" is not a command\n", RED, BLACK);
+      putcharerr('\"');
+      printerr(command_buffer);
+      putcharerr('\"');
+      printerr((uint8_t *)" is not a command\n");
     }
   }
 }
 
-void kill(uint8_t id, uint8_t aux) { sys_kill_asm(id); }
+void kill(uint8_t pid, uint8_t aux) { sys_kill_asm(pid); }
 
-void block(uint8_t id, uint8_t aux) { sys_block_asm(id); }
+void block(uint8_t pid, uint8_t aux) { sys_block_asm(pid); }
 
-void unblock(uint8_t id, uint8_t aux) { sys_unblock_asm(id); }
+void unblock(uint8_t pid, uint8_t aux) { sys_unblock_asm(pid); }
 
-void nice(uint8_t id, uint8_t aux) { sys_set_priority_asm(id, aux); }
+void nice(uint8_t pid, uint8_t aux) { sys_set_priority_asm(pid, aux); }

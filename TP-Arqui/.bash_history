@@ -398,3 +398,9 @@ gdb
 ifconfig
 exit
 exit
+cd root/
+ls
+gdb
+ifconfig
+gdb
+exit

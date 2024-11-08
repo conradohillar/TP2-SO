@@ -3,6 +3,7 @@
 
 #define STDIN 0
 #define STDOUT 1
+#define STDERR 2
 
 typedef int64_t (*fn)(uint64_t argc, uint8_t *argv[]);
 
