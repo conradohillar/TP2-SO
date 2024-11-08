@@ -379,7 +379,6 @@ void run_shell() {
   scale = 1;
   printcolor((uint8_t *)"Type \"help\" to see a list of commands\n", WHITE,
              BLUE);
-
   while (1) {
     uint64_t buff_pos = 0;
     printcolor((uint8_t *)">: ", GREEN, BLACK);

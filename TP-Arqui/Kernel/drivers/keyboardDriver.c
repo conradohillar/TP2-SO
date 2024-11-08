@@ -88,8 +88,8 @@ void keyboard_handler() {
 
   if (ascii && stdin_pipe->to_read_count < PIPE_BUFFER_SIZE) {
     write_pipe(my_pipe_manager, stdin_pipe, &ascii, 1);
-    ascii = 0;
   }
+  ascii = 0;
 }
 
 uint32_t get_key() {

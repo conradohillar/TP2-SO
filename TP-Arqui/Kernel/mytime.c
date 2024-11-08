@@ -16,7 +16,7 @@ uint64_t timer_handler(schedulerADT scheduler, uint64_t stack_pointer) {
 
   // Empty STDOUT and print to screen
   if (to_read_count > 0) {
-    uint8_t buffer[PIPE_BUFFER_SIZE + 1];
+    uint8_t buffer[MAX_CHARS_IN_SCREEN + 1];
     uint64_t count =
         read_pipe(my_pipe_manager, stdout_pipe, buffer, to_read_count);
     buffer[count] = '\0';

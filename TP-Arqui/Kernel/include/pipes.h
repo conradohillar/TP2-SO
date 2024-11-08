@@ -11,17 +11,22 @@
 
 #define PIPE_BUFFER_SIZE 256
 
+#define MAX_CHARS_IN_SCREEN 6144
+
 typedef struct pipeManagerCDT *pipeManagerADT;
 
 typedef struct pipe_t {
   uint16_t id;
-  uint8_t buffer[PIPE_BUFFER_SIZE];
+  uint8_t *buffer;
+  uint16_t buffer_size;
   sem_t *mutex;
   sem_t *read_sem;
   sem_t *write_sem;
   uint16_t last_write_pos;
   uint16_t last_read_pos;
   uint16_t to_read_count;
+  uint8_t write_waiting;
+  uint8_t read_waiting;
 } pipe_t;
 
 /**
