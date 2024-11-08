@@ -10,18 +10,18 @@ static uint64_t ticks = 0;
 uint64_t timer_handler(schedulerADT scheduler, uint64_t stack_pointer) {
   ticks++;
 
-  pipe_t *stdout_pipe = get_pipe(my_pipe_manager, STDOUT);
+  // pipe_t *stdout_pipe = get_pipe(my_pipe_manager, STDOUT);
 
-  uint16_t to_read_count = stdout_pipe->to_read_count;
+  // uint16_t to_read_count = stdout_pipe->to_read_count;
 
-  // Empty STDOUT and print to screen
-  if (to_read_count > 0) {
-    uint8_t buffer[MAX_CHARS_IN_SCREEN + 1];
-    uint64_t count =
-        read_pipe(my_pipe_manager, stdout_pipe, buffer, to_read_count);
-    buffer[count] = '\0';
-    put_string_nt(buffer, WHITE, BLACK);
-  }
+  // // Empty STDOUT and print to screen
+  // if (to_read_count > 0) {
+  //   uint8_t buffer[MAX_CHARS_IN_SCREEN + 1];
+  //   uint64_t count =
+  //       read_pipe(my_pipe_manager, stdout_pipe, buffer, to_read_count);
+  //   buffer[count] = '\0';
+  //   put_string_nt(buffer, WHITE, BLACK);
+  // }
 
   return context_switch(scheduler, stack_pointer);
 }

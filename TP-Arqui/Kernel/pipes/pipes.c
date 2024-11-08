@@ -9,8 +9,7 @@ typedef struct pipeManagerCDT {
   uint64_t count;
 } pipeManagerCDT;
 
-static pipe_t *create_pipe_size(pipeManagerADT pipe_manager,
-                                uint16_t buffer_size) {
+pipe_t *create_pipe(pipeManagerADT pipe_manager) {
   if (pipe_manager->count == MAX_PIPES_COUNT) {
     return NULL;
   }
@@ -20,7 +19,11 @@ static pipe_t *create_pipe_size(pipeManagerADT pipe_manager,
   }
   for (int i = 0; i < MAX_PIPES_COUNT; i++) {
     if (pipe_manager->pipes[i] == NULL) {
-      pipe->id = i;
+
+      // pipe id = 0 is for STDIN, the rest are for the processes (we skip 1 and
+      // 2 for STDOUT and STDERR)
+      pipe->id = (i ? i + 2 : 0);
+
       // We want to create semaphores outside the "user semaphore space"
       pipe->mutex = sem_init(my_sm, MAX_USER_SEM_ID + 3 * i, 1);
       if (pipe->mutex == NULL) {
@@ -33,7 +36,6 @@ static pipe_t *create_pipe_size(pipeManagerADT pipe_manager,
         mm_free(pipe);
         return NULL;
       }
-
       pipe->write_sem = sem_init(my_sm, MAX_USER_SEM_ID + 3 * i + 2, 1);
       if (pipe->write_sem == NULL) {
         sem_destroy(my_sm, pipe->mutex);
@@ -41,8 +43,6 @@ static pipe_t *create_pipe_size(pipeManagerADT pipe_manager,
         mm_free(pipe);
         return NULL;
       }
-      pipe->buffer = (uint8_t *)mm_malloc(buffer_size);
-      pipe->buffer_size = buffer_size;
       pipe->last_write_pos = 0;
       pipe->last_read_pos = 0;
       pipe->to_read_count = 0;
@@ -67,26 +67,23 @@ pipeManagerADT create_pipe_manager() {
     pipe_manager->pipes[i] = NULL;
   }
 
-  // We create some pipes that all processes will read and write from
-  // respectively by default
+  // We create the STDIN pipe
   create_pipe(pipe_manager);
-  create_pipe_size(pipe_manager, MAX_CHARS_IN_SCREEN);
 
   return pipe_manager;
-}
-
-pipe_t *create_pipe(pipeManagerADT pipe_manager) {
-  return create_pipe_size(pipe_manager, PIPE_BUFFER_SIZE);
 }
 
 void destroy_pipe(pipeManagerADT pipe_manager, pipe_t *pipe) {
   if (pipe == NULL) {
     return;
   }
+
+  uint16_t pipe_id = pipe->id ? pipe->id - 2 : 0;
+
   sem_destroy(my_sm, pipe->mutex);
   sem_destroy(my_sm, pipe->read_sem);
   sem_destroy(my_sm, pipe->write_sem);
-  pipe_manager->pipes[pipe->id] = NULL;
+  pipe_manager->pipes[pipe_id] = NULL;
   mm_free(pipe->buffer);
   mm_free(pipe);
   pipe_manager->count--;
@@ -99,13 +96,17 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   }
   process_control_block *running_pcb = get_running(my_scheduler);
 
+  sem_wait(my_sm, running_pcb, pipe->mutex);
+  pipe->write_waiting = 1;
+  sem_post(my_sm, pipe->mutex);
   sem_wait(my_sm, running_pcb, pipe->write_sem);
   sem_wait(my_sm, running_pcb, pipe->mutex);
+  pipe->write_waiting = 0;
 
   uint64_t i = 0;
   while (i < bytes) {
     pipe->buffer[pipe->last_write_pos] = buffer[i++];
-    pipe->last_write_pos = (pipe->last_write_pos + 1) % pipe->buffer_size;
+    pipe->last_write_pos = (pipe->last_write_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count++;
 
     if (pipe->read_waiting) {
@@ -113,7 +114,7 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
       pipe->read_waiting = 0;
     }
 
-    if (pipe->to_read_count == pipe->buffer_size && i < bytes) {
+    if (pipe->to_read_count == PIPE_BUFFER_SIZE && i < bytes) {
       pipe->write_waiting = 1;
       sem_post(my_sm, pipe->mutex);
       sem_wait(my_sm, running_pcb, pipe->write_sem);
@@ -121,7 +122,7 @@ uint64_t write_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
     }
   }
 
-  if (pipe->to_read_count < pipe->buffer_size) {
+  if (pipe->to_read_count < PIPE_BUFFER_SIZE) {
     sem_post(my_sm, pipe->write_sem);
   }
 
@@ -136,6 +137,9 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   }
   process_control_block *running_pcb = get_running(my_scheduler);
 
+  sem_wait(my_sm, running_pcb, pipe->mutex);
+  pipe->read_waiting = 1;
+  sem_post(my_sm, pipe->mutex);
   sem_wait(my_sm, running_pcb, pipe->read_sem);
   sem_wait(my_sm, running_pcb, pipe->mutex);
   pipe->read_waiting = 0;
@@ -153,7 +157,7 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
          // && pipe->to_read_count != 0
   ) {
     buffer[i++] = pipe->buffer[pipe->last_read_pos];
-    pipe->last_read_pos = (pipe->last_read_pos + 1) % pipe->buffer_size;
+    pipe->last_read_pos = (pipe->last_read_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count--;
 
     if (pipe->write_waiting) {
@@ -176,7 +180,7 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   if (pipe->to_read_count > 0) {
     sem_post(my_sm, pipe->read_sem);
   }
-  pipe->read_waiting = 1;
+  // pipe->read_waiting = 1;
   sem_post(my_sm, pipe->mutex);
   return i;
 }
@@ -191,12 +195,15 @@ void destroy_pipe_manager(pipeManagerADT pipe_manager) {
 }
 
 uint8_t check_pipe_id(pipeManagerADT pipe_manager, uint16_t pipe_id) {
-  return (pipe_id < MAX_PIPES_COUNT && pipe_manager->pipes[pipe_id] != NULL);
+  int16_t real_id = pipe_id ? pipe_id - 2 : 0;
+  return (real_id >= 0 && real_id < MAX_PIPES_COUNT &&
+          pipe_manager->pipes[real_id] != NULL);
 }
 
 pipe_t *get_pipe(pipeManagerADT pipe_manager, uint16_t pipe_id) {
-  if (pipe_id >= MAX_PIPES_COUNT) {
+  int16_t real_id = pipe_id ? pipe_id - 2 : 0;
+  if (real_id < 0 || real_id >= MAX_PIPES_COUNT) {
     return NULL;
   }
-  return pipe_manager->pipes[pipe_id];
+  return pipe_manager->pipes[real_id];
 }

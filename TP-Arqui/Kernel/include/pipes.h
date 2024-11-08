@@ -7,7 +7,7 @@
 
 // As there are 64 MAX_PROCESSES, we can have 4 pipes per process when using all
 // processes
-#define MAX_PIPES_COUNT 256
+#define MAX_PIPES_COUNT 254 // 256 - 2 (screen pipes)
 
 #define PIPE_BUFFER_SIZE 256
 
@@ -17,8 +17,7 @@ typedef struct pipeManagerCDT *pipeManagerADT;
 
 typedef struct pipe_t {
   uint16_t id;
-  uint8_t *buffer;
-  uint16_t buffer_size;
+  uint8_t buffer[PIPE_BUFFER_SIZE];
   sem_t *mutex;
   sem_t *read_sem;
   sem_t *write_sem;

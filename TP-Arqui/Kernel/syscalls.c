@@ -9,17 +9,9 @@ extern schedulerADT my_scheduler;
 extern semaphoreManagerADT my_sm;
 
 uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size) {
-  // if (fd == STDIN) {
-  //   int i;
-  //   for (i = 0; i < size; i++) {
-  //     uint8_t c = '\0';
-  //     while (c == '\0') {
-  //       c = get_ascii();
-  //     }
-  //     buffer[i] = c;
-  //   }
-  //   return i;
-  // }
+  if (fd == STDOUT || fd == STDERR) {
+    return 0;
+  }
   pipe_t *pipe = get_pipe(my_pipe_manager, fd);
   if (pipe == NULL) {
     return 0;
@@ -29,14 +21,22 @@ uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size) {
 
 uint64_t sys_write(uint16_t fd, uint8_t *buffer, uint64_t size,
                    uint32_t fore_color, uint32_t back_color) {
-  // if (fd == STDOUT) {
-  //   return put_string(buffer, size, fore_color, back_color);
-  // }
-  pipe_t *pipe = get_pipe(my_pipe_manager, fd);
-  if (pipe == NULL) {
+  switch (fd) {
+  case STDIN:
     return 0;
+  case STDOUT:
+    put_string(buffer, size, fore_color, back_color);
+    return size;
+  case STDERR:
+    put_string(buffer, size, RED, BLACK);
+    return size;
+  default:
+    pipe_t *pipe = get_pipe(my_pipe_manager, fd);
+    if (pipe == NULL) {
+      return 0;
+    }
+    return write_pipe(my_pipe_manager, pipe, buffer, size);
   }
-  return write_pipe(my_pipe_manager, pipe, buffer, size);
 }
 
 void sys_write_at(uint8_t *buffer, uint64_t size, uint64_t color, uint64_t pos,
