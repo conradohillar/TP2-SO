@@ -14,35 +14,35 @@
 #define MIN_SONG_ID 1
 #define MAX_SONG_ID 8
 
-void check_div_by_zero();
+void check_div_by_zero(uint8_t in_fg);
 
-void check_invalid_opcode();
+void check_invalid_opcode(uint8_t in_fg);
 
-void get_registers();
+void get_registers(uint8_t in_fg);
 
-void run_eliminator();
+void run_eliminator(uint8_t in_fg);
 
-void increase_text_size();
+void increase_text_size(uint8_t in_fg);
 
-void decrease_text_size();
+void decrease_text_size(uint8_t in_fg);
 
 void set_text_size(uint64_t new_size);
 
-void get_time();
+void get_time(uint8_t in_fg);
 
-void clear();
+void clear(uint8_t in_fg);
 
-void test_processes();
+void test_processes(uint8_t in_fg);
 
-void test_priority();
+void test_priority(uint8_t in_fg);
 
-void ps();
+void ps(uint8_t in_fg);
 
-void mem_status();
+void mem_status(uint8_t in_fg);
 
-void test_semaphores();
+void test_semaphores(uint8_t in_fg);
 
-void loop();
+void loop(uint8_t in_fg);
 
 void kill(uint8_t id, uint8_t aux);
 
@@ -52,7 +52,7 @@ void unblock(uint8_t id, uint8_t aux);
 
 void nice(uint8_t id, uint8_t aux);
 
-void test_ipc();
+void test_ipc(uint8_t in_fg);
 
 void play_song(uint8_t id, uint8_t aux);
 

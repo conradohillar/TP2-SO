@@ -57,3 +57,5 @@ int64_t ps_fn(uint64_t argc, uint8_t *argv[]);
 int64_t mem_fn(uint64_t argc, uint8_t *argv[]);
 
 int64_t help_fn(uint64_t argc, uint8_t *argv[]);
+
+int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]);

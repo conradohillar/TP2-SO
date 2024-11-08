@@ -64,7 +64,7 @@ int64_t test_prio(uint64_t argc, uint8_t *argv[]) {
 
   print((uint8_t *)"\nCHANGING PRIORITIES WHILE BLOCKED...\n");
 
-  ps();
+  ps(1);
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     sys_set_priority_asm(pids[i], MEDIUM);

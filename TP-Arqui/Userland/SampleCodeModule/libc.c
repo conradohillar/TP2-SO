@@ -1,7 +1,9 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <libc.h>
+#include <stddef.h>
 #include <syscaller.h>
+#include <tests.h>
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color) {
   return sys_write_asm(STDOUT, str, strlen(str), fore_color, back_color);
@@ -369,5 +371,53 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)"7: Terraria - Day\n", GRAY, BLACK);
   print(supertab);
   printcolor((uint8_t *)"8: Himno Nacional Argentino\n", GRAY, BLACK);
+  return 0;
+}
+
+int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]) {
+  print((uint8_t *)"Running synchronization test...\n");
+  char *argv_synchro[] = {"3", "1", NULL};
+  char *argv_asynchro[] = {"3", "0", NULL};
+
+  int64_t value;
+  int64_t pid =
+      sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_synchro,
+                             (uint8_t *)"test_semaphores", 0);
+  value = sys_waitpid_asm(pid);
+  // Desde aca
+  print((uint8_t *)"\n Using semaphore -> Global: ");
+  uint8_t aux[10];
+  if (value < 0) {
+    print((uint8_t *)"negativo\n");
+    return 0;
+  } else {
+    itoa(value, aux);
+    print(aux);
+  }
+  // Hasta aca, se puede borrar cuando funcione
+  if (value == 0) {
+    print((uint8_t *)"\n (1 / 2) Successfully Passed\n");
+  } else {
+    print((uint8_t *)"\n(1 / 2) NOT Passed\n");
+  }
+  pid =
+      sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_asynchro,
+                             (uint8_t *)"test_semaphores", 0);
+  value = sys_waitpid_asm(pid);
+  // Desde aca
+  print((uint8_t *)"\n Without semaphore -> Global: ");
+  if (value < 0) {
+    print((uint8_t *)"negativo\n");
+    return 0;
+  } else {
+    itoa(value, aux);
+    print(aux);
+  }
+  // Hasta aca, se puede borrar cuando funcione
+  if (value != 0) {
+    print((uint8_t *)"\n (2 / 2) Successfully Passed\n");
+  } else {
+    print((uint8_t *)"(2 / 2) NOT Passed\n");
+  }
   return 0;
 }
