@@ -8,8 +8,7 @@
 #define MAX_PARAMS 5
 #define MAX_PARAM_LENGTH 50
 
-typedef void (*shell_fn)(uint8_t in_fg);
-typedef void (*param_shell_fn)(uint8_t id, uint8_t aux);
+typedef void (*one_param_fn)(uint8_t param);
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color);
 

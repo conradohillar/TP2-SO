@@ -196,6 +196,10 @@ void make_sound(uint64_t millis, uint32_t freq) {
 }
 
 int64_t loop_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDOUT, satoi(argv[0]));
+  }
+
   uint64_t pid = sys_getpid_asm();
   uint8_t aux[10];
   itoa(pid, aux);
@@ -203,7 +207,7 @@ int64_t loop_fn(uint64_t argc, uint8_t *argv[]) {
     print((uint8_t *)"\nHola soy el proceso loop con pid: ");
     print(aux);
     print((uint8_t *)"\n");
-    sleep(3, 0);
+    sleep(1, 0);
   }
   return -1;
 }
@@ -432,6 +436,10 @@ int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]) {
 }
 
 int64_t cat_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDIN, satoi(argv[0]));
+  }
+
   uint8_t buffer[256];
   uint64_t char_read[1];
   uint64_t i = 0;
