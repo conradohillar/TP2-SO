@@ -336,6 +336,13 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
              BLACK);
   printcolor((uint8_t *)"cat        ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the input from the keyboard\n", GRAY, BLACK);
+  printcolor((uint8_t *)"wc         ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - counts chars, words and lines in the input (CTRL+D "
+                        "to execute)\n",
+             GRAY, BLACK);
+  printcolor((uint8_t *)"filter     ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - filters the input, only printing the letters\n",
+             GRAY, BLACK);
   printcolor((uint8_t *)"kill PID   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - kills the process with specified PID\n", GRAY,
              BLACK);
@@ -445,6 +452,66 @@ int64_t cat_fn(uint64_t argc, uint8_t *argv[]) {
       buffer[j] = '\0';
     }
     i = 0;
+  }
+  return -1;
+}
+
+int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
+  uint64_t lines = 1;
+  uint64_t words = 0;
+  uint64_t chars = 0;
+  uint64_t char_read[1];
+  uint8_t last_char = '\n';
+  while (1) {
+    char_read[0] = '\0';
+    while (char_read[0] != '\n') {
+      char_read[0] = getchar();
+      if (!char_read[0]) {
+        printcolor((uint8_t *)"\nLines: ", ORANGE, BLACK);
+        uint8_t aux[10];
+        itoa(lines, aux);
+        print(aux);
+        printcolor((uint8_t *)"\nWords: ", ORANGE, BLACK);
+        itoa(words, aux);
+        print(aux);
+        printcolor((uint8_t *)"\nChars: ", ORANGE, BLACK);
+        itoa(chars, aux);
+        print(aux);
+        print((uint8_t *)"\n");
+        return 0;
+      }
+      putchar(char_read[0]);
+
+      chars += char_read[0] == '\b' ? -1 : 1;
+
+      if (char_read[0] == '\n') {
+        lines++;
+      } else {
+        if (char_read[0] != ' ' && char_read[0] != '\t' &&
+            char_read[0] != '\n') {
+          if (last_char == ' ' || last_char == '\t' || last_char == '\n') {
+            words++;
+          }
+        }
+      }
+      last_char = char_read[0];
+    }
+  }
+  return -1;
+}
+
+int64_t filter_fn(uint64_t argc, uint8_t *argv[]) {
+  uint64_t char_read[1];
+  while (1) {
+    char_read[0] = getchar();
+    if (!char_read[0]) {
+      print((uint8_t *)"\n");
+      return 0;
+    }
+    if (char_read[0] == 'a' || char_read[0] == 'e' || char_read[0] == 'i' ||
+        char_read[0] == 'o' || char_read[0] == 'u') {
+      putchar(char_read[0]);
+    }
   }
   return -1;
 }

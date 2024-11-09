@@ -46,6 +46,10 @@ void loop(uint8_t in_fg);
 
 void cat(uint8_t in_fg);
 
+void wc(uint8_t in_fg);
+
+void filter(uint8_t in_fg);
+
 void kill(uint8_t id, uint8_t aux);
 
 void block(uint8_t id, uint8_t aux);
@@ -55,6 +59,8 @@ void unblock(uint8_t id, uint8_t aux);
 void nice(uint8_t id, uint8_t aux);
 
 void test_ipc(uint8_t in_fg);
+
+void pipe_functions(shell_fn fn1, shell_fn fn2);
 
 void play_song(uint8_t id, uint8_t aux);
 

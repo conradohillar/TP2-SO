@@ -8,7 +8,8 @@
 #define MAX_PARAMS 5
 #define MAX_PARAM_LENGTH 50
 
-typedef void (*shell_fn)(uint8_t id, uint8_t aux);
+typedef void (*shell_fn)(uint8_t in_fg);
+typedef void (*param_shell_fn)(uint8_t id, uint8_t aux);
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color);
 
@@ -61,3 +62,7 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]);
 int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]);
 
 int64_t cat_fn(uint64_t argc, uint8_t *argv[]);
+
+int64_t wc_fn(uint64_t argc, uint8_t *argv[]);
+
+int64_t filter_fn(uint64_t argc, uint8_t *argv[]);

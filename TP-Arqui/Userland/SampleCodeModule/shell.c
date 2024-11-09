@@ -121,6 +121,37 @@ void cat(uint8_t in_fg) {
   return;
 }
 
+void wc(uint8_t in_fg) {
+  uint64_t pid = sys_create_process_asm(wc_fn, 0, NULL, (uint8_t *)"wc", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
+  }
+  return;
+}
+
+void filter(uint8_t in_fg) {
+  uint64_t pid =
+      sys_create_process_asm(filter_fn, 0, NULL, (uint8_t *)"filter", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
+  }
+  return;
+}
+
+// void pipe_functions(shell_fn fn1, shell_fn fn2) {
+//   int16_t pipe_id = sys_create_pipe_asm();
+//   if (pipe_id < 0) {
+//     printerr((uint8_t *)"Error creating pipe\n");
+//     return;
+//   }
+//   uint8_t aux[10];
+//   itoa(pipe_id, aux);
+//   uint8_t *args[] = {aux};
+//   uint64_t pid1 = sys_create_process_asm(fn1, 1, args, (uint8_t *)"pipe1",
+//   0); uint64_t pid2 = sys_create_process_asm(fn2, 1, args, (uint8_t
+//   *)"pipe2", 0); sys_waitpid_asm(pid1); sys_kill_asm(pid2);
+// }
+
 void play_song(uint8_t id, uint8_t aux) {
   if (id >= MIN_SONG_ID && id <= MAX_SONG_ID)
     song_dispatcher(id);
@@ -132,25 +163,28 @@ static uint8_t *commands[] = {
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
     (uint8_t *)"testsem",  (uint8_t *)"testipc",   (uint8_t *)"mem",
-    (uint8_t *)"loop",     (uint8_t *)"cat"};
+    (uint8_t *)"loop",     (uint8_t *)"cat",       (uint8_t *)"wc",
+    (uint8_t *)"filter"};
 
-static void (*functions[])(uint8_t in_fg) = {help,
-                                             check_div_by_zero,
-                                             check_invalid_opcode,
-                                             get_time,
-                                             get_registers,
-                                             run_eliminator,
-                                             increase_text_size,
-                                             decrease_text_size,
-                                             clear,
-                                             test_processes,
-                                             test_priority,
-                                             ps,
-                                             test_semaphores,
-                                             test_ipc,
-                                             mem,
-                                             loop,
-                                             cat};
+static shell_fn functions[] = {help,
+                               check_div_by_zero,
+                               check_invalid_opcode,
+                               get_time,
+                               get_registers,
+                               run_eliminator,
+                               increase_text_size,
+                               decrease_text_size,
+                               clear,
+                               test_processes,
+                               test_priority,
+                               ps,
+                               test_semaphores,
+                               test_ipc,
+                               mem,
+                               loop,
+                               cat,
+                               wc,
+                               filter};
 static uint8_t found_command = 0;
 
 uint64_t get_command(uint8_t *str) {
@@ -183,7 +217,7 @@ uint64_t get_command(uint8_t *str) {
   }
 
   uint8_t *command;
-  shell_fn function;
+  param_shell_fn function;
 
   uint8_t *command1 = (uint8_t *)"playsong";
   uint8_t *command2 = (uint8_t *)"kill";
@@ -235,7 +269,24 @@ uint64_t get_command(uint8_t *str) {
       function(idx, aux);
       return 1;
     } else {
-      // TODO: PIPEAR PROCESOS
+      shell_fn fn1 = NULL, fn2 = NULL;
+      for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
+        if (strcmp(commands[i], input[0]) == 0) {
+          fn1 = functions[i];
+          break;
+        }
+      }
+      for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
+        if (strcmp(commands[i], input[3]) == 0) {
+          fn2 = functions[i];
+          break;
+        }
+      }
+      if (fn1 == NULL || fn2 == NULL) {
+        return 0;
+      }
+      // pipe_functions(fn1, fn2); // TODO: Implement pipe functions
+      return 1;
     }
   }
 
