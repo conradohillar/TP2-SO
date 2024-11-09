@@ -367,3 +367,11 @@ int8_t set_fd(processManagerADT pm, uint16_t fd, uint16_t pipe_id) {
   pcb->fds[fd] = pipe_id;
   return 0;
 }
+
+int16_t get_fd(processManagerADT pm, uint16_t fd) {
+  process_control_block *pcb = get_running(pm->scheduler);
+  if (fd >= FD_COUNT) {
+    return -1;
+  }
+  return pcb->fds[fd];
+}

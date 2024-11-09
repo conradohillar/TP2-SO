@@ -411,3 +411,11 @@ gdb
 gdb
 gdb
 exit
+cd ~
+gdb
+gdb
+gdb
+gdb
+gdb
+gdb
+exit

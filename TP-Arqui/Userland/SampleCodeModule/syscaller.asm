@@ -30,6 +30,7 @@ GLOBAL sys_sem_open_asm
 GLOBAL sys_yield
 GLOBAL sys_mem_status_asm
 GLOBAL sys_set_fd_asm
+GLOBAL sys_get_fd_asm
 GLOBAL sys_create_pipe_asm
 GLOBAL sys_destroy_pipe_asm
 
@@ -602,13 +603,31 @@ sys_set_fd_asm:
 
     ret
 
+sys_get_fd_asm:
+    push rbp    
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi                 
+    mov rdi, 29                  ;id syscall get_fd
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
 sys_create_pipe_asm:
     push rbp    
     mov rbp, rsp
 
     pushState
 
-    mov rdi, 29                  ;id syscall create_pipe
+    mov rdi, 30                  ;id syscall create_pipe
 
     int 80h
 
@@ -626,7 +645,7 @@ sys_destroy_pipe_asm:
     pushState
 
     mov rsi, rdi                 
-    mov rdi, 30                  ;id syscall destroy_pipe
+    mov rdi, 31                  ;id syscall destroy_pipe
 
     int 80h
 
@@ -643,7 +662,7 @@ sys_mem_status_asm:
 
     pushState
 
-    mov rdi, 31                  ;id syscall mem_status
+    mov rdi, 32                  ;id syscall mem_status
 
     int 80h
 
@@ -653,3 +672,4 @@ sys_mem_status_asm:
     pop rbp
 
     ret
+

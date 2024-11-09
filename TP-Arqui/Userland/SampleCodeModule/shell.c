@@ -8,14 +8,25 @@
 
 static uint64_t scale = 1;
 
-int64_t help(uint64_t argc, uint8_t *argv[]) {
+static int64_t fn_wrapper(uint64_t argc, uint8_t *argv[], fn function,
+                          uint8_t *name) {
+  uint64_t child_argc = 0;
+  uint8_t *child_argv[1] = {(uint8_t *)'\0'};
+  if (argc == 2) {
+    child_argc = 1;
+    child_argv[0] = argv[1];
+  }
   uint8_t in_fg = satoi(argv[0]);
   uint64_t pid =
-      sys_create_process_asm(help_fn, 0, NULL, (uint8_t *)"help", in_fg);
+      sys_create_process_asm(function, child_argc, child_argv, name, in_fg);
   if (in_fg) {
     sys_waitpid_asm(pid);
   }
   return 1;
+}
+
+int64_t help(uint64_t argc, uint8_t *argv[]) {
+  return fn_wrapper(argc, argv, help_fn, (uint8_t *)"help");
 }
 
 int64_t check_div_by_zero(uint64_t argc, uint8_t *argv[]) {
@@ -34,13 +45,7 @@ int64_t get_registers(uint64_t argc, uint8_t *argv[]) {
 }
 
 int64_t mem(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid =
-      sys_create_process_asm(mem_fn, 0, NULL, (uint8_t *)"mem", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, mem_fn, (uint8_t *)"mem");
 }
 
 int64_t run_eliminator(uint64_t argc, uint8_t *argv[]) {
@@ -92,93 +97,35 @@ int64_t test_processes(uint64_t argc, uint8_t *argv[]) {
 }
 
 int64_t test_priority(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(test_prio, 0, NULL,
-                                        (uint8_t *)"test_priority", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, test_prio_fn, (uint8_t *)"test_priority");
 }
 
 int64_t test_semaphores(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(test_semaphores_fn, 0, NULL,
-                                        (uint8_t *)"test_semaphores", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, test_semaphores_fn, (uint8_t *)"test_sem");
 }
 
 int64_t test_ipc(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(test_ipc_fn, 0, NULL,
-                                        (uint8_t *)"test_ipc", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, test_ipc_fn, (uint8_t *)"test_ipc");
 }
 
 int64_t ps(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(ps_fn, 0, NULL, (uint8_t *)"ps", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, ps_fn, (uint8_t *)"ps");
 }
 
 int64_t loop(uint64_t argc, uint8_t *argv[]) {
-  uint64_t child_argc = 0;
-  uint8_t *child_argv[1] = {(uint8_t *)'\0'};
-  if (argc == 2) {
-    child_argc = 1;
-    child_argv[0] = argv[1];
-  }
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(loop_fn, child_argc, child_argv,
-                                        (uint8_t *)"loop", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, loop_fn, (uint8_t *)"loop");
 }
 
 int64_t cat(uint64_t argc, uint8_t *argv[]) {
-  uint64_t child_argc = 0;
-  uint8_t *child_argv[1] = {(uint8_t *)'\0'};
-  if (argc == 2) {
-    child_argc = 1;
-    child_argv[0] = argv[1];
-  }
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(cat_fn, child_argc, child_argv,
-                                        (uint8_t *)"cat", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, cat_fn, (uint8_t *)"cat");
 }
 
 int64_t wc(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid = sys_create_process_asm(wc_fn, 0, NULL, (uint8_t *)"wc", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, wc_fn, (uint8_t *)"wc");
 }
 
 int64_t filter(uint64_t argc, uint8_t *argv[]) {
-  uint8_t in_fg = satoi(argv[0]);
-  uint64_t pid =
-      sys_create_process_asm(filter_fn, 0, NULL, (uint8_t *)"filter", in_fg);
-  if (in_fg) {
-    sys_waitpid_asm(pid);
-  }
-  return 1;
+  return fn_wrapper(argc, argv, filter_fn, (uint8_t *)"filter");
 }
 
 void pipe_functions(fn fn1, fn fn2) {
@@ -191,7 +138,7 @@ void pipe_functions(fn fn1, fn fn2) {
   itoa(pipe_id, aux);
   uint8_t *args[] = {(uint8_t *)"1", aux};
   uint64_t pid1 = sys_create_process_asm(fn1, 2, args, (uint8_t *)"pipe1", 0);
-  uint64_t pid2 = sys_create_process_asm(fn2, 2, args, (uint8_t *)"pipe2", 0);
+  uint64_t pid2 = sys_create_process_asm(fn2, 2, args, (uint8_t *)"pipe2", 1);
   sys_waitpid_asm(pid1);
   sys_waitpid_asm(pid2);
   sys_destroy_pipe_asm(pipe_id);
@@ -248,6 +195,7 @@ uint64_t get_command(uint8_t *str) {
         return 1;
       }
     }
+    return 0;
   }
 
   if (count == 2) {
@@ -306,7 +254,7 @@ uint64_t get_command(uint8_t *str) {
   }
 
   if (count == 3) {
-    if (strcmp(input[2], (uint8_t *)".") != 0) {
+    if (strcmp(input[1], (uint8_t *)".") != 0) {
       uint8_t pid = satoi(input[1]);
       uint8_t new_priority = satoi(input[2]);
       nice(pid, new_priority);
@@ -320,7 +268,7 @@ uint64_t get_command(uint8_t *str) {
         }
       }
       for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
-        if (strcmp(commands[i], input[3]) == 0) {
+        if (strcmp(commands[i], input[2]) == 0) {
           fn2 = functions[i];
           break;
         }

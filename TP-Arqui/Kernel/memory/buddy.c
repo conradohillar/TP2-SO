@@ -268,14 +268,17 @@ void mem_status(memoryManagerADT mm) {
 
   write_pipe(my_pipe_manager, pipe, (uint8_t *)"\nMEMORY STATE:\n", 15);
   void *null = NULL;
-  for (int level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
+  for (uint32_t level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
     Block *current = mem_manager->free_blocks_per_level[level];
     uint8_t aux[10];
     if (current != null) {
       itoa(level, aux);
-      write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 7);
+      write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 6);
+      if (strlen(aux) == 1) {
+        write_pipe(my_pipe_manager, pipe, (uint8_t *)" ", 1);
+      }
       write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-      write_pipe(my_pipe_manager, pipe, (uint8_t *)":\n", 1);
+      write_pipe(my_pipe_manager, pipe, (uint8_t *)":", 1);
       // Imprimir cada bloque de la lista
       while (current != null) {
         itoa((void *)current - (void *)mem_manager->mem_start, aux);
@@ -298,9 +301,12 @@ void mem_status(memoryManagerADT mm) {
     } else {
       itoa(level, aux);
       write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 6);
+      if (strlen(aux) == 1) {
+        write_pipe(my_pipe_manager, pipe, (uint8_t *)" ", 1);
+      }
       write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
       write_pipe(my_pipe_manager, pipe, (uint8_t *)":  No blocks available\n",
-                 24);
+                 23);
     }
   }
   write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);

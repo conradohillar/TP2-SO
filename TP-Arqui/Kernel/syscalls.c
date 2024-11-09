@@ -27,9 +27,7 @@ uint64_t sys_write(uint16_t fd, uint8_t *buffer, uint64_t size,
   case STDOUT:
     put_string(buffer, size, fore_color, back_color);
     return size;
-  case STDERR:
-    put_string(buffer, size, RED, BLACK);
-    return size;
+
   default:
     pipe_t *pipe = get_pipe(my_pipe_manager, fd);
     if (pipe == NULL) {
@@ -152,6 +150,8 @@ void sys_mem_status() { mem_status(); }
 int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id) {
   return set_fd(my_pm, fd, pipe_id);
 }
+
+int16_t sys_get_fd(uint16_t fd) { return get_fd(my_pm, fd); }
 
 int16_t sys_create_pipe() {
   pipe_t *pipe = create_pipe(my_pipe_manager);

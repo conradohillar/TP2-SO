@@ -131,4 +131,9 @@ process_control_block *get_PCB(processManagerADT pm, uint64_t pid);
  */
 int8_t set_fd(processManagerADT pm, uint16_t fd, uint16_t pipe_id);
 
+/**
+ * Returns the pipe_id mapped to the file descriptor fd.
+ */
+int16_t get_fd(processManagerADT pm, uint16_t fd);
+
 #endif

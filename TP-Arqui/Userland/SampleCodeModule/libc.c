@@ -6,7 +6,12 @@
 #include <tests.h>
 
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color) {
-  return sys_write_asm(STDOUT, str, strlen(str), fore_color, back_color);
+  int16_t fd = sys_get_fd_asm(STDOUT);
+  if (fd < 0) {
+    return 0;
+  }
+  uint64_t len = strcmp(str, (uint8_t *)"\0") == 0 ? 1 : strlen(str);
+  return sys_write_asm((uint64_t)fd, str, len, fore_color, back_color);
 }
 
 uint64_t print(uint8_t *str) {
@@ -14,8 +19,11 @@ uint64_t print(uint8_t *str) {
 }
 
 uint64_t printerr(uint8_t *str) {
-  return sys_write_asm(STDERR, str, strlen(str), STD_FORE_COLOR,
-                       STD_BACK_COLOR);
+  int16_t fd = sys_get_fd_asm(STDERR);
+  if (fd < 0) {
+    return 0;
+  }
+  return sys_write_asm((uint64_t)fd, str, strlen(str), RED, BLACK);
 }
 
 void print_at(uint8_t *buffer, uint64_t size, uint32_t fore_color,
@@ -44,20 +52,32 @@ uint64_t scan(uint8_t *buffer, uint64_t max_length) {
 }
 
 uint8_t getchar(void) {
+  int16_t fd = sys_get_fd_asm(STDIN);
+  if (fd < 0) {
+    return 0;
+  }
   uint8_t buff[1];
-  sys_read_asm(STDIN, buff, 1);
+  sys_read_asm((uint64_t)fd, buff, 1);
   return buff[0];
 }
 
 uint64_t putcharcolor(uint8_t c, uint32_t fore_color, uint32_t back_color) {
+  int16_t fd = sys_get_fd_asm(STDOUT);
+  if (fd < 0) {
+    return 0;
+  }
   uint8_t buff[1] = {c};
-  sys_write_asm(STDOUT, buff, 1, fore_color, back_color);
+  sys_write_asm((uint64_t)fd, buff, 1, fore_color, back_color);
   return c;
 }
 
 uint64_t putcharerr(uint8_t c) {
+  int16_t fd = sys_get_fd_asm(STDERR);
+  if (fd < 0) {
+    return 0;
+  }
   uint8_t buff[1] = {c};
-  sys_write_asm(STDERR, buff, 1, STD_FORE_COLOR, STD_BACK_COLOR);
+  sys_write_asm((uint64_t)fd, buff, 1, RED, BLACK);
   return c;
 }
 
@@ -231,6 +251,10 @@ static uint8_t *status_to_string(process_status status) {
 }
 
 int64_t ps_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDOUT, satoi(argv[0]));
+  }
+
   ps_struct *ps = (ps_struct *)sys_ps_asm();
 
   printcolor((uint8_t *)"PID\tNAME\t\t\t\tSTACK_POINTER\t\t BASE_"
@@ -260,28 +284,48 @@ int64_t ps_fn(uint64_t argc, uint8_t *argv[]) {
     print((uint8_t *)(ps->info[i].in_fg ? "FG" : "BG"));
     print((uint8_t *)"\n");
   }
+  if (argc) {
+    print((uint8_t *)"\0");
+  }
   sys_free_ps_asm(ps);
   return 0;
 }
 
 static int64_t mem_writer(uint64_t argc, uint8_t *argv[]) {
-  uint16_t new_fd = atoi(argv[0]);
-  sys_set_fd_asm(STDOUT, new_fd);
+  sys_set_fd_asm(STDOUT, atoi(argv[0]));
   sys_mem_status_asm();
+  print((uint8_t *)"\0");
   return 0;
 }
 
 static int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
-  uint16_t new_fd = atoi(argv[0]);
-  sys_set_fd_asm(STDIN, new_fd);
-  while (1) {
-    uint8_t buffer[2];
+  sys_set_fd_asm(STDIN, atoi(argv[0]));
+  uint8_t c;
+  if (argc == 1) {
     while (1) {
-      uint64_t count = sys_read_asm(new_fd, buffer, 1);
-      buffer[count] = '\0';
-      print(buffer);
+      c = getchar();
+      if (c == '\0') {
+        return 0;
+      }
+      putchar(c);
     }
+  } else if (argc == 2) {
+    sys_set_fd_asm(STDOUT, atoi(argv[1]));
+    uint8_t buffer[1024 + 256];
+    uint64_t i = 0;
+    while (i < 1024 + 256) {
+      c = getchar();
+      if (c == '\0') {
+        break;
+      }
+      buffer[i++] = c;
+    }
+    for (uint64_t j = 0; j < i - 1; j++) {
+      putchar(buffer[j]);
+    }
+    return 0;
   }
+
   return -1;
 }
 
@@ -289,13 +333,23 @@ int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
   uint16_t pipe_id = sys_create_pipe_asm();
   uint8_t aux[10];
   itoa(pipe_id, aux);
-  uint8_t *args[] = {aux};
-  uint64_t pid =
-      sys_create_process_asm(mem_writer, 1, args, (uint8_t *)"mem_writer", 0);
-  uint64_t pid2 =
-      sys_create_process_asm(mem_reader, 1, args, (uint8_t *)"mem_reader", 0);
-  sys_waitpid_asm(pid);
-  sys_kill_asm(pid2);
+
+  uint8_t *writer_args[] = {aux};
+  uint8_t *reader_args[2];
+  reader_args[0] = aux;
+  uint8_t reader_argc = 1;
+
+  if (argc) {
+    reader_argc = 2;
+    reader_args[1] = argv[0];
+  }
+
+  sys_create_process_asm(mem_writer, 1, writer_args, (uint8_t *)"mem_writer",
+                         0);
+  uint64_t reader_pid = sys_create_process_asm(
+      mem_reader, reader_argc, reader_args, (uint8_t *)"mem_reader", 1);
+
+  sys_waitpid_asm(reader_pid);
   sys_destroy_pipe_asm(pipe_id);
   return 0;
 }
@@ -441,17 +495,17 @@ int64_t cat_fn(uint64_t argc, uint8_t *argv[]) {
   }
 
   uint8_t buffer[256];
-  uint64_t char_read[1];
+  uint8_t c;
   uint64_t i = 0;
   while (1) {
-    char_read[0] = '\0';
-    while (char_read[0] != '\n') {
-      char_read[0] = getchar();
-      if (!char_read[0]) {
+    c = '\0';
+    while (c != '\n') {
+      c = getchar();
+      if (!c) {
         return 0;
       }
-      putchar(char_read[0]);
-      buffer[i] = char_read[0];
+      putchar(c);
+      buffer[i] = c;
       i = (i + 1) % 256;
     }
     buffer[i] = '\0';
@@ -468,13 +522,13 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
   uint64_t lines = 1;
   uint64_t words = 0;
   uint64_t chars = 0;
-  uint64_t char_read[1];
+  uint8_t c;
   uint8_t last_char = '\n';
   while (1) {
-    char_read[0] = '\0';
-    while (char_read[0] != '\n') {
-      char_read[0] = getchar();
-      if (!char_read[0]) {
+    c = '\0';
+    while (c != '\n') {
+      c = getchar();
+      if (!c) {
         printcolor((uint8_t *)"\nLines: ", ORANGE, BLACK);
         uint8_t aux[10];
         itoa(lines, aux);
@@ -488,37 +542,35 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
         print((uint8_t *)"\n");
         return 0;
       }
-      putchar(char_read[0]);
+      putchar(c);
 
-      chars += char_read[0] == '\b' ? -1 : 1;
+      chars += c == '\b' ? -1 : 1;
 
-      if (char_read[0] == '\n') {
+      if (c == '\n') {
         lines++;
       } else {
-        if (char_read[0] != ' ' && char_read[0] != '\t' &&
-            char_read[0] != '\n') {
+        if (c != ' ' && c != '\t' && c != '\n') {
           if (last_char == ' ' || last_char == '\t' || last_char == '\n') {
             words++;
           }
         }
       }
-      last_char = char_read[0];
+      last_char = c;
     }
   }
   return -1;
 }
 
 int64_t filter_fn(uint64_t argc, uint8_t *argv[]) {
-  uint64_t char_read[1];
+  uint8_t c;
   while (1) {
-    char_read[0] = getchar();
-    if (!char_read[0]) {
+    c = getchar();
+    if (!c) {
       print((uint8_t *)"\n");
       return 0;
     }
-    if (char_read[0] == 'a' || char_read[0] == 'e' || char_read[0] == 'i' ||
-        char_read[0] == 'o' || char_read[0] == 'u') {
-      putchar(char_read[0]);
+    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
+      putchar(c);
     }
   }
   return -1;
