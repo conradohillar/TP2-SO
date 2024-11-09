@@ -112,6 +112,15 @@ void loop(uint8_t in_fg) {
   return;
 }
 
+void cat(uint8_t in_fg) {
+  uint64_t pid =
+      sys_create_process_asm(cat_fn, 0, NULL, (uint8_t *)"cat", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
+  }
+  return;
+}
+
 void play_song(uint8_t id, uint8_t aux) {
   if (id >= MIN_SONG_ID && id <= MAX_SONG_ID)
     song_dispatcher(id);
@@ -123,7 +132,7 @@ static uint8_t *commands[] = {
     (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
     (uint8_t *)"testsem",  (uint8_t *)"testipc",   (uint8_t *)"mem",
-    (uint8_t *)"loop"};
+    (uint8_t *)"loop",     (uint8_t *)"cat"};
 
 static void (*functions[])(uint8_t in_fg) = {help,
                                              check_div_by_zero,
@@ -140,7 +149,8 @@ static void (*functions[])(uint8_t in_fg) = {help,
                                              test_semaphores,
                                              test_ipc,
                                              mem,
-                                             loop};
+                                             loop,
+                                             cat};
 static uint8_t found_command = 0;
 
 uint64_t get_command(uint8_t *str) {

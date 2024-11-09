@@ -404,3 +404,10 @@ gdb
 ifconfig
 gdb
 exit
+cd ~
+gdb
+gdb
+gdb
+gdb
+gdb
+exit

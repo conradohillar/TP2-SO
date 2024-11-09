@@ -78,6 +78,11 @@ void keyboard_handler() {
         kill(my_pm, pid);
       }
     }
+    if (state[0] && (ascii == EOF_SHORTCUT)) {
+      ascii = 0;
+      write_pipe(my_pipe_manager, get_pipe(my_pipe_manager, STDIN), &ascii, 1);
+      return;
+    }
     if (state[0]) {
       ascii = 0;
     }

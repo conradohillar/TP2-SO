@@ -6,6 +6,7 @@
 
 #define SAVE_REGS_SHORTCUT 'r'
 #define KILL_PROCESS_SHORTCUT 'c'
+#define EOF_SHORTCUT 'd'
 
 uint32_t get_key();
 

@@ -44,6 +44,8 @@ void test_semaphores(uint8_t in_fg);
 
 void loop(uint8_t in_fg);
 
+void cat(uint8_t in_fg);
+
 void kill(uint8_t id, uint8_t aux);
 
 void block(uint8_t id, uint8_t aux);

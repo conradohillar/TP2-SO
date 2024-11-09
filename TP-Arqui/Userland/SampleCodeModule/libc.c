@@ -334,6 +334,8 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)"loop       ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints hello and its pid every 3 seconds\n", GRAY,
              BLACK);
+  printcolor((uint8_t *)"cat        ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - prints the input from the keyboard\n", GRAY, BLACK);
   printcolor((uint8_t *)"kill PID   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - kills the process with specified PID\n", GRAY,
              BLACK);
@@ -420,4 +422,29 @@ int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]) {
     print((uint8_t *)"(2 / 2) NOT Passed\n");
   }
   return 0;
+}
+
+int64_t cat_fn(uint64_t argc, uint8_t *argv[]) {
+  uint8_t buffer[256];
+  uint64_t char_read[1];
+  uint64_t i = 0;
+  while (1) {
+    char_read[0] = '\0';
+    while (char_read[0] != '\n') {
+      char_read[0] = getchar();
+      if (!char_read[0]) {
+        return 0;
+      }
+      putchar(char_read[0]);
+      buffer[i] = char_read[0];
+      i = (i + 1) % 256;
+    }
+    buffer[i] = '\0';
+    print(buffer);
+    for (int j = 0; j < 256; j++) {
+      buffer[j] = '\0';
+    }
+    i = 0;
+  }
+  return -1;
 }
