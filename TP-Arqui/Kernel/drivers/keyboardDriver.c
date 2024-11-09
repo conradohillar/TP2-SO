@@ -10,17 +10,17 @@ extern pipeManagerADT my_pipe_manager;
 
 static uint8_t qwerty_ES_lowercase[] = {
     '\0', '\e', '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8', '9',  '0',
-    '\'', '\0',  '\b', '\t', 'q',  'w',  'e',  'r',  't',  'y', 'u',  'i',
-    'o',  'p',  '\0',  '+',  '\n', '\0', 'a',  's',  'd',  'f', 'g',  'h',
-    'j',  'k',  'l',  '\0',  '{',  '|',  '\0', '}',  'z',  'x', 'c',  'v',
+    '\'', '\0', '\b', '\t', 'q',  'w',  'e',  'r',  't',  'y', 'u',  'i',
+    'o',  'p',  '\0', '+',  '\n', '\0', 'a',  's',  'd',  'f', 'g',  'h',
+    'j',  'k',  'l',  '\0', '{',  '|',  '\0', '}',  'z',  'x', 'c',  'v',
     'b',  'n',  'm',  ',',  '.',  '-',  '\0', '\0', '\0', ' ', '\0',
 };
 
 static uint8_t qwerty_ES_uppercase[] = {
     '\0', '\e', '!',  '"',  '#',  '$',  '%',  '&',  '/',  '(', ')',  '=',
-    '?',  '\0',  '\b', '\t', 'Q',  'W',  'E',  'R',  'T',  'Y', 'U',  'I',
-    'O',  'P',  '\0',  '*',  '\n', '\0', 'A',  'S',  'D',  'F', 'G',  'H',
-    'J',  'K',  'L',  '\0',  '[',  '\0',  '\0', ']',  'Z',  'X', 'C',  'V',
+    '?',  '\0', '\b', '\t', 'Q',  'W',  'E',  'R',  'T',  'Y', 'U',  'I',
+    'O',  'P',  '\0', '*',  '\n', '\0', 'A',  'S',  'D',  'F', 'G',  'H',
+    'J',  'K',  'L',  '\0', '[',  '\0', '\0', ']',  'Z',  'X', 'C',  'V',
     'B',  'N',  'M',  ';',  ':',  '_',  '\0', '\0', '\0', ' ', '\0',
 };
 
@@ -93,6 +93,10 @@ void keyboard_handler() {
     ascii = 0;
     write_pipe(my_pipe_manager, get_pipe(my_pipe_manager, STDIN), &ascii, 1);
     return;
+  }
+  if (state[0] && (ascii == CLEAR_SCREEN_SHORTCUT)) {
+    clear_screen_and_buffer();
+    put_string_nt((uint8_t *)">: ", GREEN, BLACK);
   }
   if (state[0]) {
     ascii = 0;

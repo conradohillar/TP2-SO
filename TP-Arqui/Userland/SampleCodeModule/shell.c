@@ -94,7 +94,7 @@ int64_t test_processes(uint64_t argc, uint8_t *argv[]) {
   }
   uint8_t in_fg = satoi(argv[0]);
   uint64_t pid = sys_create_process_asm(test_processes_fn, my_argc, args,
-                                        (uint8_t *)"test_priority", in_fg);
+                                        (uint8_t *)"test_processes", in_fg);
   if (in_fg) {
     sys_waitpid_asm(pid);
   }
@@ -205,7 +205,7 @@ uint64_t get_command(uint8_t *str) {
 
   if (count == 2) {
 
-    if (strcmp(input[1], (uint8_t *)"bg") == 0) {
+    if (strcmp(input[1], (uint8_t *)"&") == 0) {
       // Execute in bg
       for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
         if (strcmp(commands[i], input[0]) == 0) {
@@ -264,7 +264,7 @@ uint64_t get_command(uint8_t *str) {
       uint8_t new_priority = satoi(input[2]);
       nice(pid, new_priority);
       return 1;
-    } else if (strcmp(input[1], (uint8_t *)".") == 0) {
+    } else if (strcmp(input[1], (uint8_t *)"|") == 0) {
       fn fn1 = NULL, fn2 = NULL;
       for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
         if (strcmp(commands[i], input[0]) == 0) {

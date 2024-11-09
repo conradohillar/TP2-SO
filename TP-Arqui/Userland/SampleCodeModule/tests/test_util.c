@@ -71,6 +71,9 @@ void endless_loop() {
 }
 
 int64_t endless_loop_print(uint64_t argc, uint8_t *argv[]) {
+  if (argc == 2) {
+    sys_set_fd_asm(STDOUT, satoi(argv[1]));
+  }
 
   uint64_t wait = satoi(argv[0]);
 

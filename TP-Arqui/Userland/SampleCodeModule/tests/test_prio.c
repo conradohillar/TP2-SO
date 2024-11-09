@@ -26,23 +26,26 @@
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, LOW, MEDIUM, HIGH, HIGHEST};
 
 int64_t test_prio_fn(uint64_t argc, uint8_t *argv[]) {
+  uint8_t *args[2] = {WAIT_S, (uint8_t *)"\0"};
+  uint8_t child_argc = 1;
   if (argc) {
     sys_set_fd_asm(STDOUT, satoi(argv[0]));
+    child_argc = 2;
+    args[1] = argv[0];
   }
 
-  print((uint8_t *)"EXECUTING PRIORITY TEST\n");
+  printcolor((uint8_t *)"EXECUTING PRIORITY TEST\n", GREEN, BLACK);
   int64_t pids[TOTAL_PROCESSES];
-  uint8_t *args[] = {WAIT_S};
   uint64_t i;
 
   for (i = 0; i < TOTAL_PROCESSES; i++) {
-    pids[i] = sys_create_process_asm(endless_loop_print, 1, args,
+    pids[i] = sys_create_process_asm(endless_loop_print, child_argc, args,
                                      (uint8_t *)"endless_loop_print", 0);
     if (pids[i] == -1) {
       print((uint8_t *)"ERROR CREATING PROCESS\n");
       return -1;
     }
-    print((uint8_t *)"CREATED PROCESS pid: ");
+    printcolor((uint8_t *)"CREATED PROCESS pid: ", ORANGE, BLACK);
     uint8_t num[20] = {0};
     itoa(pids[i], num);
     print(num);
@@ -52,7 +55,7 @@ int64_t test_prio_fn(uint64_t argc, uint8_t *argv[]) {
   // ps();
 
   bussy_wait(WAIT);
-  print((uint8_t *)"\nCHANGING PRIORITIES...\n");
+  printcolor((uint8_t *)"\nCHANGING PRIORITIES...\n", ORANGE, BLACK);
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     sys_set_priority_asm(pids[i], prio[i]);
@@ -61,31 +64,32 @@ int64_t test_prio_fn(uint64_t argc, uint8_t *argv[]) {
 
   bussy_wait(WAIT);
 
-  print((uint8_t *)"\nBLOCKING...\n");
+  printcolor((uint8_t *)"\nBLOCKING...\n", ORANGE, BLACK);
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     sys_block_asm(pids[i]);
 
-  print((uint8_t *)"\nCHANGING PRIORITIES WHILE BLOCKED...\n");
+  printcolor((uint8_t *)"\nCHANGING PRIORITIES WHILE BLOCKED...\n", ORANGE,
+             BLACK);
 
-  ps(1, (uint8_t *[]){(uint8_t *)"1"});
+  // ps(1, (uint8_t *[]){(uint8_t *)"1"});
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     sys_set_priority_asm(pids[i], MEDIUM);
 
-  print((uint8_t *)"UNBLOCKING...\n");
+  printcolor((uint8_t *)"UNBLOCKING...\n", ORANGE, BLACK);
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     sys_unblock_asm(pids[i]);
 
   bussy_wait(WAIT);
 
-  print((uint8_t *)"\nKILLING...\n");
+  printcolor((uint8_t *)"\nKILLING...\n", RED, BLACK);
 
   for (i = 0; i < TOTAL_PROCESSES; i++)
     sys_kill_asm(pids[i]);
 
-  print((uint8_t *)"TEST SUCCESSFUL!\n");
+  printcolor((uint8_t *)"TEST SUCCESSFUL!\n", GREEN, BLACK);
 
   if (argc) {
     print((uint8_t *)"\0");
