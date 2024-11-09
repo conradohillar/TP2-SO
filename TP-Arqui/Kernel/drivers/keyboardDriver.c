@@ -8,12 +8,20 @@ extern processManagerADT my_pm;
 extern schedulerADT my_scheduler;
 extern pipeManagerADT my_pipe_manager;
 
-static uint8_t qwerty_US[] = {
+static uint8_t qwerty_ES_lowercase[] = {
     '\0', '\e', '1',  '2',  '3',  '4',  '5',  '6',  '7',  '8', '9',  '0',
-    '-',  '=',  '\b', '\t', 'q',  'w',  'e',  'r',  't',  'y', 'u',  'i',
-    'o',  'p',  '[',  ']',  '\n', '\0', 'a',  's',  'd',  'f', 'g',  'h',
-    'j',  'k',  'l',  ';',  '\'', '`',  '\0', '\\', 'z',  'x', 'c',  'v',
-    'b',  'n',  'm',  ',',  '.',  '/',  '\0', '*',  '\0', ' ', '\0',
+    '\'', '\0',  '\b', '\t', 'q',  'w',  'e',  'r',  't',  'y', 'u',  'i',
+    'o',  'p',  '\0',  '+',  '\n', '\0', 'a',  's',  'd',  'f', 'g',  'h',
+    'j',  'k',  'l',  '\0',  '{',  '|',  '\0', '}',  'z',  'x', 'c',  'v',
+    'b',  'n',  'm',  ',',  '.',  '-',  '\0', '\0', '\0', ' ', '\0',
+};
+
+static uint8_t qwerty_ES_uppercase[] = {
+    '\0', '\e', '!',  '"',  '#',  '$',  '%',  '&',  '/',  '(', ')',  '=',
+    '?',  '\0',  '\b', '\t', 'Q',  'W',  'E',  'R',  'T',  'Y', 'U',  'I',
+    'O',  'P',  '\0',  '*',  '\n', '\0', 'A',  'S',  'D',  'F', 'G',  'H',
+    'J',  'K',  'L',  '\0',  '[',  '\0',  '\0', ']',  'Z',  'X', 'C',  'V',
+    'B',  'N',  'M',  ';',  ':',  '_',  '\0', '\0', '\0', ' ', '\0',
 };
 
 // es un vector de unos o ceros. uno dice que la tecla esta presionada y cero
@@ -54,38 +62,40 @@ void keyboard_handler() {
 
   default:
     key_scan_code = read;
-    if (key_scan_code < sizeof(qwerty_US) && key_scan_code >= 0) {
-      ascii = qwerty_US[key_scan_code];
+    if (key_scan_code < sizeof(qwerty_ES_lowercase) && key_scan_code >= 0) {
+      ascii = qwerty_ES_lowercase[key_scan_code];
       if ((((state[1] || state[3]) && !state[2]) ||
            (state[2] && !(state[1] || state[3]))) &&
-          is_letter(ascii))
-        ascii -= 'a' - 'A';
+          (is_letter(ascii))) {
+        ascii = qwerty_ES_uppercase[key_scan_code];
+      } else if ((state[1] || state[3]))
+        ascii = qwerty_ES_uppercase[key_scan_code];
     }
-    if (state[0] && (ascii == SAVE_REGS_SHORTCUT)) {
-      save_registers();
-    }
-    if (state[0] && (ascii == KILL_PROCESS_SHORTCUT)) {
-      uint64_t pid = getpid(my_pm);
-      process_control_block *pcb;
-      while (pid != INIT_PID) {
-        pcb = get_PCB(my_pm, pid);
-        if (pcb->in_fg) {
-          break;
-        }
-        pid = pcb->parent_pid;
+  }
+  if (state[0] && (ascii == SAVE_REGS_SHORTCUT)) {
+    save_registers();
+  }
+  if (state[0] && (ascii == KILL_PROCESS_SHORTCUT)) {
+    uint64_t pid = getpid(my_pm);
+    process_control_block *pcb;
+    while (pid != INIT_PID) {
+      pcb = get_PCB(my_pm, pid);
+      if (pcb->in_fg) {
+        break;
       }
-      if (pid) {
-        kill(my_pm, pid);
-      }
+      pid = pcb->parent_pid;
     }
-    if (state[0] && (ascii == EOF_SHORTCUT)) {
-      ascii = 0;
-      write_pipe(my_pipe_manager, get_pipe(my_pipe_manager, STDIN), &ascii, 1);
-      return;
+    if (pid) {
+      kill(my_pm, pid);
     }
-    if (state[0]) {
-      ascii = 0;
-    }
+  }
+  if (state[0] && (ascii == EOF_SHORTCUT)) {
+    ascii = 0;
+    write_pipe(my_pipe_manager, get_pipe(my_pipe_manager, STDIN), &ascii, 1);
+    return;
+  }
+  if (state[0]) {
+    ascii = 0;
   }
 
   // Only write to the pipe if there is space
