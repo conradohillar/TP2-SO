@@ -311,18 +311,20 @@ static int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
     }
   } else if (argc == 2) {
     sys_set_fd_asm(STDOUT, atoi(argv[1]));
-    uint8_t buffer[1024 + 256];
+    uint8_t buffer[1280];
     uint64_t i = 0;
-    while (i < 1024 + 256) {
+    while (i < 1280) {
       c = getchar();
       if (c == '\0') {
         break;
       }
       buffer[i++] = c;
     }
-    for (uint64_t j = 0; j < i - 1; j++) {
+    uint64_t j = 0;
+    for (; j < i - 1; j++) {
       putchar(buffer[j]);
     }
+    print((uint8_t *)"\0");
     return 0;
   }
 
