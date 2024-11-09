@@ -26,6 +26,10 @@
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, LOW, MEDIUM, HIGH, HIGHEST};
 
 int64_t test_prio_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDOUT, satoi(argv[0]));
+  }
+
   print((uint8_t *)"EXECUTING PRIORITY TEST\n");
   int64_t pids[TOTAL_PROCESSES];
   uint8_t *args[] = {WAIT_S};
@@ -82,5 +86,10 @@ int64_t test_prio_fn(uint64_t argc, uint8_t *argv[]) {
     sys_kill_asm(pids[i]);
 
   print((uint8_t *)"TEST SUCCESSFUL!\n");
+
+  if (argc) {
+    print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
+  }
   return 0;
 }

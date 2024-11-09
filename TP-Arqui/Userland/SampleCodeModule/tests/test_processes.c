@@ -8,14 +8,15 @@ typedef struct P_rq {
 } p_rq;
 
 int64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc == 2) {
+    sys_set_fd_asm(STDOUT, satoi(argv[1]));
+  }
+
   uint8_t rq;
   uint8_t alive = 0;
   uint8_t action;
   uint64_t max_processes;
   uint8_t *argvAux[] = {0};
-
-  if (argc != 1)
-    return -1;
 
   if ((max_processes = satoi(argv[0])) <= 0)
     return -1;
@@ -144,5 +145,10 @@ int64_t test_processes_fn(uint64_t argc, uint8_t *argv[]) {
     sleep(0, 500);
   }
   printcolor((uint8_t *)"Test: Success\n", GREEN, BLACK);
+
+  if (argc == 2) {
+    print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
+  }
   return 0;
 }

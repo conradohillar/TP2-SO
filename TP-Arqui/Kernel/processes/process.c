@@ -240,7 +240,7 @@ int64_t waitpid(processManagerADT pm, uint64_t pid) {
   int64_t value;
 
   if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
-      (pm->process_table[pid].pcb->parent_pid != ppid && ppid != INIT_PID)) {
+      (pm->process_table[pid].pcb->parent_pid != ppid)) {
     return -1;
   }
 

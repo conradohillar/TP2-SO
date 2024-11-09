@@ -203,6 +203,17 @@ uint64_t atoi(uint8_t *str) {
   return ans;
 }
 
+uint8_t *to_lower(uint8_t *str) {
+  uint64_t i = 0;
+  while (str[i] != '\0') {
+    if (str[i] >= 'A' && str[i] <= 'Z') {
+      str[i] += 32;
+    }
+    i++;
+  }
+  return str;
+}
+
 /*
     AUXILIARY FUNCTIONS NOT RELATED TO THE STANDARD C LIBRARY
 */
@@ -286,6 +297,7 @@ int64_t ps_fn(uint64_t argc, uint8_t *argv[]) {
   }
   if (argc) {
     print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
   }
   sys_free_ps_asm(ps);
   return 0;
@@ -325,6 +337,7 @@ static int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
       putchar(buffer[j]);
     }
     print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
     return 0;
   }
 
@@ -357,6 +370,10 @@ int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
 }
 
 int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDOUT, satoi(argv[0]));
+  }
+
   uint8_t *supertab = (uint8_t *)"\t\t\t\t";
   printcolor((uint8_t *)"help       ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints a list of all possible commands\n", GRAY,
@@ -440,10 +457,19 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)"7: Terraria - Day\n", GRAY, BLACK);
   print(supertab);
   printcolor((uint8_t *)"8: Himno Nacional Argentino\n", GRAY, BLACK);
+
+  if (argc) {
+    print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
+  }
   return 0;
 }
 
 int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDOUT, satoi(argv[0]));
+  }
+
   print((uint8_t *)"Running synchronization test...\n");
   char *argv_synchro[] = {"3", "1", NULL};
   char *argv_asynchro[] = {"3", "0", NULL};
@@ -465,9 +491,9 @@ int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]) {
   }
   // Hasta aca, se puede borrar cuando funcione
   if (value == 0) {
-    print((uint8_t *)"\n (1 / 2) Successfully Passed\n");
+    printcolor((uint8_t *)"\n (1 / 2) Successfully Passed\n", GREEN, BLACK);
   } else {
-    print((uint8_t *)"\n(1 / 2) NOT Passed\n");
+    printerr((uint8_t *)"\n(1 / 2) NOT Passed\n");
   }
   pid =
       sys_create_process_asm(test_sem_synchro_fn, 2, (uint8_t **)argv_asynchro,
@@ -484,9 +510,14 @@ int64_t test_semaphores_fn(uint64_t argc, uint8_t *argv[]) {
   }
   // Hasta aca, se puede borrar cuando funcione
   if (value != 0) {
-    print((uint8_t *)"\n (2 / 2) Successfully Passed\n");
+    printcolor((uint8_t *)"\n (2 / 2) Successfully Passed\n", GREEN, BLACK);
   } else {
-    print((uint8_t *)"(2 / 2) NOT Passed\n");
+    printerr((uint8_t *)"\n(2 / 2) NOT Passed\n");
+  }
+
+  if (argc) {
+    print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
   }
   return 0;
 }
@@ -504,6 +535,7 @@ int64_t cat_fn(uint64_t argc, uint8_t *argv[]) {
     while (c != '\n') {
       c = getchar();
       if (!c) {
+        sys_set_fd_asm(STDIN, STDIN);
         return 0;
       }
       putchar(c);
@@ -521,6 +553,10 @@ int64_t cat_fn(uint64_t argc, uint8_t *argv[]) {
 }
 
 int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDIN, satoi(argv[0]));
+  }
+
   uint64_t lines = 1;
   uint64_t words = 0;
   uint64_t chars = 0;
@@ -531,6 +567,10 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
     while (c != '\n') {
       c = getchar();
       if (!c) {
+        if (last_char == '\n') {
+          lines--;
+          chars--;
+        }
         printcolor((uint8_t *)"\nLines: ", ORANGE, BLACK);
         uint8_t aux[10];
         itoa(lines, aux);
@@ -542,6 +582,7 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
         itoa(chars, aux);
         print(aux);
         print((uint8_t *)"\n");
+        sys_set_fd_asm(STDIN, STDIN);
         return 0;
       }
       putchar(c);
@@ -564,15 +605,21 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
 }
 
 int64_t filter_fn(uint64_t argc, uint8_t *argv[]) {
+  if (argc) {
+    sys_set_fd_asm(STDIN, satoi(argv[0]));
+  }
+
   uint8_t c;
   while (1) {
     c = getchar();
     if (!c) {
       print((uint8_t *)"\n");
+      sys_set_fd_asm(STDIN, STDIN);
       return 0;
     }
-    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
-      putchar(c);
+    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' ||
+        c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+      putchar(*to_lower(&c));
     }
   }
   return -1;
