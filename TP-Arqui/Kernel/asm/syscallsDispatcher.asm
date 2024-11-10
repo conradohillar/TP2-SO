@@ -31,6 +31,7 @@ EXTERN sys_set_fd
 EXTERN sys_get_fd
 EXTERN sys_create_pipe
 EXTERN sys_destroy_pipe
+EXTERN sys_kill_by_name
 
 GLOBAL syscalls_dispatcher
 
@@ -107,6 +108,8 @@ syscalls_dispatcher:
     je destroy_pipe
     cmp rdi, 32
     je mem_status
+    cmp rdi, 33
+    je kill_by_name
 
 end:
     cli
@@ -319,4 +322,9 @@ create_pipe:
 destroy_pipe:
     mov rdi, rsi
     call sys_destroy_pipe
+    jmp end
+
+kill_by_name:
+    mov rdi, rsi                ;name
+    call sys_kill_by_name
     jmp end

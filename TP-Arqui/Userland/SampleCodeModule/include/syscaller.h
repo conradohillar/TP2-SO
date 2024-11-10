@@ -42,6 +42,8 @@ int64_t sys_create_process_asm(fn code, uint64_t argc, uint8_t **argv,
 
 uint64_t sys_kill_asm(uint64_t pid);
 
+void sys_kill_by_name_asm(uint8_t *name);
+
 void sys_wait_asm();
 
 int64_t sys_waitpid_asm(uint64_t pid);

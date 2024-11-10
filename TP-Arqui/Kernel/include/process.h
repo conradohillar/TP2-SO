@@ -10,6 +10,7 @@
 #define MAX_PROCESS_COUNT 64
 #define STACK_SIZE_BYTES 4096
 #define INIT_PID 0
+#define SHELL_PID 1
 #define MAX_PRIORITY 5
 
 typedef struct process_node {
@@ -48,6 +49,12 @@ uint8_t exit(processManagerADT pm, uint64_t pid);
  * @param pid The PID of the process to kill.
  */
 uint8_t kill(processManagerADT pm, uint64_t pid);
+
+/**
+ * Kills all processes with a given name.
+ * @param name The name of the process/es to kill.
+ */
+void kill_by_name(processManagerADT pm, uint8_t *name);
 
 /**
  * Running process waits for any child to finish.
@@ -135,5 +142,10 @@ int8_t set_fd(processManagerADT pm, uint16_t fd, uint16_t pipe_id);
  * Returns the pipe_id mapped to the file descriptor fd.
  */
 int16_t get_fd(processManagerADT pm, uint16_t fd);
+
+/**
+ * Returns the process control block of the process in the foreground.
+ */
+process_control_block *get_process_fg(processManagerADT pm);
 
 #endif

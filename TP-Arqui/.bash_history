@@ -419,3 +419,7 @@ gdb
 gdb
 gdb
 exit
+cd root/
+gdb
+gdb
+exit

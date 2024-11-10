@@ -54,6 +54,8 @@ int64_t filter(uint64_t argc, uint8_t *argv[]);
 
 void kill(uint8_t pid);
 
+void kill_by_name(uint8_t *name);
+
 void block(uint8_t pid);
 
 void unblock(uint8_t pid);

@@ -25,6 +25,7 @@ struct processManagerCDT {
   process_node process_table[MAX_PROCESS_COUNT];
   uint64_t process_count;
   uint64_t next_pid;
+  uint64_t current_pid_in_fg;
   schedulerADT scheduler;
 } processManagerCDT;
 
@@ -43,13 +44,14 @@ processManagerADT create_process_manager(schedulerADT scheduler) {
 
   pm->next_pid = 0;
   pm->process_count = 0;
+  pm->current_pid_in_fg = SHELL_PID;
 
   pm->scheduler = scheduler;
 
   // INIT process (unkillable)
   create_process(pm, (main_fn)init_process, 0, NULL, (uint8_t *)"init", 0);
 
-  // SHELL
+  // SHELL process (unkillable)
   create_process(pm, (main_fn)USERLAND_ADDRESS, 0, NULL, (uint8_t *)"shell", 1);
   set_priority(pm, 1, 5);
 
@@ -60,13 +62,27 @@ uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
                         uint8_t **argv, uint8_t *name, uint8_t in_fg) {
 
   if (pm->process_count == MAX_PROCESS_COUNT) {
-    // TODO ERRORES DESPUES
+    put_string_nt((uint8_t *)"ERROR: Max process count reached\n", RED, BLACK);
     return -1;
   }
   process_control_block *new_pcb = mm_malloc(sizeof(process_control_block));
   if (new_pcb == NULL) {
     // TODO ERRORES DESPUES
     return -1;
+  }
+
+  pid_t ppid = getpid(pm);
+
+  // If the process that is trying to create a process is in background (except
+  // for init), the new process can't be in foreground (it's forcefully created
+  // in background)
+  if (pm->next_pid != SHELL_PID && in_fg &&
+      !pm->process_table[ppid].pcb->in_fg) {
+    put_string_nt(
+        (uint8_t *)"WARNING: Can't create foreground process from background "
+                   "process, so process was forcefully created in background\n",
+        ORANGE, BLACK);
+    in_fg = 0;
   }
 
   uint8_t **argv_copy = (uint8_t **)mm_malloc((argc + 1) * sizeof(uint8_t *));
@@ -82,6 +98,10 @@ uint64_t create_process(processManagerADT pm, main_fn code, uint64_t argc,
   pm->process_table[pm->next_pid].pcb = new_pcb;
 
   pm->next_pid = pm->process_table[pm->next_pid].next_index;
+
+  if (in_fg) {
+    pm->current_pid_in_fg = new_pcb->pid;
+  }
 
   pm->process_count++;
 
@@ -127,7 +147,7 @@ static void pcb_init(processManagerADT pm, process_control_block *pcb,
   pcb->argv = argv;
   pcb->argc = argc;
 
-  pcb->killable = (pcb->pid == INIT_PID ? 0 : 1);
+  pcb->killable = ((pcb->pid == INIT_PID || pcb->pid == SHELL_PID) ? 0 : 1);
   pcb->priority = 1;
   pcb->remaining_quantum = 1;
   pcb->status = READY;
@@ -137,8 +157,8 @@ static void pcb_init(processManagerADT pm, process_control_block *pcb,
 
   // Set STDIN, STDOUT and STDERR to known default pipe ids
   pcb->fds[STDIN] = 0;
-  pcb->fds[STDOUT] = 1;
-  pcb->fds[STDERR] = 1;
+  pcb->fds[STDOUT] = (in_fg ? 1 : -1);
+  pcb->fds[STDERR] = 2;
 }
 
 static void process_wrapper(processManagerADT pm, uint64_t code, uint64_t argc,
@@ -159,17 +179,32 @@ uint8_t kill(processManagerADT pm, uint64_t pid) {
   return terminate_process(pm, pid, KILLED);
 }
 
+void kill_by_name(processManagerADT pm, uint8_t *name) {
+  for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
+    if (pm->process_table[i].pcb != NULL &&
+        strcmp(pm->process_table[i].pcb->name, name) == 0) {
+      kill(pm, i);
+    }
+  }
+}
+
 static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
                                  process_status status) {
   if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
       pm->process_table[pid].pcb->killable == 0) {
-    return -1;
+    return 0;
   }
 
   if (pm->process_table[pid].pcb->status == KILLED) {
     return 0;
+  }
 
-  } else if (pm->process_table[pid].pcb->status != ZOMBIE) {
+  // If it's in foreground, change current_pid_in_fg
+  pm->current_pid_in_fg = pm->process_table[pid].pcb->in_fg
+                              ? pm->process_table[pid].pcb->parent_pid
+                              : pm->current_pid_in_fg;
+
+  if (pm->process_table[pid].pcb->status != ZOMBIE) {
 
     // Remove from scheduler
     if (pm->process_table[pid].pcb->status != BLOCKED) {
@@ -211,7 +246,7 @@ static uint8_t terminate_process(processManagerADT pm, uint64_t pid,
     pm->process_table[pid].next_index = aux_pid;
   }
 
-  return 0;
+  return 1;
 }
 
 void wait(processManagerADT pm) {
@@ -374,4 +409,8 @@ int16_t get_fd(processManagerADT pm, uint16_t fd) {
     return -1;
   }
   return pcb->fds[fd];
+}
+
+process_control_block *get_process_fg(processManagerADT pm) {
+  return pm->process_table[pm->current_pid_in_fg].pcb;
 }

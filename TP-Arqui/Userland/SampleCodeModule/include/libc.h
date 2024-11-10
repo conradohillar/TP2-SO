@@ -33,7 +33,7 @@ void print_spaces(uint64_t spaces);
 
 uint64_t strlen(uint8_t *string);
 
-uint64_t strcmp(uint8_t *str1, uint8_t *str2);
+int64_t strcmp(uint8_t *str1, uint8_t *str2);
 
 int8_t split_string(const uint8_t *str,
                     uint8_t words[MAX_PARAMS][MAX_PARAM_LENGTH]);
@@ -65,3 +65,5 @@ int64_t cat_fn(uint64_t argc, uint8_t *argv[]);
 int64_t wc_fn(uint64_t argc, uint8_t *argv[]);
 
 int64_t filter_fn(uint64_t argc, uint8_t *argv[]);
+
+uint8_t is_number(uint8_t *str);

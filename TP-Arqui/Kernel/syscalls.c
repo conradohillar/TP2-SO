@@ -19,13 +19,18 @@ uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size) {
   return read_pipe(my_pipe_manager, pipe, buffer, size);
 }
 
-uint64_t sys_write(uint16_t fd, uint8_t *buffer, uint64_t size,
+uint64_t sys_write(int16_t fd, uint8_t *buffer, uint64_t size,
                    uint32_t fore_color, uint32_t back_color) {
   switch (fd) {
+  case -1:
+    return 0;
   case STDIN:
     return 0;
   case STDOUT:
     put_string(buffer, size, fore_color, back_color);
+    return size;
+  case STDERR:
+    put_string(buffer, size, RED, BLACK);
     return size;
 
   default:
@@ -78,6 +83,8 @@ int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
 }
 
 int64_t sys_kill(uint64_t pid) { return kill(my_pm, pid); }
+
+void sys_kill_by_name(uint8_t *name) { kill_by_name(my_pm, name); }
 
 void sys_wait() { wait(my_pm); }
 

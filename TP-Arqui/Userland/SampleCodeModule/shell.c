@@ -253,6 +253,9 @@ uint64_t get_command(uint8_t *str) {
       }
     }
 
+    if (!is_number(input[1])) {
+      return 0;
+    }
     uint8_t id = satoi(input[1]);
     function(id);
     return 1;
@@ -283,6 +286,10 @@ uint64_t get_command(uint8_t *str) {
       }
       pipe_functions(fn1, fn2);
       return 1;
+    } else if (strcmp(input[0], (uint8_t *)"kill") == 0 &&
+               strcmp(input[1], (uint8_t *)"name") == 0) {
+      kill_by_name(input[2]);
+      return 1;
     }
   }
 
@@ -308,12 +315,12 @@ void run_shell() {
            buff_pos < COMM_BUFF_SIZE) {
 
       if (c == '\b') {
-        if (buff_pos > 0) {
+        if (buff_pos > 0 && command_buffer[buff_pos - 1] != '\0') {
           putchar('\b');
           buff_pos--;
         } else
           make_sound(120, 70);
-      } else if (c != '\n') {
+      } else if (c != '\n' && c != '\0') {
         command_buffer[buff_pos++] = c;
         putchar(c);
       }
@@ -332,6 +339,8 @@ void run_shell() {
 }
 
 void kill(uint8_t pid) { sys_kill_asm(pid); }
+
+void kill_by_name(uint8_t *name) { sys_kill_by_name_asm(name); }
 
 void block(uint8_t pid) { sys_block_asm(pid); }
 

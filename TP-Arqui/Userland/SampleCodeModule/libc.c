@@ -98,7 +98,7 @@ uint64_t strlen(uint8_t *string) {
   return len;
 }
 
-uint64_t strcmp(uint8_t *str1, uint8_t *str2) {
+int64_t strcmp(uint8_t *str1, uint8_t *str2) {
   uint64_t i = 0;
   while (str1[i] != '\0' && str2[i] != '\0') {
     if (str1[i] != str2[i])
@@ -423,6 +423,9 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)"kill PID   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - kills the process with specified PID\n", GRAY,
              BLACK);
+  printcolor((uint8_t *)"kill name N", ORANGE, BLACK);
+  printcolor((uint8_t *)" - kills all processes with specified name N\n", GRAY,
+             BLACK);
   printcolor((uint8_t *)"block PID  ", ORANGE, BLACK);
   printcolor((uint8_t *)" - blocks the process with specified PID\n", GRAY,
              BLACK);
@@ -569,7 +572,6 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
       if (!c) {
         if (last_char == '\n') {
           lines--;
-          chars--;
         }
         printcolor((uint8_t *)"\nLines: ", ORANGE, BLACK);
         uint8_t aux[10];
@@ -587,7 +589,7 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
       }
       putchar(c);
 
-      chars += c == '\b' ? -1 : 1;
+      chars += c == '\b' ? -1 : (c != ' ' && c != '\t' && c != '\n');
 
       if (c == '\n') {
         lines++;
@@ -623,4 +625,15 @@ int64_t filter_fn(uint64_t argc, uint8_t *argv[]) {
     }
   }
   return -1;
+}
+
+uint8_t is_number(uint8_t *str) {
+  uint64_t i = 0;
+  while (str[i] != '\0') {
+    if (str[i] < '0' || str[i] > '9') {
+      return 0;
+    }
+    i++;
+  }
+  return 1;
 }

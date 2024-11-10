@@ -33,7 +33,7 @@ typedef struct process_control_block {
   int32_t waiting_pid;
   int64_t return_value;
 
-  uint16_t fds[FD_COUNT];
+  int16_t fds[FD_COUNT];
 
 } process_control_block;
 

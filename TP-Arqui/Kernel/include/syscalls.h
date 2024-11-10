@@ -21,7 +21,7 @@ typedef int64_t (*main_fn)(uint64_t argc, uint8_t **argv);
 
 uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size);
 
-uint64_t sys_write(uint16_t fd, uint8_t *buffer, uint64_t size,
+uint64_t sys_write(int16_t fd, uint8_t *buffer, uint64_t size,
                    uint32_t fore_color, uint32_t back_color);
 
 void sys_write_at(uint8_t *buffer, uint64_t size, uint64_t color, uint64_t pos,
@@ -51,6 +51,8 @@ int32_t sys_create_process(main_fn code, uint64_t argc, uint8_t **argv,
                            uint8_t *name, uint8_t in_fg);
 
 int64_t sys_kill(uint64_t pid);
+
+void sys_kill_by_name(uint8_t *name);
 
 void sys_wait();
 

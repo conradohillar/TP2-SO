@@ -33,6 +33,7 @@ GLOBAL sys_set_fd_asm
 GLOBAL sys_get_fd_asm
 GLOBAL sys_create_pipe_asm
 GLOBAL sys_destroy_pipe_asm
+GLOBAL sys_kill_by_name_asm
 
 
 %macro pushState 0
@@ -673,3 +674,20 @@ sys_mem_status_asm:
 
     ret
 
+sys_kill_by_name_asm:
+    push rbp
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi
+    mov rdi, 33                  ;id syscall kill_by_name
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
