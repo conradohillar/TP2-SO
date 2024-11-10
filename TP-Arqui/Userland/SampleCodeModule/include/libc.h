@@ -5,6 +5,7 @@
 #define STDOUT 1
 #define STD_FORE_COLOR WHITE
 #define STD_BACK_COLOR BLACK
+#define NULL (void *)0
 
 typedef void (*shell_fn)(uint8_t id, uint8_t aux);
 typedef int8_t sem_t;
