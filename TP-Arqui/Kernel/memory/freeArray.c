@@ -13,7 +13,7 @@ extern pipeManagerADT my_pipe_manager;
 extern memoryManagerADT mem_manager;
 
 #define TOTAL_BLOCKS 750
-#define BLOCK_SIZE 8200
+#define BLOCK_SIZE 16384
 
 typedef struct memoryManagerCDT {
   void *memory_start;           // Puntero al bloque de memoria inicial
