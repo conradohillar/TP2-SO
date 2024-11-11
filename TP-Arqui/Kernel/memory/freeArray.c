@@ -73,7 +73,7 @@ void mm_free(void *block) {
       block_idx; // El bloque liberado es ahora el primero libre
 }
 
-void mem_status() {
+uint64_t mem_status() {
   uint16_t fd = get_running(my_scheduler)->fds[STDOUT];
   pipe_t *pipe = get_pipe(my_pipe_manager, fd);
 

@@ -30,6 +30,6 @@ void mm_free(void *ptr);
 /**
  * @brief Prints the current status of the memory
  */
-void mem_status();
+uint64_t mem_status();
 
 #endif

@@ -336,7 +336,8 @@ process_status get_status(processManagerADT pm, uint64_t pid) {
 
 uint16_t set_priority(processManagerADT pm, uint64_t pid, uint8_t priority) {
   if (pid >= MAX_PROCESS_COUNT || pm->process_table[pid].pcb == NULL ||
-      pm->process_table[pid].pcb->status == KILLED || priority > MAX_PRIORITY) {
+      pm->process_table[pid].pcb->status == KILLED || priority > MAX_PRIORITY ||
+      priority < 1) {
     return -1;
   }
 

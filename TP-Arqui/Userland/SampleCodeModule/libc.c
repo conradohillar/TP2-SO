@@ -185,7 +185,26 @@ void itoh(uint64_t num, uint8_t *str) {
   str[18] = '\0';
 }
 
-void sleep(uint64_t secs, uint64_t millis) { sys_sleep_asm(secs, millis); }
+void double_to_ascii(double num, uint8_t *str) {
+  num = ((int)(num * 100 + 0.5)) / 100.0;
+  uint32_t int_part = (uint32_t)num;
+  double dec_part = num - int_part;
+  uint32_t dec_digits = 0;
+  uint32_t dec_part_int = (uint32_t)(dec_part * 1000);
+  uint8_t plus = (dec_part_int % 10 >= 5);
+  dec_part_int /= 10;
+  dec_part_int += plus;
+  while (dec_part_int % 10 == 0) {
+    dec_part_int /= 10;
+    dec_digits++;
+  }
+  itoa(int_part, str);
+  uint32_t len = strlen(str);
+  str[len] = '.';
+  itoa(dec_part_int, str + len + 1);
+  len = strlen(str);
+  str[len] = '\0';
+}
 
 uint64_t atoi(uint8_t *str) {
   uint64_t digits;
@@ -217,6 +236,7 @@ uint8_t *to_lower(uint8_t *str) {
 /*
     AUXILIARY FUNCTIONS NOT RELATED TO THE STANDARD C LIBRARY
 */
+void sleep(uint64_t secs, uint64_t millis) { sys_sleep_asm(secs, millis); }
 
 void check_keyboard(uint8_t *buffer) { sys_check_keyboard_asm(buffer); }
 
@@ -303,69 +323,88 @@ int64_t ps_fn(uint64_t argc, uint8_t *argv[]) {
   return 0;
 }
 
-static int64_t mem_writer(uint64_t argc, uint8_t *argv[]) {
-  sys_set_fd_asm(STDOUT, atoi(argv[0]));
-  sys_mem_status_asm();
-  print((uint8_t *)"\0");
-  return 0;
-}
+// static int64_t mem_writer(uint64_t argc, uint8_t *argv[]) {
+//   sys_set_fd_asm(STDOUT, atoi(argv[0]));
+//   sys_mem_status_asm();
+//   print((uint8_t *)"\0");
+//   return 0;
+// }
 
-static int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
-  sys_set_fd_asm(STDIN, atoi(argv[0]));
-  uint8_t c;
-  if (argc == 1) {
-    while (1) {
-      c = getchar();
-      if (c == '\0') {
-        return 0;
-      }
-      putchar(c);
-    }
-  } else if (argc == 2) {
-    sys_set_fd_asm(STDOUT, atoi(argv[1]));
-    uint8_t buffer[1280];
-    uint64_t i = 0;
-    while (i < 1280) {
-      c = getchar();
-      if (c == '\0') {
-        break;
-      }
-      buffer[i++] = c;
-    }
-    uint64_t j = 0;
-    for (; j < i - 1; j++) {
-      putchar(buffer[j]);
-    }
-    print((uint8_t *)"\0");
-    sys_set_fd_asm(STDOUT, STDOUT);
-    return 0;
-  }
+// static int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
+//   sys_set_fd_asm(STDIN, atoi(argv[0]));
+//   uint8_t c;
+//   if (argc == 1) {
+//     while (1) {
+//       c = getchar();
+//       if (c == '\0') {
+//         return 0;
+//       }
+//       putchar(c);
+//     }
+//   } else if (argc == 2) {
+//     sys_set_fd_asm(STDOUT, atoi(argv[1]));
+//     uint8_t buffer[1280];
+//     uint64_t i = 0;
+//     while (i < 1280) {
+//       c = getchar();
+//       if (c == '\0') {
+//         break;
+//       }
+//       buffer[i++] = c;
+//     }
+//     uint64_t j = 0;
+//     for (; j < i - 1; j++) {
+//       putchar(buffer[j]);
+//     }
+//     print((uint8_t *)"\0");
+//     sys_set_fd_asm(STDOUT, STDOUT);
+//     return 0;
+//   }
 
-  return -1;
-}
+//   return -1;
+// }
 
 int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
-  uint16_t pipe_id = sys_create_pipe_asm();
-  uint8_t aux[10];
-  itoa(pipe_id, aux);
-
-  uint8_t *writer_args[] = {aux};
-  uint8_t *reader_args[2];
-  reader_args[0] = aux;
-  uint8_t reader_argc = 1;
-
   if (argc) {
-    reader_argc = 2;
-    reader_args[1] = argv[0];
+    sys_set_fd_asm(STDOUT, satoi(argv[0]));
   }
 
-  sys_create_process_asm(mem_writer, 1, writer_args, (uint8_t *)"mem_writer",
-                         0);
-  uint64_t reader_pid = sys_create_process_asm(
-      mem_reader, reader_argc, reader_args, (uint8_t *)"mem_reader", 1);
+  mem_info *info = sys_mem_status_asm();
+  print((uint8_t *)"\n MEMORY STATUS: \n\n");
+  printcolor((uint8_t *)" Memory start address: ", YELLOW, BLACK);
+  uint8_t mem_start_address[20] = {0};
+  itoh(info->mem_start_address, mem_start_address);
+  printcolor(mem_start_address, YELLOW, BLACK);
+  print((uint8_t *)"\n\n  Total memory: ");
+  uint8_t total_mem[20] = {0};
+  itoa(info->total_mem, total_mem);
+  print(total_mem);
+  print((uint8_t *)" bytes\n");
+  print((uint8_t *)"  Used memory: ");
+  uint8_t used_mem[20] = {0};
+  itoa(info->used_mem, used_mem);
+  printcolor(used_mem, ORANGE, BLACK);
+  printcolor((uint8_t *)" bytes (", ORANGE, BLACK);
+  double used_mem_perc = (double)info->used_mem / info->total_mem * 100;
+  uint8_t used_mem_perc_str[20] = {0};
+  double_to_ascii(used_mem_perc, used_mem_perc_str);
+  printcolor(used_mem_perc_str, ORANGE, BLACK);
+  printcolor((uint8_t *)"%)\n", ORANGE, BLACK);
+  print((uint8_t *)"  Free memory: ");
+  uint8_t free_mem[20] = {0};
+  itoa(info->free_mem, free_mem);
+  printcolor(free_mem, GREEN, BLACK);
+  printcolor((uint8_t *)" bytes (", GREEN, BLACK);
+  double free_mem_perc = (double)info->free_mem / info->total_mem * 100;
+  uint8_t free_mem_perc_str[20] = {0};
+  double_to_ascii(free_mem_perc, free_mem_perc_str);
+  printcolor(free_mem_perc_str, GREEN, BLACK);
+  printcolor((uint8_t *)"%)\n\n", GREEN, BLACK);
 
-  sys_waitpid_asm(reader_pid);
-  sys_destroy_pipe_asm(pipe_id);
+  if (argc) {
+    print((uint8_t *)"\0");
+    sys_set_fd_asm(STDOUT, STDOUT);
+  }
   return 0;
 }
 
