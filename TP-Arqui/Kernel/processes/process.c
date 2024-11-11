@@ -316,6 +316,10 @@ uint8_t unblock(processManagerADT pm, uint64_t pid) {
   }
 
   pm->process_table[pid].pcb->status = READY;
+  if (!pm->process_table[pid].pcb->remaining_quantum) {
+    pm->process_table[pid].pcb->remaining_quantum =
+        pm->process_table[pid].pcb->priority;
+  }
   add_to_scheduler(pm->scheduler, pm->process_table[pid].pcb);
   return 0;
 }

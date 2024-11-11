@@ -323,47 +323,6 @@ int64_t ps_fn(uint64_t argc, uint8_t *argv[]) {
   return 0;
 }
 
-// static int64_t mem_writer(uint64_t argc, uint8_t *argv[]) {
-//   sys_set_fd_asm(STDOUT, atoi(argv[0]));
-//   sys_mem_status_asm();
-//   print((uint8_t *)"\0");
-//   return 0;
-// }
-
-// static int64_t mem_reader(uint64_t argc, uint8_t *argv[]) {
-//   sys_set_fd_asm(STDIN, atoi(argv[0]));
-//   uint8_t c;
-//   if (argc == 1) {
-//     while (1) {
-//       c = getchar();
-//       if (c == '\0') {
-//         return 0;
-//       }
-//       putchar(c);
-//     }
-//   } else if (argc == 2) {
-//     sys_set_fd_asm(STDOUT, atoi(argv[1]));
-//     uint8_t buffer[1280];
-//     uint64_t i = 0;
-//     while (i < 1280) {
-//       c = getchar();
-//       if (c == '\0') {
-//         break;
-//       }
-//       buffer[i++] = c;
-//     }
-//     uint64_t j = 0;
-//     for (; j < i - 1; j++) {
-//       putchar(buffer[j]);
-//     }
-//     print((uint8_t *)"\0");
-//     sys_set_fd_asm(STDOUT, STDOUT);
-//     return 0;
-//   }
-
-//   return -1;
-// }
-
 int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
   if (argc) {
     sys_set_fd_asm(STDOUT, satoi(argv[0]));
