@@ -8,6 +8,7 @@
 
 extern schedulerADT my_scheduler;
 extern pipeManagerADT my_pipe_manager;
+extern memoryManagerADT mem_manager;
 
 #define MAX_LEVEL                                                              \
   25 // Este seria un nivel maximo hardcodeado (podria ser limitacion del nivel
@@ -251,4 +252,20 @@ static Block *create_block(void *block_pointer, uint8_t level) {
   return new_block;
 }
 
-uint64_t mem_status(memoryManagerADT mm) {}
+uint64_t mem_status(memoryManagerADT mm) {
+  mem_info *info = (mem_info *)mm_malloc(sizeof(mem_info));
+  info->mem_start_address = (uint64_t)mm->mem_start;
+  info->total_mem = (uint64_t)mm->memory_size;
+  info->free_mem = 0;
+  for (int i = MIN_LEVEL; i < mm->max_level; i++) {
+    Block *current_block = mm->free_blocks_per_level[i];
+    while (current_block != NULL) {
+
+      info->free_mem += (uint64_t)(1 << i);
+
+      current_block = current_block->next;
+    }
+  }
+  info->used_mem = info->total_mem - info->free_mem;
+  return (uint64_t)info;
+}

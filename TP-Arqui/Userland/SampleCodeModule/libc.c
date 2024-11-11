@@ -369,7 +369,8 @@ int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
     sys_set_fd_asm(STDOUT, satoi(argv[0]));
   }
 
-  mem_info *info = sys_mem_status_asm();
+  mem_info *info = (mem_info *)sys_mem_status_asm();
+
   print((uint8_t *)"\n MEMORY STATUS: \n\n");
   printcolor((uint8_t *)" Memory start address: ", YELLOW, BLACK);
   uint8_t mem_start_address[20] = {0};
@@ -405,6 +406,8 @@ int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
     print((uint8_t *)"\0");
     sys_set_fd_asm(STDOUT, STDOUT);
   }
+
+  sys_mm_free_asm(info);
   return 0;
 }
 

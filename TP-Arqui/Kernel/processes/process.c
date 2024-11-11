@@ -350,6 +350,8 @@ void free_process(process_control_block *pcb) {
     mm_free(pcb->argv[i]);
   }
   mm_free(pcb->argv);
+  mm_free(pcb->stack_base_pointer - STACK_SIZE_BYTES);
+  mm_free(pcb);
 }
 
 ps_struct *send_ps_info(processManagerADT pm) {

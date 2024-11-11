@@ -84,7 +84,6 @@ void destroy_pipe(pipeManagerADT pipe_manager, pipe_t *pipe) {
   sem_destroy(my_sm, pipe->read_sem);
   sem_destroy(my_sm, pipe->write_sem);
   pipe_manager->pipes[pipe_id] = NULL;
-  mm_free(pipe->buffer);
   mm_free(pipe);
   pipe_manager->count--;
 }
@@ -144,18 +143,8 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   sem_wait(my_sm, running_pcb, pipe->mutex);
   pipe->read_waiting = 0;
 
-  // if (pipe->to_read_count == 0) {
-  //   sem_post(my_sm, pipe->mutex);
-  //   // TODO: Check if the pipe is empty and write waits for read (possible
-  //   // deadlock?)
-  //   sem_wait(my_sm, running_pcb, pipe->read_sem);
-  //   sem_wait(my_sm, running_pcb, pipe->mutex);
-  // }
-
   uint64_t i = 0;
-  while (i < bytes
-         // && pipe->to_read_count != 0
-  ) {
+  while (i < bytes) {
     buffer[i++] = pipe->buffer[pipe->last_read_pos];
     pipe->last_read_pos = (pipe->last_read_pos + 1) % PIPE_BUFFER_SIZE;
     pipe->to_read_count--;
@@ -180,7 +169,7 @@ uint64_t read_pipe(pipeManagerADT pipe_manager, pipe_t *pipe, uint8_t *buffer,
   if (pipe->to_read_count > 0) {
     sem_post(my_sm, pipe->read_sem);
   }
-  // pipe->read_waiting = 1;
+
   sem_post(my_sm, pipe->mutex);
   return i;
 }

@@ -1,6 +1,7 @@
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
+#include "../../processUtils.h"
 #include "../include/textMode.h"
 
 #define NULL ((void *)0)
