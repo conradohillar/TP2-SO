@@ -2,6 +2,7 @@
 #define MEMORY_MANAGER_H
 
 #include "../include/textMode.h"
+#include "../../processUtils.h"
 
 #define NULL ((void *)0)
 
@@ -30,6 +31,6 @@ void mm_free(void *ptr);
 /**
  * @brief Prints the current status of the memory
  */
-void mem_status();
+mem_info *mem_status();
 
 #endif

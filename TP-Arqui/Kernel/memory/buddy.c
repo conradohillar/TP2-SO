@@ -8,6 +8,8 @@
 
 extern schedulerADT my_scheduler;
 extern pipeManagerADT my_pipe_manager;
+extern memoryManagerADT mem_manager;
+
 
 #define MAX_LEVEL                                                              \
   25 // Este seria un nivel maximo hardcodeado (podria ser limitacion del nivel
@@ -251,63 +253,20 @@ static Block *create_block(void *block_pointer, uint8_t level) {
   return new_block;
 }
 
-void mem_status(memoryManagerADT mm) {
-  uint16_t fd = get_running(my_scheduler)->fds[STDOUT];
-  pipe_t *pipe = get_pipe(my_pipe_manager, fd);
-
-  // write_pipe(
-  //     my_pipe_manager, pipe,
-  //     "El aprendizaje continuo es clave para adaptarse a un mundo en
-  //     constante " "cambio. Cada dia surgen nuevas tecnologias y herramientas
-  //     que " "transforman nuestra manera de trabajar, comunicarnos y aprender.
-  //     La " "curiosidad y la disposicion a adquirir conocimientos nos
-  //     permiten" "mantenernos actualizados y competitivos. Al enfrentar
-  //     desafios con una " "mentalidad abierta y dispuesta a aprender,
-  //     incrementamos nuestras " "habilidades y ampliamos nuestras
-  //     perspectivas.\n", 453);
-
-  write_pipe(my_pipe_manager, pipe, (uint8_t *)"\nMEMORY STATE:\n", 15);
-  void *null = NULL;
-  for (uint32_t level = MIN_LEVEL; level <= mem_manager->max_level; level++) {
-    Block *current = mem_manager->free_blocks_per_level[level];
-    uint8_t aux[10];
-    if (current != null) {
-      itoa(level, aux);
-      write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 6);
-      if (strlen(aux) == 1) {
-        write_pipe(my_pipe_manager, pipe, (uint8_t *)" ", 1);
-      }
-      write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-      write_pipe(my_pipe_manager, pipe, (uint8_t *)":", 1);
-      // Imprimir cada bloque de la lista
-      while (current != null) {
-        itoa((void *)current - (void *)mem_manager->mem_start, aux);
-        write_pipe(my_pipe_manager, pipe,
-                   (uint8_t *)"  Block at address: ", 20);
-        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-        itoa((1UL << current->level), aux);
-        write_pipe(my_pipe_manager, pipe, (uint8_t *)", size: ", 8);
-        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-        itoa((void *)current->next - mem_manager->mem_start, aux);
-        write_pipe(my_pipe_manager, pipe, (uint8_t *)", next: ", 8);
-        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-        itoa(current->is_free, aux);
-        write_pipe(my_pipe_manager, pipe, (uint8_t *)", is_free: ", 11);
-        write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-        write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);
-
-        current = current->next; // Mover al siguiente bloque
-      }
-    } else {
-      itoa(level, aux);
-      write_pipe(my_pipe_manager, pipe, (uint8_t *)"Level ", 6);
-      if (strlen(aux) == 1) {
-        write_pipe(my_pipe_manager, pipe, (uint8_t *)" ", 1);
-      }
-      write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-      write_pipe(my_pipe_manager, pipe, (uint8_t *)":  No blocks available\n",
-                 23);
+mem_info *mem_status(memoryManagerADT mm) {
+    mem_info *info = (mem_info *)mm_malloc(sizeof(mem_info));
+    info->mem_start_address = (uint64_t)mm->mem_start;
+    info->total_mem = (uint64_t)mm->memory_size;
+    info->free_mem = 0;
+    for (int i = MIN_LEVEL; i < mm->max_level; i++) {
+        Block *current_block = mm->free_blocks_per_level[i];
+        while (current_block != NULL) {
+        
+            info->free_mem += (uint64_t)(1 << i);
+        
+        current_block = current_block->next;
+        }
     }
-  }
-  write_pipe(my_pipe_manager, pipe, (uint8_t *)"\n", 1);
+    info->used_mem = info->total_mem - info->free_mem;
+    return info;
 }

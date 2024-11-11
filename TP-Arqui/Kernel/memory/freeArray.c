@@ -10,9 +10,10 @@
 
 extern schedulerADT my_scheduler;
 extern pipeManagerADT my_pipe_manager;
+extern memoryManagerADT mem_manager;
 
 #define TOTAL_BLOCKS 750
-#define BLOCK_SIZE 7000
+#define BLOCK_SIZE 8192
 
 typedef struct memoryManagerCDT {
   void *memory_start;           // Puntero al bloque de memoria inicial
@@ -73,26 +74,22 @@ void mm_free(void *block) {
       block_idx; // El bloque liberado es ahora el primero libre
 }
 
-void mem_status() {
-  uint16_t fd = get_running(my_scheduler)->fds[STDOUT];
-  pipe_t *pipe = get_pipe(my_pipe_manager, fd);
+mem_info *mem_status() {
+    mem_info *info = (mem_info *)mm_malloc(sizeof(mem_info));
+    if (info == NULL) {
+        return NULL;
+    }
+    info->mem_start_address = (uint64_t)mem_manager->memory_start;
+    info->total_mem = TOTAL_BLOCKS * BLOCK_SIZE;
+    int64_t free_blocks = 0;
+    
+    int i = mem_manager->free_index;
+    while (i != -1) {
+        free_blocks++;
+        i = mem_manager->free_array[i];
+    }
 
-  uint64_t counter = 0;
-  for (int64_t i = mem_manager->free_index; i != -1;) {
-    counter++;
-    i = mem_manager->free_array[i];
-  }
-
-  uint8_t aux[10];
-  itoa(counter, aux);
-  write_pipe(my_pipe_manager, pipe, (uint8_t *)"There are ", 10);
-  write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  write_pipe(my_pipe_manager, pipe, (uint8_t *)" of ", 4);
-  itoa(TOTAL_BLOCKS, aux);
-  write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  write_pipe(my_pipe_manager, pipe,
-             (uint8_t *)" free blocks available with size ", 34);
-  itoa(BLOCK_SIZE, aux);
-  write_pipe(my_pipe_manager, pipe, aux, strlen(aux));
-  write_pipe(my_pipe_manager, pipe, (uint8_t *)" each\n", 6);
+    info->free_mem = free_blocks * BLOCK_SIZE;
+    info->used_mem = (TOTAL_BLOCKS - free_blocks) * BLOCK_SIZE;
+    return info;
 }

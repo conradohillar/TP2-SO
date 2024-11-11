@@ -7,6 +7,7 @@ extern pipeManagerADT my_pipe_manager;
 extern processManagerADT my_pm;
 extern schedulerADT my_scheduler;
 extern semaphoreManagerADT my_sm;
+extern memoryManagerADT mem_manager;
 
 uint64_t sys_read(uint16_t fd, uint8_t *buffer, uint64_t size) {
   if (fd == STDOUT || fd == STDERR) {
@@ -152,7 +153,7 @@ int8_t sys_sem_open(uint8_t id) {
   return (int8_t)id;
 }
 
-void sys_mem_status() { mem_status(); }
+mem_info *sys_mem_status() { return mem_status(mem_manager); }
 
 int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id) {
   return set_fd(my_pm, fd, pipe_id);
