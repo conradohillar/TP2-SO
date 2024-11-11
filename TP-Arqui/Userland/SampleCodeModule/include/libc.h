@@ -67,3 +67,5 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]);
 int64_t filter_fn(uint64_t argc, uint8_t *argv[]);
 
 uint8_t is_number(uint8_t *str);
+
+int64_t philos_fn(uint64_t argc, uint8_t *argv[]);

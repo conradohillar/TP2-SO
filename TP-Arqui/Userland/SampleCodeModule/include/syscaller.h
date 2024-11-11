@@ -81,3 +81,7 @@ int16_t sys_get_fd_asm(uint16_t fd);
 int16_t sys_create_pipe_asm();
 
 void sys_destroy_pipe_asm(uint16_t pipe_id);
+
+void *sys_mm_malloc_asm(uint64_t size);
+
+void sys_mm_free_asm(void *ptr);

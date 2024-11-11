@@ -48,6 +48,10 @@ int64_t mem(uint64_t argc, uint8_t *argv[]) {
   return fn_wrapper(argc, argv, mem_fn, (uint8_t *)"mem");
 }
 
+int64_t philos(uint64_t argc, uint8_t *argv[]) {
+  return fn_wrapper(argc, argv, philos_fn, (uint8_t *)"philos");
+}
+
 int64_t run_eliminator(uint64_t argc, uint8_t *argv[]) {
   eliminator_menu();
   sys_clear_screen_asm();
@@ -113,6 +117,22 @@ int64_t test_ipc(uint64_t argc, uint8_t *argv[]) {
   return fn_wrapper(argc, argv, test_ipc_fn, (uint8_t *)"test_ipc");
 }
 
+int64_t test_mm(uint64_t argc, uint8_t *argv[]) {
+  uint8_t my_argc = 1;
+  uint8_t *args[2] = {argv[1], (uint8_t *)"\0"};
+  if (argc == 3) {
+    my_argc = 2;
+    args[1] = argv[2];
+  }
+  uint8_t in_fg = satoi(argv[0]);
+  uint64_t pid = sys_create_process_asm(test_mm_fn, my_argc, args,
+                                        (uint8_t *)"test_mm", in_fg);
+  if (in_fg) {
+    sys_waitpid_asm(pid);
+  }
+  return 1;
+}
+
 int64_t ps(uint64_t argc, uint8_t *argv[]) {
   return fn_wrapper(argc, argv, ps_fn, (uint8_t *)"ps");
 }
@@ -161,7 +181,7 @@ static uint8_t *commands[] = {
     (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
     (uint8_t *)"testsem",  (uint8_t *)"testipc",   (uint8_t *)"mem",
     (uint8_t *)"loop",     (uint8_t *)"cat",       (uint8_t *)"wc",
-    (uint8_t *)"filter"};
+    (uint8_t *)"filter",   (uint8_t *)"philos"};
 
 static fn functions[] = {help,
                          check_div_by_zero,
@@ -181,7 +201,8 @@ static fn functions[] = {help,
                          loop,
                          cat,
                          wc,
-                         filter};
+                         filter,
+                         philos};
 
 uint64_t get_command(uint8_t *str) {
   uint8_t input[MAX_PARAMS][MAX_PARAM_LENGTH] = {0};
@@ -247,21 +268,35 @@ uint64_t get_command(uint8_t *str) {
       break;
     }
 
+    if (!is_number(input[1])) {
+      return 0;
+    }
+    if (strcmp(input[0], (uint8_t *)"testmem") == 0) {
+      uint8_t *args[] = {(uint8_t *)"1", input[1]};
+      uint64_t argc = 2;
+      test_mm(argc, args);
+      return 1;
+    }
+
     for (int j = 0; j < strlen(command); j++) {
       if (input[0][j] != command[j]) {
         return 0;
       }
     }
 
-    if (!is_number(input[1])) {
-      return 0;
-    }
     uint8_t id = satoi(input[1]);
     function(id);
     return 1;
   }
 
   if (count == 3) {
+    if ((strcmp(input[0], (uint8_t *)"testmem") == 0) && is_number(input[1]) &&
+        (strcmp(input[2], (uint8_t *)"&") == 0)) {
+      uint8_t *args[] = {(uint8_t *)"0", input[1]};
+      uint64_t argc = 2;
+      test_mm(argc, args);
+      return 1;
+    }
     if (strcmp(input[0], (uint8_t *)"nice") == 0) {
       uint8_t pid = satoi(input[1]);
       uint8_t new_priority = satoi(input[2]);

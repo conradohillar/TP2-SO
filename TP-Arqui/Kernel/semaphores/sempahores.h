@@ -16,7 +16,6 @@ typedef struct sem_t {
   uint8_t lock;              // 1 = free, 0 = taken
   uint8_t count;             // sem value (shared resource)
   listADT blocked_processes; // list
-
 } sem_t;
 
 typedef struct semaphoreManagerCDT *semaphoreManagerADT;

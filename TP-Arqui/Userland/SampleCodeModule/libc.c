@@ -403,6 +403,10 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)"testipc    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for inter-process communication\n", GRAY,
              BLACK);
+  printcolor((uint8_t *)"testmem N  ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - Runs test for memory manager, where N is the max "
+                        "memory size\n",
+             GRAY, BLACK);
   printcolor((uint8_t *)"ps         ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
   printcolor((uint8_t *)"mem        ", ORANGE, BLACK);

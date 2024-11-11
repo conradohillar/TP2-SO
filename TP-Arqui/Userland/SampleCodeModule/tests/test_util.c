@@ -4,9 +4,9 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
-#include "../include/syscaller.h"
-#include "../include/tests.h"
 #include <stdint.h>
+#include <syscaller.h>
+#include <tests.h>
 
 // Random
 static uint32_t m_z = 362436069;

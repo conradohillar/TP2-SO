@@ -175,3 +175,7 @@ void sys_destroy_pipe(uint16_t pipe_id) {
   }
   destroy_pipe(my_pipe_manager, pipe);
 }
+
+void *sys_mm_malloc(uint64_t size) { return mm_malloc(size); }
+
+void sys_mm_free(void *ptr) { mm_free(ptr); }

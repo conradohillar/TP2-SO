@@ -70,3 +70,23 @@ int8_t strcmp(const uint8_t *str1, const uint8_t *str2) {
   }
   return str1[i] - str2[i];
 }
+
+uint32_t itoa(uint32_t num, uint8_t *str) {
+  uint32_t digits = 1;
+  for (uint32_t n = num / 10; n != 0; digits++, n /= 10)
+    ;
+
+  if (digits == 1) {
+    str[0] = num + '0';
+    str[1] = '\0';
+    return digits;
+  }
+
+  str[digits] = '\0';
+  for (int32_t i = digits - 1; i >= 0; i--) {
+    str[i] = (num % 10) + '0';
+    num /= 10;
+  }
+
+  return digits;
+}

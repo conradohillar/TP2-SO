@@ -32,6 +32,8 @@ EXTERN sys_get_fd
 EXTERN sys_create_pipe
 EXTERN sys_destroy_pipe
 EXTERN sys_kill_by_name
+EXTERN sys_mm_malloc
+EXTERN sys_mm_free
 
 GLOBAL syscalls_dispatcher
 
@@ -110,6 +112,10 @@ syscalls_dispatcher:
     je mem_status
     cmp rdi, 33
     je kill_by_name
+    cmp rdi, 34
+    je mm_malloc
+    cmp rdi, 35
+    je mm_free
 
 end:
     cli
@@ -327,4 +333,14 @@ destroy_pipe:
 kill_by_name:
     mov rdi, rsi                ;name
     call sys_kill_by_name
+    jmp end
+
+mm_malloc:
+    mov rdi, rsi                ;size
+    call sys_mm_malloc
+    jmp end
+
+mm_free:
+    mov rdi, rsi                ;ptr
+    call sys_mm_free
     jmp end

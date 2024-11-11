@@ -88,4 +88,8 @@ int16_t sys_create_pipe();
 
 void sys_destroy_pipe(uint16_t pipe_id);
 
+void *sys_mm_malloc(uint64_t size);
+
+void sys_mm_free(void *ptr);
+
 #endif

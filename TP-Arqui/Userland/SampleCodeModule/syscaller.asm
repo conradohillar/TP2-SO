@@ -34,6 +34,8 @@ GLOBAL sys_get_fd_asm
 GLOBAL sys_create_pipe_asm
 GLOBAL sys_destroy_pipe_asm
 GLOBAL sys_kill_by_name_asm
+GLOBAL sys_mm_malloc_asm
+GLOBAL sys_mm_free_asm
 
 
 %macro pushState 0
@@ -682,6 +684,42 @@ sys_kill_by_name_asm:
 
     mov rsi, rdi
     mov rdi, 33                  ;id syscall kill_by_name
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_mm_malloc_asm:
+    push rbp
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi
+    mov rdi, 34                  ;id syscall mm_malloc
+
+    int 80h
+
+    popState
+
+    mov rsp, rbp
+    pop rbp
+
+    ret
+
+sys_mm_free_asm:
+    push rbp
+    mov rbp, rsp
+
+    pushState
+
+    mov rsi, rdi
+    mov rdi, 35                  ;id syscall mm_free
 
     int 80h
 
