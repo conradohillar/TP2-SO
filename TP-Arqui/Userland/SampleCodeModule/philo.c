@@ -2,7 +2,7 @@
 #include "../include/syscaller.h"
 
 #define MAX_PHILOS 10
-#define MIN_PHILOS 2
+#define MIN_PHILOS 1
 #define START_PHILOS 5
 #define EATING "E"
 #define THINKING "T"
@@ -22,7 +22,7 @@ int64_t philosopher(uint64_t argc, uint8_t *argv[]);
 
 void init_philos() {
   for (uint8_t i = 0; i < philo_count; i++) {
-    philo_sem[i] = sys_sem_init_asm(i, 1);
+    philo_sem[i] = sys_sem_init_asm(i, 0);
     states[i] = THINKING;
     char aux[10];
     itoa(i, aux);
@@ -36,11 +36,10 @@ void init_philos() {
 }
 
 void test(uint8_t i) {
-  if (states[i] == HUNGRY && states[LEFT] != EATING &&
-      states[RIGHT] != EATING) {
+  if (states[i] == HUNGRY && states[((i + philo_count - 1) % philo_count)] != EATING &&
+      states[((i + 1) % philo_count)] != EATING) {
     states[i] = EATING;
     sys_sem_post_asm(print_flag);
-    sys_sem_wait_asm(c_flag);
     sys_sem_post_asm(philo_sem[i]);
   }
 }
@@ -48,6 +47,8 @@ void test(uint8_t i) {
 void take_forks(uint8_t i) {
   sys_sem_wait_asm(mutex);
   states[i] = HUNGRY;
+    sys_sem_post_asm(print_flag);
+    sleep(0, 50);
   test(i);
   sys_sem_post_asm(mutex);
   sys_sem_wait_asm(philo_sem[i]);
@@ -56,14 +57,17 @@ void take_forks(uint8_t i) {
 void put_forks(uint8_t i) {
   sys_sem_wait_asm(mutex);
   states[i] = THINKING;
-  test(LEFT);
-  test(RIGHT);
+    sys_sem_post_asm(print_flag);
+    sleep(0, 50);
+
+  test(((i + philo_count - 1) % philo_count));
+  test(((i + 1) % philo_count));
   sys_sem_post_asm(mutex);
 }
 
-void think() { sleep(0, 100); }
+void think() { sleep(0, 150); }
 
-void eat() { sleep(0, 200); }
+void eat() { sleep(0, 300); }
 
 int64_t philosopher(uint64_t argc, uint8_t *argv[]) {
   if (argc != 1) {
@@ -87,7 +91,6 @@ int64_t print_philos(uint64_t argc, uint8_t *argv[]) {
       print(" ");
     }
     print("\n");
-    sys_sem_post_asm(c_flag);
   }
   return 0;
 }
@@ -115,22 +118,24 @@ int64_t philos(uint64_t argc, uint8_t *argv[]) {
       break;
 
     case 'a':
-      sys_sem_wait_asm(mutex);
+    sys_sem_wait_asm(mutex);
       if (philo_count < MAX_PHILOS) {
         char aux[10];
-        philo_sem[philo_count] = sys_sem_init_asm(philo_count, 1);
+        philo_sem[philo_count] = sys_sem_init_asm(philo_count, 0);
+        states[philo_count] = THINKING;
         itoa(philo_count, aux);
         diners[philo_count] = sys_create_process_asm(
             philosopher, 1, (uint8_t *[]){aux}, "philosopher", 0);
-        states[philo_count] = THINKING;
         philo_count++;
       }
       sys_sem_post_asm(mutex);
         break;
 
     case 'd':
-        sys_sem_wait_asm(mutex);
+    sys_sem_wait_asm(mutex);
         if (philo_count > MIN_PHILOS) {
+            states[philo_count-1] = THINKING;
+            states[philo_count - 2] = THINKING;
             philo_count--;
             sys_kill_asm(diners[philo_count]);
             sys_sem_destroy_asm(philo_sem[philo_count]);
