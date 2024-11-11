@@ -39,23 +39,12 @@ int64_t check_invalid_opcode(uint64_t argc, uint8_t *argv[]) {
   return 1;
 }
 
-int64_t get_registers(uint64_t argc, uint8_t *argv[]) {
-  sys_get_registers_asm();
-  return 1;
-}
-
 int64_t mem(uint64_t argc, uint8_t *argv[]) {
   return fn_wrapper(argc, argv, mem_fn, (uint8_t *)"mem");
 }
 
 int64_t philos(uint64_t argc, uint8_t *argv[]) {
   return fn_wrapper(argc, argv, philos_fn, (uint8_t *)"philos");
-}
-
-int64_t run_eliminator(uint64_t argc, uint8_t *argv[]) {
-  eliminator_menu();
-  sys_clear_screen_asm();
-  return 1;
 }
 
 int64_t increase_text_size(uint64_t argc, uint8_t *argv[]) {
@@ -178,20 +167,17 @@ void play_song(uint8_t id) {
 }
 
 static uint8_t *commands[] = {
-    (uint8_t *)"help",     (uint8_t *)"divzero",   (uint8_t *)"inopcode",
-    (uint8_t *)"time",     (uint8_t *)"regstatus", (uint8_t *)"eliminator",
-    (uint8_t *)"inctext",  (uint8_t *)"dectext",   (uint8_t *)"clear",
-    (uint8_t *)"testproc", (uint8_t *)"testprio",  (uint8_t *)"ps",
-    (uint8_t *)"testsem",  (uint8_t *)"testipc",   (uint8_t *)"mem",
-    (uint8_t *)"loop",     (uint8_t *)"cat",       (uint8_t *)"wc",
-    (uint8_t *)"filter",   (uint8_t *)"philos"};
+    (uint8_t *)"help",  (uint8_t *)"divzero",  (uint8_t *)"inopcode",
+    (uint8_t *)"time",  (uint8_t *)"inctext",  (uint8_t *)"dectext",
+    (uint8_t *)"clear", (uint8_t *)"testproc", (uint8_t *)"testprio",
+    (uint8_t *)"ps",    (uint8_t *)"testsem",  (uint8_t *)"testipc",
+    (uint8_t *)"mem",   (uint8_t *)"loop",     (uint8_t *)"cat",
+    (uint8_t *)"wc",    (uint8_t *)"filter",   (uint8_t *)"philos"};
 
 static fn functions[] = {help,
                          check_div_by_zero,
                          check_invalid_opcode,
                          get_time,
-                         get_registers,
-                         run_eliminator,
                          increase_text_size,
                          decrease_text_size,
                          clear,
@@ -243,16 +229,11 @@ uint64_t get_command(uint8_t *str) {
     uint8_t *command;
     one_param_fn function;
 
-    uint8_t *command1 = (uint8_t *)"playsong";
     uint8_t *command2 = (uint8_t *)"kill";
     uint8_t *command3 = (uint8_t *)"block";
     uint8_t *command4 = (uint8_t *)"unblock";
 
     switch (str[0]) {
-    case 'p':
-      command = command1;
-      function = play_song;
-      break;
     case 'k':
       command = command2;
       function = kill;

@@ -81,11 +81,7 @@ int64_t endless_loop_print(uint64_t argc, uint8_t *argv[]) {
   itoa(sys_getpid_asm(), pid_s);
 
   while (1) {
-    if (argc == 1) {
-      printerr(pid_s);
-    } else {
-      print(pid_s);
-    }
+    print(pid_s);
     bussy_wait(wait);
   }
   return 0;

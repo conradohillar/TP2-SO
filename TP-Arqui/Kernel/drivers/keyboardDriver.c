@@ -72,35 +72,18 @@ void keyboard_handler() {
         ascii = qwerty_ES_uppercase[key_scan_code];
     }
   }
-  if (state[0] && (ascii == SAVE_REGS_SHORTCUT)) {
-    save_registers();
-  }
   if (state[0] && (ascii == KILL_PROCESS_SHORTCUT ||
                    ascii == KILL_PROCESS_SHORTCUT - ('a' - 'A'))) {
-    process_control_block *pcb = get_process_fg(my_pm);
-    if (pcb != NULL) {
 
-      if (kill(my_pm, pcb->pid)) {
-        put_string_nt((uint8_t *)"\nProcess \"", YELLOW, BLACK);
-        put_string_nt(pcb->name, YELLOW, BLACK);
-        put_string_nt((uint8_t *)"\" terminated by Ctrl + C\n", YELLOW, BLACK);
-      }
-      ascii = 0;
-      write_pipe(my_pipe_manager, get_pipe(my_pipe_manager, STDIN), &ascii, 1);
-      return;
+    uint8_t *name = kill_process_in_fg(my_pm);
+    if (name != NULL) {
+      put_string_nt((uint8_t *)"\nProcess \"", YELLOW, BLACK);
+      put_string_nt(name, YELLOW, BLACK);
+      put_string_nt((uint8_t *)"\" terminated by Ctrl + C\n", YELLOW, BLACK);
     }
-    // uint64_t pid = getpid(my_pm);kj
-    // process_control_block *pcb;
-    // while (pid != INIT_PID) {
-    //   pcb = get_PCB(my_pm, pid);
-    //   if (pcb->in_fg) {
-    //     break;
-    //   }
-    //   pid = pcb->parent_pid;
-    // }
-    // if (pid) {
-    //   kill(my_pm, pid);
-    // }
+    ascii = 0;
+    write_pipe(my_pipe_manager, get_pipe(my_pipe_manager, STDIN), &ascii, 1);
+    return;
   }
   if (state[0] &&
       (ascii == EOF_SHORTCUT || ascii == EOF_SHORTCUT - ('a' - 'A'))) {

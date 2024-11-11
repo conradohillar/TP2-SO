@@ -144,8 +144,8 @@ int8_t set_fd(processManagerADT pm, uint16_t fd, uint16_t pipe_id);
 int16_t get_fd(processManagerADT pm, uint16_t fd);
 
 /**
- * Returns the process control block of the process in the foreground.
+ * Kills the process in the foreground.
  */
-process_control_block *get_process_fg(processManagerADT pm);
+uint8_t *kill_process_in_fg(processManagerADT pm);
 
 #endif

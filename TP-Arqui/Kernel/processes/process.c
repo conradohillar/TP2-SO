@@ -418,6 +418,23 @@ int16_t get_fd(processManagerADT pm, uint16_t fd) {
   return pcb->fds[fd];
 }
 
-process_control_block *get_process_fg(processManagerADT pm) {
-  return pm->process_table[pm->current_pid_in_fg].pcb;
+uint8_t *kill_process_in_fg(processManagerADT pm) {
+  uint64_t pid = pm->current_pid_in_fg;
+  uint64_t ppid = pm->process_table[pid].pcb->parent_pid;
+  if (pid == SHELL_PID) {
+    return NULL;
+  }
+  uint8_t *name = pm->process_table[pid].pcb->name;
+
+  if (pm->process_table[ppid].pcb->in_fg &&
+      pm->process_table[ppid].pcb->status == BLOCKED && ppid != SHELL_PID) {
+    name = pm->process_table[ppid].pcb->name;
+    if (!kill(pm, ppid)) {
+      return NULL;
+    }
+  }
+  if (!kill(pm, pid)) {
+    return NULL;
+  }
+  return name;
 }

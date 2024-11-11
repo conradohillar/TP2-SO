@@ -4,7 +4,6 @@
 #include <registers.h>
 #include <stdint.h>
 
-#define SAVE_REGS_SHORTCUT 'r'
 #define KILL_PROCESS_SHORTCUT 'c'
 #define EOF_SHORTCUT 'd'
 

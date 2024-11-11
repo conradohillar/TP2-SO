@@ -375,7 +375,6 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
     sys_set_fd_asm(STDOUT, satoi(argv[0]));
   }
 
-  uint8_t *supertab = (uint8_t *)"\t\t\t\t";
   printcolor((uint8_t *)"help       ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints a list of all possible commands\n", GRAY,
              BLACK);
@@ -387,12 +386,6 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor(
       (uint8_t *)" - returns the current system time in HH:MM:SS format\n",
       GRAY, BLACK);
-  printcolor((uint8_t *)"regstatus  ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - prints the values of the CPU registers\n", GRAY,
-             BLACK);
-  print((uint8_t *)"\t\t\t ");
-  printcolor((uint8_t *)"press Ctrl + r to save the register states\n", GRAY,
-             BLACK);
   printcolor((uint8_t *)"testproc   ", ORANGE, BLACK);
   printcolor((uint8_t *)" - Runs test for creating and scheduling processes\n",
              GRAY, BLACK);
@@ -408,6 +401,13 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)" - Runs test for memory manager, where N is the max "
                         "memory size\n",
              GRAY, BLACK);
+  printcolor((uint8_t *)"philos     ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - Runs the dining philosophers problem\n", GRAY,
+             BLACK);
+  printcolor(
+      (uint8_t *)"\t\t\t  Press A to add a philosopher, D to remove one, "
+                 "Q to quit\n",
+      GRAY, BLACK);
   printcolor((uint8_t *)"ps         ", ORANGE, BLACK);
   printcolor((uint8_t *)" - prints the process table\n", GRAY, BLACK);
   printcolor((uint8_t *)"mem        ", ORANGE, BLACK);
@@ -437,8 +437,10 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
   printcolor((uint8_t *)"unblock PID", ORANGE, BLACK);
   printcolor((uint8_t *)" - unblocks the process with specified PID\n", GRAY,
              BLACK);
-  printcolor((uint8_t *)"eliminator ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - play the \"Eliminator\" game\n", GRAY, BLACK);
+  printcolor((uint8_t *)"nice N M   ", ORANGE, BLACK);
+  printcolor((uint8_t *)" - changes the priority of the process with PID N to "
+                        "the priority M\n",
+             GRAY, BLACK);
   printcolor((uint8_t *)"inctext    ", ORANGE, BLACK);
   printcolor((uint8_t *)" - increases the size of the text, (max: 2)\n", GRAY,
              BLACK);
@@ -447,24 +449,6 @@ int64_t help_fn(uint64_t argc, uint8_t *argv[]) {
              BLACK);
   printcolor((uint8_t *)"clear      ", ORANGE, BLACK);
   printcolor((uint8_t *)" - clears the screen\n", GRAY, BLACK);
-  printcolor((uint8_t *)"playsong N ", ORANGE, BLACK);
-  printcolor((uint8_t *)" - plays the N-th tune, being N:\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"1: Starting beep sound\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"2: Happy birthday\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"3: La Cucaracha\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"4: The Imperial March\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"5: Dale Dale Bo'\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"6: Game Over! sound\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"7: Terraria - Day\n", GRAY, BLACK);
-  print(supertab);
-  printcolor((uint8_t *)"8: Himno Nacional Argentino\n", GRAY, BLACK);
 
   if (argc) {
     print((uint8_t *)"\0");
