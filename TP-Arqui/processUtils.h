@@ -20,6 +20,13 @@ typedef struct ps_struct {
   uint64_t count;
 } ps_struct;
 
+typedef struct mem_info {
+  uint64_t mem_start_address;
+  uint64_t total_mem;
+  uint64_t used_mem;
+  uint64_t free_mem;
+} mem_info;
+
 typedef uint8_t semaphore;
 
 #endif

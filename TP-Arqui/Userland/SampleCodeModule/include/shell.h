@@ -56,6 +56,8 @@ void kill(uint8_t pid);
 
 void kill_by_name(uint8_t *name);
 
+void kill_zombies();
+
 void block(uint8_t pid);
 
 void unblock(uint8_t pid);

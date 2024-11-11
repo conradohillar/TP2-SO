@@ -161,11 +161,14 @@ void pipe_functions(fn fn1, fn fn2) {
   }
   uint8_t aux[10];
   itoa(pipe_id, aux);
-  uint8_t *args[] = {(uint8_t *)"1", aux};
-  uint64_t pid1 = sys_create_process_asm(fn1, 2, args, (uint8_t *)"pipe1", 0);
-  uint64_t pid2 = sys_create_process_asm(fn2, 2, args, (uint8_t *)"pipe2", 1);
-  sys_waitpid_asm(pid1);
+  uint8_t *args_bg[] = {(uint8_t *)"0", aux};
+  uint8_t *args_fg[] = {(uint8_t *)"1", aux};
+  uint64_t pid1 =
+      sys_create_process_asm(fn1, 2, args_bg, (uint8_t *)"pipe1", 0);
+  uint64_t pid2 =
+      sys_create_process_asm(fn2, 2, args_fg, (uint8_t *)"pipe2", 1);
   sys_waitpid_asm(pid2);
+  sys_kill_asm(pid1);
   sys_destroy_pipe_asm(pipe_id);
 }
 
@@ -342,6 +345,7 @@ void run_shell() {
   printcolor((uint8_t *)"Type \"help\" to see a list of commands\n", WHITE,
              BLUE);
   while (1) {
+    kill_zombies();
     uint64_t buff_pos = 0;
     printcolor((uint8_t *)">: ", GREEN, BLACK);
     uint8_t c;
@@ -376,6 +380,16 @@ void run_shell() {
 void kill(uint8_t pid) { sys_kill_asm(pid); }
 
 void kill_by_name(uint8_t *name) { sys_kill_by_name_asm(name); }
+
+void kill_zombies() {
+  ps_struct *ps = (ps_struct *)sys_ps_asm();
+  for (int i = 0; i < ps->count; i++) {
+    if (ps->info[i].state == ZOMBIE) {
+      sys_kill_asm(ps->info[i].pid);
+    }
+  }
+  sys_free_ps_asm(ps);
+}
 
 void block(uint8_t pid) { sys_block_asm(pid); }
 
