@@ -1,7 +1,7 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "../memory/memoryManager.h"
+#include <memoryManager.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -14,6 +14,8 @@ void free_list(listADT list);
 uint8_t add_to_list(listADT list, void *data);
 
 uint8_t remove_from_list(listADT list, void *data);
+
+void *remove_first(listADT list);
 
 void *list_next(const listADT list);
 

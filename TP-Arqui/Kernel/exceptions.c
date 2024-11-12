@@ -1,5 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <exceptions.h>
 
 void exception_dispatcher(int exception) {
@@ -41,7 +43,7 @@ void zero_division() {
   put_char('\n', BLACK, BLACK);
   put_string_nt((uint8_t *)"Press ENTER to return to shell", ORANGE, BLACK);
   _sti();
-  uint8_t buffer[1];
+  uint8_t buffer[1] = {0};
   while (buffer[0] != '\n') {
     sys_read(0, buffer, 1);
   }

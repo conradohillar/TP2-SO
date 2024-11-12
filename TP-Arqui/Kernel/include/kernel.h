@@ -3,15 +3,15 @@
 
 typedef int (*EntryPoint)();
 
-#include <../include/pipes.h>
-#include <../memory/memoryManager.h>
-#include <../processes/scheduler.h>
-#include <../semaphores/sempahores.h>
 #include <idtLoader.h>
 #include <lib.h>
+#include <memoryManager.h>
 #include <moduleLoader.h>
+#include <pipes.h>
 #include <process.h>
 #include <processManager.h>
+#include <scheduler.h>
+#include <sempahores.h>
 #include <stdint.h>
 
 #endif

@@ -1,5 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <pipes.h>
 #include <syscalls.h>
 
@@ -24,7 +26,6 @@ uint64_t sys_write(int16_t fd, uint8_t *buffer, uint64_t size,
                    uint32_t fore_color, uint32_t back_color) {
   switch (fd) {
   case -1:
-    return 0;
   case STDIN:
     return 0;
   case STDOUT:
@@ -109,9 +110,6 @@ void sys_set_priority(uint64_t pid, uint8_t new_priority) {
 }
 
 int8_t sys_sem_init(uint8_t id, uint8_t count) {
-  if (id >= MAX_USER_SEM_ID) {
-    return -1;
-  }
   sem_t *sem = sem_init(my_sm, id, count);
   if (sem == NULL) {
     return -1;
@@ -120,28 +118,15 @@ int8_t sys_sem_init(uint8_t id, uint8_t count) {
 }
 
 void sys_sem_wait(uint8_t id) {
-  if (id >= MAX_USER_SEM_ID) {
-    return;
-  }
   sem_wait(my_sm, get_running(my_scheduler), get_sem(my_sm, id));
 }
 
-void sys_sem_post(uint8_t id) {
-  if (id >= MAX_USER_SEM_ID) {
-    return;
-  }
-  sem_post(my_sm, get_sem(my_sm, id));
-}
+void sys_sem_post(uint8_t id) { sem_post(my_sm, get_sem(my_sm, id)); }
 
-void sys_sem_destroy(uint8_t id) {
-  if (id >= MAX_USER_SEM_ID) {
-    return;
-  }
-  sem_destroy(my_sm, get_sem(my_sm, id));
-}
+void sys_sem_destroy(uint8_t id) { sem_destroy(my_sm, get_sem(my_sm, id)); }
 
 int8_t sys_sem_open(uint8_t id) {
-  if (my_sm == NULL || id >= MAX_USER_SEM_ID) {
+  if (my_sm == NULL) {
     return -1;
   }
   if (get_sem(my_sm, id) == NULL) {
@@ -153,7 +138,7 @@ int8_t sys_sem_open(uint8_t id) {
   return (int8_t)id;
 }
 
-uint64_t sys_mem_status() { return mem_status(mem_manager); }
+uint64_t sys_mem_status() { return mem_status(); }
 
 int8_t sys_set_fd(uint16_t fd, uint16_t pipe_id) {
   return set_fd(my_pm, fd, pipe_id);

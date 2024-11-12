@@ -1,5 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <keyboardDriver.h>
 #include <pipes.h>
 #include <process.h>
@@ -24,11 +26,9 @@ static uint8_t qwerty_ES_uppercase[] = {
     'B',  'N',  'M',  ';',  ':',  '_',  '\0', '\0', '\0', ' ', '\0',
 };
 
-// es un vector de unos o ceros. uno dice que la tecla esta presionada y cero
-// que no
-//  pos      0       1       2           3
-// tecla     ctr l   sh l    capslock    sh r
-uint8_t state[3] = {0};
+//  pos       0      1       2       3
+//  key     ctr-l   sh-l  capslock  sh-r
+uint8_t state[4] = {0};
 
 static uint32_t key_scan_code = '\0';
 static uint8_t ascii = '\0';
@@ -62,11 +62,9 @@ void keyboard_handler() {
 
   default:
     key_scan_code = read;
-    if (key_scan_code < sizeof(qwerty_ES_lowercase) && key_scan_code >= 0) {
+    if (key_scan_code < sizeof(qwerty_ES_lowercase)) {
       ascii = qwerty_ES_lowercase[key_scan_code];
-      if ((((state[1] || state[3]) && !state[2]) ||
-           (state[2] && !(state[1] || state[3]))) &&
-          (is_letter(ascii))) {
+      if (((state[1] || state[3]) != state[2]) && is_letter(ascii)) {
         ascii = qwerty_ES_uppercase[key_scan_code];
       } else if ((state[1] || state[3]))
         ascii = qwerty_ES_uppercase[key_scan_code];
@@ -111,10 +109,6 @@ uint32_t get_key() {
   return aux;
 }
 
-/*
-Retorna el valor de ascii correspondiente al scancode
-de la tecla presionada o '\0' si no es imprimible.
-*/
 uint8_t get_ascii() {
   uint8_t aux = ascii;
   ascii = 0;

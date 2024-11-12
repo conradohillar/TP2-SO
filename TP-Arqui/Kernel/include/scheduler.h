@@ -1,8 +1,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include "./list.h"
-#include "./processManager.h"
+#include <list.h>
+#include <processManager.h>
 
 #define NULL ((void *)0)
 

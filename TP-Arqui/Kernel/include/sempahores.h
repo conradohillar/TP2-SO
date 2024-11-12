@@ -1,10 +1,10 @@
 #ifndef SEMAPHORES_H
 #define SEMAPHORES_H
 
-#include "../memory/memoryManager.h"
-#include "../processes/list.h"
-#include "../processes/scheduler.h"
+#include <list.h>
+#include <memoryManager.h>
 #include <process.h>
+#include <scheduler.h>
 #include <stdint.h>
 
 #define MAX_SEM_COUNT 1024

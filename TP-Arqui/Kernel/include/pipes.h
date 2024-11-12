@@ -2,7 +2,7 @@
 #define PIPES_H
 
 // #include "../processes/process.h"
-#include "../semaphores/sempahores.h"
+#include <sempahores.h>
 #include <stdint.h>
 
 // As there are 64 MAX_PROCESSES, we can have 4 pipes per process when using all

@@ -1,5 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <libc.h>
 #include <stddef.h>
 #include <syscaller.h>
@@ -594,7 +596,7 @@ int64_t wc_fn(uint64_t argc, uint8_t *argv[]) {
       if (c == '\n') {
         lines++;
       } else {
-        if (c != ' ' && c != '\t' && c != '\n') {
+        if (c != ' ' && c != '\t') {
           if (last_char == ' ' || last_char == '\t' || last_char == '\n') {
             words++;
           }

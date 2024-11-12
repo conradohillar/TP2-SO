@@ -1,4 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
@@ -252,16 +254,19 @@ static Block *create_block(void *block_pointer, uint8_t level) {
   return new_block;
 }
 
-uint64_t mem_status(memoryManagerADT mm) {
+uint64_t mem_status() {
   mem_info *info = (mem_info *)mm_malloc(sizeof(mem_info));
-  info->mem_start_address = (uint64_t)mm->mem_start;
-  info->total_mem = (uint64_t)mm->memory_size;
+  if (info == NULL) {
+    return 0;
+  }
+  info->mem_start_address = (uint64_t)mem_manager->mem_start;
+  info->total_mem = (uint64_t)mem_manager->memory_size;
   info->free_mem = 0;
-  for (int i = MIN_LEVEL; i < mm->max_level; i++) {
-    Block *current_block = mm->free_blocks_per_level[i];
+  for (uint64_t i = MIN_LEVEL; i < mem_manager->max_level; i++) {
+    Block *current_block = mem_manager->free_blocks_per_level[i];
     while (current_block != NULL) {
 
-      info->free_mem += (uint64_t)(1 << i);
+      info->free_mem += (uint64_t)((uint64_t)1 << i);
 
       current_block = current_block->next;
     }

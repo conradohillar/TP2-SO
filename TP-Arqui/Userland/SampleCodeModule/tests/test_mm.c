@@ -1,6 +1,8 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 // This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
@@ -80,11 +82,6 @@ int64_t test_mm_fn(uint64_t argc, uint8_t *argv[]) {
     for (i = 0; i < rq; i++)
       if (mm_rqs[i].address)
         sys_mm_free_asm(mm_rqs[i].address);
-  }
-
-  if (argc == 2) {
-    print((uint8_t *)"\0");
-    sys_set_fd_asm(STDOUT, STDOUT);
   }
 
   return 0;

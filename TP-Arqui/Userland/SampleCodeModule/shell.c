@@ -1,5 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <shell.h>
 
 #define MAX_TEXT_SIZE 2
@@ -11,7 +13,7 @@ static uint64_t scale = 1;
 static int64_t fn_wrapper(uint64_t argc, uint8_t *argv[], fn function,
                           uint8_t *name) {
   uint64_t child_argc = 0;
-  uint8_t *child_argv[1] = {(uint8_t *)'\0'};
+  uint8_t *child_argv[1] = {(uint8_t *)"\0"};
   if (argc == 2) {
     child_argc = 1;
     child_argv[0] = argv[1];
@@ -240,7 +242,7 @@ uint64_t get_command(uint8_t *str) {
       }
     }
 
-    uint8_t *command;
+    uint8_t *command = (uint8_t *)"";
     one_param_fn function;
 
     uint8_t *command2 = (uint8_t *)"kill";

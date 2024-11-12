@@ -2,13 +2,13 @@
 #define _SYSCALLS_H
 
 #include "../../processUtils.h"
-#include <../semaphores/sempahores.h>
 #include <keyboardDriver.h>
 #include <mytime.h>
 #include <process.h>
 #include <processManager.h>
 #include <registers.h>
 #include <rtcDriver.h>
+#include <sempahores.h>
 #include <soundDriver.h>
 #include <stdint.h>
 #include <textMode.h>

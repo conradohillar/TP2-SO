@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../../../processUtils.h"
 #include <libc.h>
 #include <stddef.h>
@@ -7,7 +9,6 @@
 #define MAX_PHILOS 10
 #define MIN_PHILOS 2
 #define START_PHILOS 4
-#define MUTEX_ID MAX_PHILOS + 1
 typedef uint8_t philo;
 
 philo diners[MAX_PHILOS];
@@ -21,6 +22,7 @@ int64_t philosopher(uint64_t argc, uint8_t *argv[]);
 
 void init_philos() {
   for (int i = 0; i < START_PHILOS; i++) {
+    sys_sem_destroy_asm(i);
     forks[i] = sys_sem_init_asm(i, 1);
     states[i] = (uint8_t *)".";
   }
@@ -31,6 +33,8 @@ void init_philos() {
     diners[i] = sys_create_process_asm(philosopher, 1, argv,
                                        (uint8_t *)"philosopher", 0);
   }
+  sys_sem_destroy_asm(print_flag);
+  sys_sem_destroy_asm(mutex);
   print_flag = sys_sem_init_asm(print_flag, 0);
   mutex = sys_sem_init_asm(mutex, 1);
 }

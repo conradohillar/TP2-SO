@@ -1,13 +1,15 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 // This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java:
 // https://pvs-studio.com
 
-#include "scheduler.h"
-#include "../include/textMode.h"
-#include "../memory/memoryManager.h"
-#include "process.h"
+#include <memoryManager.h>
+#include <process.h>
+#include <scheduler.h>
+#include <textMode.h>
 
 typedef struct schedulerCDT {
   listADT list;
@@ -75,6 +77,9 @@ uint64_t context_switch(schedulerADT scheduler, uint64_t stack_pointer) {
 
   process_control_block *next_process = schedule(scheduler);
 
+  if (next_process == NULL) {
+    return 0;
+  }
   return (uint64_t)next_process->stack_pointer;
 }
 
