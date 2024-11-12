@@ -91,5 +91,6 @@ uint64_t mem_status() {
 
   info->free_mem = free_blocks * BLOCK_SIZE;
   info->used_mem = (TOTAL_BLOCKS - free_blocks) * BLOCK_SIZE;
+  info->memory_manager = (uint8_t *)"FreeArray";
   return (uint64_t)info;
 }

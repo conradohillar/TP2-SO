@@ -161,9 +161,23 @@ void pipe_functions(fn fn1, fn fn2) {
   sys_destroy_pipe_asm(pipe_id);
 }
 
-void play_song(uint8_t id) {
-  if (id >= MIN_SONG_ID && id <= MAX_SONG_ID)
-    song_dispatcher(id);
+void pipe_testmem(uint8_t *param, fn fn2) {
+  int16_t pipe_id = sys_create_pipe_asm();
+  if (pipe_id < 0) {
+    printerr((uint8_t *)"Error creating pipe\n");
+    return;
+  }
+  uint8_t aux[10];
+  itoa(pipe_id, aux);
+  uint8_t *args_bg[] = {(uint8_t *)"1", param, aux};
+  uint8_t *args_fg[] = {(uint8_t *)"1", aux};
+  uint64_t pid1 =
+      sys_create_process_asm(test_mm, 3, args_bg, (uint8_t *)"pipe1", 1);
+  uint64_t pid2 =
+      sys_create_process_asm(fn2, 2, args_fg, (uint8_t *)"pipe2", 1);
+  sys_waitpid_asm(pid2);
+  sys_kill_asm(pid1);
+  sys_destroy_pipe_asm(pipe_id);
 }
 
 static uint8_t *commands[] = {
@@ -308,6 +322,24 @@ uint64_t get_command(uint8_t *str) {
     } else if (strcmp(input[0], (uint8_t *)"kill") == 0 &&
                strcmp(input[1], (uint8_t *)"name") == 0) {
       kill_by_name(input[2]);
+      return 1;
+    }
+  }
+
+  if (count == 4) {
+    if ((strcmp(input[0], (uint8_t *)"testmem") == 0) && is_number(input[1]) &&
+        (strcmp(input[2], (uint8_t *)"|") == 0)) {
+      fn fn2 = NULL;
+      for (int i = 0; i < (sizeof(commands) / sizeof(uint8_t *)); i++) {
+        if (strcmp(commands[i], input[3]) == 0) {
+          fn2 = functions[i];
+          break;
+        }
+      }
+      if (fn2 == NULL) {
+        return 0;
+      }
+      pipe_testmem(input[1], fn2);
       return 1;
     }
   }

@@ -25,6 +25,7 @@ typedef struct mem_info {
   uint64_t total_mem;
   uint64_t used_mem;
   uint64_t free_mem;
+  uint8_t *memory_manager;
 } mem_info;
 
 typedef uint8_t semaphore;

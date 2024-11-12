@@ -5,6 +5,14 @@
 #include <syscaller.h>
 #include <tests.h>
 
+void play_startsound() {
+  make_sound(5, 262);
+  sleep(0, 30);
+  make_sound(50, 330);
+  sleep(0, 50);
+  make_sound(400, 534);
+}
+
 uint64_t printcolor(uint8_t *str, uint64_t fore_color, uint64_t back_color) {
   int16_t fd = sys_get_fd_asm(STDOUT);
   if (fd < 0) {
@@ -331,15 +339,18 @@ int64_t mem_fn(uint64_t argc, uint8_t *argv[]) {
   mem_info *info = (mem_info *)sys_mem_status_asm();
 
   print((uint8_t *)"\n MEMORY STATUS: \n\n");
-  printcolor((uint8_t *)" Memory start address: ", YELLOW, BLACK);
+  print((uint8_t *)"  Memory manager type: ");
+  printcolor(info->memory_manager, GRAY, BLACK);
+  print((uint8_t *)"\n");
+  print((uint8_t *)"  Memory start address: ");
   uint8_t mem_start_address[20] = {0};
   itoh(info->mem_start_address, mem_start_address);
-  printcolor(mem_start_address, YELLOW, BLACK);
+  printcolor(mem_start_address, GRAY, BLACK);
   print((uint8_t *)"\n\n  Total memory: ");
   uint8_t total_mem[20] = {0};
   itoa(info->total_mem, total_mem);
-  print(total_mem);
-  print((uint8_t *)" bytes\n");
+  printcolor(total_mem, GRAY, BLACK);
+  printcolor((uint8_t *)" bytes\n", GRAY, BLACK);
   print((uint8_t *)"  Used memory: ");
   uint8_t used_mem[20] = {0};
   itoa(info->used_mem, used_mem);

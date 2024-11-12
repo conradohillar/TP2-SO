@@ -267,5 +267,6 @@ uint64_t mem_status(memoryManagerADT mm) {
     }
   }
   info->used_mem = info->total_mem - info->free_mem;
+  info->memory_manager = (uint8_t *)"Buddy";
   return (uint64_t)info;
 }
